@@ -35,3 +35,7 @@
 *.root
 *.png
 *.pdf
+
+# Swap file
+*.swo
+*.swp
