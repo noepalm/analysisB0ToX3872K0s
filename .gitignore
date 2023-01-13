@@ -33,6 +33,7 @@
 
 # Graphycs
 *.root
+*.pcm
 *.png
 *.pdf
 
