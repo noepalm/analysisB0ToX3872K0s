@@ -32,6 +32,8 @@ $(OUTLIB)Prep.o: $(INCLUDEDIR)src/PrepAnalysis.C
 		$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)PrepAnalysis.o $<
 $(OUTLIB)MCbase_B0toX3872K0s.o: $(INCLUDEDIR)src/MCbase_B0toX3872K0s.C
 		$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)MCbase_B0toX3872K0s.o $<
+$(OUTLIB)RecoDecayX.o: $(INCLUDEDIR)src/RecoDecayX.C
+		$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)RecoDecayX.o $<
 $(OUTLIB)CheckGenLev.o: $(INCLUDEDIR)src/CheckGenLev.C 
 		$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)CheckGenLev.o $<
 $(OUTLIB)CheckGenLevPsi2S.o: $(INCLUDEDIR)src/CheckGenLevPsi2S.C 
@@ -41,13 +43,16 @@ GenLev:$(INCLUDEDIR)macro.cc\
 		$(OUTLIB)Prep.o\
 		$(OUTLIB)CheckGenLev.o\
 		$(OUTLIB)CheckGenLevPsi2S.o
-			$(CXX) $(CXXFLAGS) -ldl -o analysisGenLevel $(OUTLIB)/*.o $(GLIBS) $(LDFLAGS) $ $<
+		$(CXX) $(CXXFLAGS) -ldl -o analysisGenLevel $(OUTLIB)/*.o $(GLIBS) $(LDFLAGS) $ $<
 GenLev.clean:
 			 rm -f GenLev 
 
 
 # ==================== RECO LEVEL STUDY =============================================
-RecoLev:$(OUTLIB)MCbase_B0toX3872K0s.o$<
+RecoLev:$(INCLUDEDIR)src/RecoChainAnalysis.cc\
+		$(OUTLIB)MCbase_B0toX3872K0s.o\
+		$(OUTLIB)RecoDecayX.o
+		$(CXX) $(CXXFLAGS) -ldl -o RecoChainAnalysis $(OUTLIB)/*.o $(GLIBS) $(LDFLAGS) $ $<
 
 clean:
 		rm -f $(OUTLIB)*.o
@@ -56,3 +61,4 @@ clean:
 gen: GenLev
 
 reco: RecoLev
+
