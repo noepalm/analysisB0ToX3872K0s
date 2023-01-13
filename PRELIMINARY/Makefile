@@ -30,6 +30,8 @@ OUTLIB	         = $(INCLUDEDIR)/lib/
 
 $(OUTLIB)Prep.o: $(INCLUDEDIR)src/PrepAnalysis.C 
 		$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)PrepAnalysis.o $<
+$(OUTLIB)MCbase_B0toX3872K0s.o: $(INCLUDEDIR)src/MCbase_B0toX3872K0s.C
+		$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)MCbase_B0toX3872K0s.o $<
 $(OUTLIB)CheckGenLev.o: $(INCLUDEDIR)src/CheckGenLev.C 
 		$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)CheckGenLev.o $<
 $(OUTLIB)CheckGenLevPsi2S.o: $(INCLUDEDIR)src/CheckGenLevPsi2S.C 
@@ -43,8 +45,14 @@ GenLev:$(INCLUDEDIR)macro.cc\
 GenLev.clean:
 			 rm -f GenLev 
 
+
+# ==================== RECO LEVEL STUDY =============================================
+RecoLev:$(OUTLIB)MCbase_B0toX3872K0s.o$<
+
 clean:
 		rm -f $(OUTLIB)*.o
 		rm -f GenLev
 
 gen: GenLev
+
+reco: RecoLev
