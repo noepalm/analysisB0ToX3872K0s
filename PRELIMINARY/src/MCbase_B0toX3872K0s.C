@@ -46,6 +46,7 @@ void MCbase_B0toX3872K0s::GenPartFillP4(){
 
 	Int_t MumIdx = -1, MupIdx = -1, PimIdx = -1 , PipIdx = -1, JPsiIdx = -1, X3872Idx = -1, K0sIdx = -1, RhoIdx = -1, B0Idx = -1;
    for (UInt_t g = 0; g < nGenPart; g++){
+		//std::cout << g << " \t " << GenPart_pdgId[g] << " \t " << GenPart_genPartIdxMother[g] << std::endl;
 		// MUONS
 		if( (abs(GenPart_pdgId[g]) ==   isMum) &&
 			 (GenPart_pdgId[GenPart_genPartIdxMother[g]] == isJPsi) && 
