@@ -80,7 +80,7 @@ void CheckGenLev::Loop()
       if (ientry < 0) break;
       nb = fChain->GetEntry(jentry);   nbytes += nb;
 
-      //if (!HLT_DoubleMu4_PsiPrimeTrk_Displaced) continue;
+      if (!HLT_DoubleMu4_JpsiTrk_Displaced) continue;
 
       if ((jentry+1) % percentToPrint ==0) std::cout << "--> " << Form("%.0f",(float)(jentry+1)/nentries* 100.) << " \%"<< std::endl;
       // ------- GENERATOR -------//
