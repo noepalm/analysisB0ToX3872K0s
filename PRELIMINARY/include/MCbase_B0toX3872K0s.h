@@ -528,8 +528,6 @@ public :
 
    virtual void     GenPartFillP4();
 
-   private:
-
    // I/O
    TString tags_;
 
