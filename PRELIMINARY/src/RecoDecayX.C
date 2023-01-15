@@ -19,7 +19,7 @@ RecoDecayX::~RecoDecayX(){
 void RecoDecayX::Loop(){
 
     Long64_t nentries = fChain->GetEntriesFast();
-    const Long64_t Nbreak = 10;
+    const Long64_t Nbreak = nentries + 10;
     const Long64_t Nprint = (int)(nentries/20.);
 
 
@@ -31,29 +31,43 @@ void RecoDecayX::Loop(){
     TH1F h_Mu_TrkQlty_MC = TH1F("Mu_TrkQlty_MC", "", 3, -0.5, 2.5);
     TH1F h_Mu_TrkQlty_Fk = TH1F("Mu_TrkQlty_Fk", "", 3, -0.5, 2.5);
 
-    TH1F h_Pi_TrkQlty_MC = TH1F("Mu_TrkQlty_MC", "", 3, -0.5, 2.5);
-    TH1F h_Pi_TrkQlty_Fk = TH1F("Mu_TrkQlty_Fk", "", 3, -0.5, 2.5);
+    TH1F h_Pi_TrkQlty_MC = TH1F("Pi_TrkQlty_MC", "", 3, -0.5, 2.5);
+    TH1F h_Pi_TrkQlty_Fk = TH1F("Pi_TrkQlty_Fk", "", 3, -0.5, 2.5);
 
     int Nbins = 20;
-    TH1F h_Mu_dR_HLT_Dimuon25_Jpsi_MC = TH1F("Mu_dR_HLT_Dimuon25_Jpsi_MC", "", Nbins, 0., 0.01);
-    TH1F h_Mu_dR_HLT_Dimuon25_Jpsi_Fk = TH1F("Mu_dR_HLT_Dimuon25_Jpsi_Fk", "", Nbins, 0., 0.01);
-    TH1F h_Mu_dR_HLT_DoubleMu4_JpsiTrk_MC = TH1F("Mu_dR_HLT_DoubleMu4_JpsiTrk_MC", "", Nbins, 0., 0.01);
-    TH1F h_Mu_dR_HLT_DoubleMu4_JpsiTrk_Fk = TH1F("Mu_dR_HLT_DoubleMu4_JpsiTrk_Fk", "", Nbins, 0., 0.01);
-    Nbins = 500;
-    TH1F h_Pi_dR_HLT_DoubleMu4_JpsiTrk_MC = TH1F("Pi_dR_HLT_DoubleMu4_JpsiTrk_MC", "", Nbins, 0., 0.5);
-    TH1F h_Pi_dR_HLT_DoubleMu4_JpsiTrk_Fk = TH1F("Pi_dR_HLT_DoubleMu4_JpsiTrk_Fk", "", Nbins, 0., 0.5);
-    Nbins = 50;
-    TH1F h_PiPi_svProb_MC = TH1F("PiPi_svProb_MC", "", Nbins, 0., 1.);
-    TH1F h_PiPi_svProb_Fk = TH1F("PiPi_svProb_Fk", "", Nbins, 0., 1.);
+    double xlow = 0., xhigh = 0.005;
+    TH1F h_Mu_dR_HLT_Dimuon25_Jpsi_MC = TH1F("Mu_dR_HLT_Dimuon25_Jpsi_MC", "", Nbins, xlow, xhigh);
+    TH1F h_Mu_dR_HLT_Dimuon25_Jpsi_Fk = TH1F("Mu_dR_HLT_Dimuon25_Jpsi_Fk", "", Nbins, xlow, xhigh);
+    TH1F h_Mu_dR_HLT_DoubleMu4_JpsiTrk_MC = TH1F("Mu_dR_HLT_DoubleMu4_JpsiTrk_MC", "", Nbins, xlow, xhigh);
+    TH1F h_Mu_dR_HLT_DoubleMu4_JpsiTrk_Fk = TH1F("Mu_dR_HLT_DoubleMu4_JpsiTrk_Fk", "", Nbins, xlow, xhigh);
+    xlow = 0., xhigh = 0.1;
+    TH1F h_Pi_dR_HLT_DoubleMu4_JpsiTrk_MC = TH1F("Pi_dR_HLT_DoubleMu4_JpsiTrk_MC", "", Nbins, xlow, xhigh);
+    TH1F h_Pi_dR_HLT_DoubleMu4_JpsiTrk_Fk = TH1F("Pi_dR_HLT_DoubleMu4_JpsiTrk_Fk", "", Nbins, xlow, xhigh);
+    Nbins = 50, xlow = 0., xhigh = 1.;
+    TH1F h_PiPi_svProb_MC = TH1F("PiPi_svProb_MC", "", Nbins, xlow, xhigh);
+    TH1F h_PiPi_svProb_Fk = TH1F("PiPi_svProb_Fk", "", Nbins, xlow, xhigh);
 
+    xlow = 0., xhigh = 100;
+    TH1F h_K0s_LxySign_wrtBvtx_MC = TH1F("K0s_LxySign_wrtBvtx_MC", "", Nbins, xlow, xhigh);
+    TH1F h_K0s_LxySign_wrtBvtx_Fk = TH1F("K0s_LxySign_wrtBvtx_Fk", "", Nbins, xlow, xhigh);
+    Nbins = 20, xlow = 0., xhigh = 1.;
+    TH1F h_K0s_cosAlpha2D_MC = TH1F("K0s_cosAlpha2D_MC", "", Nbins, xlow, xhigh);
+    TH1F h_K0s_cosAlpha2D_Fk = TH1F("K0s_cosAlpha2D_Fk", "", Nbins, xlow, xhigh);
+    TH1F h_K0s_cosAlpha3D_MC = TH1F("K0s_cosAlpha3D_MC", "", Nbins, xlow, xhigh);
+    TH1F h_K0s_cosAlpha3D_Fk = TH1F("K0s_cosAlpha3D_Fk", "", Nbins, xlow, xhigh);
+    xlow = 0.999, xhigh = 1.;
+    TH1F h_B0_cosAlpha2D_MC = TH1F("B0_cosAlpha2D_MC", "", Nbins, xlow, xhigh);
+    TH1F h_B0_cosAlpha2D_Fk = TH1F("B0_cosAlpha2D_Fk", "", Nbins, xlow, xhigh);
+    TH1F h_B0_cosAlpha2DwrtBS_MC = TH1F("B0_cosAlpha2DwrtBS_MC", "", Nbins, xlow, xhigh);
+    TH1F h_B0_cosAlpha2DwrtBS_Fk = TH1F("B0_cosAlpha2DwrtBS_Fk", "", Nbins, xlow, xhigh);
+    TH1F h_B0_cosAlpha3D_MC = TH1F("B0_cosAlpha3D_MC", "", Nbins, xlow, xhigh);
+    TH1F h_B0_cosAlpha3D_Fk = TH1F("B0_cosAlpha3D_Fk", "", Nbins, xlow, xhigh);
+    Nbins = 50, xlow = 0., xhigh = 100;
+    TH1F h_B0_LxySign_wrtPV_MC = TH1F("B0_LxySign_wrtPV_MC", "", Nbins, xlow, xhigh);
+    TH1F h_B0_LxySign_wrtPV_Fk = TH1F("B0_LxySign_wrtPV_Fk", "", Nbins, xlow, xhigh);
+    TH1F h_B0_LxySign_wrtBS_MC = TH1F("B0_LxySign_wrtBS_MC", "", Nbins, xlow, xhigh);
+    TH1F h_B0_LxySign_wrtBS_Fk = TH1F("B0_LxySign_wrtBS_Fk", "", Nbins, xlow, xhigh);
 
-    TH1F h_K0s_LxySign_wrtBvtx_MC = TH1F("K0s_LxySign_wrtBvtx_MC", "", Nbins, 0, 100);
-    TH1F h_K0s_LxySign_wrtBvtx_Fk = TH1F("K0s_LxySign_wrtBvtx_Fk", "", Nbins, 0, 100);
-    Nbins = 10;
-    TH1F h_K0s_cosAlpha2D_MC = TH1F("K0s_cosAlpha2D_MC", "", Nbins, 0., 1.);
-    TH1F h_K0s_cosAlpha2D_Fk = TH1F("K0s_cosAlpha2D_Fk", "", Nbins, 0., 1.);
-    TH1F h_K0s_cosAlpha3D_MC = TH1F("K0s_cosAlpha3D_MC", "", Nbins, 0., 1.);
-    TH1F h_K0s_cosAlpha3D_Fk = TH1F("K0s_cosAlpha3D_Fk", "", Nbins, 0., 1.);
 
     // MCmatching variables
     bool isMCmatched_Mu1, isMCmatched_Mu2, isMCmatched_Pi1, isMCmatched_Pi2;
@@ -72,7 +86,7 @@ void RecoDecayX::Loop(){
         GenPartFillP4();
 
         // ----- FIND THE MONTE CARLO TRUTH
-        std::cout << " --- EV " << jentry << " with #B0 candidates " << nB0 << std::endl;
+        //std::cout << " --- EV " << jentry << " with #B0 candidates " << nB0 << std::endl;
         MCtruthMatching();
 
         for (Int_t b = 0; b  < nB0; b++){
@@ -154,7 +168,7 @@ void RecoDecayX::Loop(){
             h_K0s_LxySign_wrtBvtx_MC.Fill(B0_K0_lxySign_wrtBvtx[b]);
             h_K0s_cosAlpha2D_MC.Fill(fabs(B0_K0_cosAlpha2D[b]));
             h_K0s_cosAlpha3D_MC.Fill(fabs(B0_K0_cosAlpha3D[b]));
-    
+ 
         }else{
             h_K0s_LxySign_wrtBvtx_Fk.Fill(B0_K0_lxySign_wrtBvtx[b]);
             h_K0s_cosAlpha2D_Fk.Fill(fabs(B0_K0_cosAlpha2D[b]));
@@ -165,9 +179,19 @@ void RecoDecayX::Loop(){
         
         // *** B0 --> X(3872) K0s ***
         if (isMCmatched_B0){
+            h_B0_cosAlpha2D_MC.Fill(fabs(B0_cosAlpha2D_PV[b]));
+            h_B0_cosAlpha2DwrtBS_MC.Fill(fabs(B0_cosAlpha2D_BS[b]));
+            h_B0_cosAlpha3D_MC.Fill(fabs(B0_cosAlpha3D_PV[b]));
 
+            h_B0_LxySign_wrtPV_MC.Fill(B0_lxySign_PV[b]);
+            h_B0_LxySign_wrtBS_MC.Fill(B0_lxySign_BS[b]);
         }else{
+            h_B0_cosAlpha2D_Fk.Fill(fabs(B0_cosAlpha2D_PV[b]));
+            h_B0_cosAlpha2DwrtBS_Fk.Fill(fabs(B0_cosAlpha2D_BS[b]));
+            h_B0_cosAlpha3D_Fk.Fill(fabs(B0_cosAlpha3D_PV[b]));
 
+            h_B0_LxySign_wrtPV_Fk.Fill(B0_lxySign_PV[b]);
+            h_B0_LxySign_wrtBS_Fk.Fill(B0_lxySign_BS[b]);
         }
 
         if (isMCmatched_B0) N_B0matching++;
@@ -206,6 +230,18 @@ void RecoDecayX::Loop(){
     h_K0s_cosAlpha2D_Fk.Write();
     h_K0s_cosAlpha3D_MC.Write();
     h_K0s_cosAlpha3D_Fk.Write();
+
+
+    h_B0_cosAlpha2D_MC.Write();
+    h_B0_cosAlpha2D_Fk.Write();
+    h_B0_cosAlpha2DwrtBS_MC.Write();
+    h_B0_cosAlpha2DwrtBS_Fk.Write();
+    h_B0_cosAlpha3D_MC.Write();
+    h_B0_cosAlpha3D_Fk.Write();
+    h_B0_LxySign_wrtPV_MC.Write();
+    h_B0_LxySign_wrtPV_Fk.Write();
+    h_B0_LxySign_wrtBS_MC.Write();
+    h_B0_LxySign_wrtBS_Fk.Write();
 
     outFile_->Close();
     std::cout << "  ...[OUTPUT] output histograms written on file " << outFilePath_ << std::endl;
