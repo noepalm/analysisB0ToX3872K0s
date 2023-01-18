@@ -2,8 +2,12 @@
 
 #include <TFile.h>
 #include <TString.h>
+
 #include <TH1.h>
 #include <TH1F.h>
+#include <TGraph.h>
+#include <TMultiGraph.h>
+
 #include <TStyle.h>
 #include <TCanvas.h>
 #include <TLegend.h>
@@ -12,8 +16,9 @@
 using namespace std;
 //https://root.cern.ch/root/htmldoc/guides/users-guide/Histograms.html
 //This macro contains following functions:
-// draw_single_histogram(const TString histo_name)
-// draw_two_histograms()
+// void draw_single_histogram(const TString histo_name)
+// void draw_two_histograms()
+// TGraph* makeROCcurve(TH1F* sigHist, TH1F* bkgHist){
 
 TString inRootFile_  = "../outRoot/RecoDecay_X3872_UL17_X3872.root"; 
 TString outPath_     = "/eos/user/c/cbasile/www/B0toX3872K0s/GEN_LEVEL/";
@@ -47,6 +52,7 @@ Color_t PtlColorMap(const TString& particle){
 
   std::map <TString , Color_t> PtlColor{};
   PtlColor["mu"] = kPink + 5;
+  
   PtlColor["muL"] = kAzure + 5;
   PtlColor["muSL"] = kPink + 5;
   PtlColor["pi"] = kBlue - 4;
@@ -59,7 +65,12 @@ Color_t PtlColorMap(const TString& particle){
   PtlColor["B0"] = kViolet + 8;
 
   PtlColor["MCmatch"] = kAzure +1;
-  PtlColor["MCfake"] = kRed;
+  PtlColor["MCfake"]  = kRed;
+  PtlColor["mu_MC"]   = kBlue;
+  PtlColor["mu_Fk"]   = kPink + 5;
+  PtlColor["pi_MC"]   = kGreen + 1;
+  PtlColor["pi_Fk"]   = kYellow - 7;
+
   return PtlColor[particle];
 }
 
@@ -79,8 +90,12 @@ TString CategoryLegend(const TString& category){
   Leg_entry["Psi"] = "#psi (2S)";
   Leg_entry["B0"] = "B_{0} ";
 
-  Leg_entry["MCmatch"] = "MC matching";
-  Leg_entry["MCfake"] = "Fake";
+  Leg_entry["MCmatch"] = "B^{0} MC matching";
+  Leg_entry["MCfake"] = "B^{0} FAKE";
+  Leg_entry["mu_MC"] = "#mu MC matching";
+  Leg_entry["mu_Fk"] = "#mu FAKE";
+  Leg_entry["pi_MC"] = "#pi MC matching";
+  Leg_entry["pi_Fk"] = "#pi FAKE";
 
   return Leg_entry[category];
 }
@@ -103,9 +118,6 @@ void histoSetUp(TH1* histo, const TString& category, const TString& x_name, bool
 
   //NORMALIZATION
   if(norm )histo->Scale(1./histo->Integral());
-
-
-
 }
 
 TString pngName(TString histo_name){
@@ -228,122 +240,116 @@ int draw_two_histograms(const TString histo1,const TString& category1, const TSt
     return 0;
 }
 
-int draw_mass_histo(const TString histo_name, const TString particle){
-    
-    TFile* input_file = open_file();
 
-    TH1F* h = (TH1F*)input_file->Get(histo_name);
-    
-    if ( !h ){
-      std::cout<< "null pointer for histogram named " << histo_name << std::endl;
-      exit(-1);
-    }
-	 histoSetUp(h, particle, "M [GeV]");
-    
-    //LEGEND
-    auto legend = new TLegend(0.75,0.82,.89,.89);
-	 legend->SetBorderSize(0);
-	 legend->SetTextSize(0.04);
-    legend->AddEntry(h,CategoryLegend(particle),"l");
+int draw_binary_histo(const TString h_MCmatch, const TString MC_category, const TString& title,TString out_name){
 
-    //STATISTICS
-    gStyle->SetOptStat(0);
-    TString png_name = pngName(histo_name);
-    TString pdf_name = pdfName(histo_name);
-    TCanvas* c1 = new TCanvas("c1","canvas", 1024,1024);
-	
-	 h->Draw("HIST");
-    legend->Draw();
-    
-    c1->SaveAs(png_name);
-    c1->SaveAs(pdf_name);
+	  TFile* input_file = open_file();
 
-    input_file->Close();
-    return 0;
+	  TH1F* h1 = (TH1F*)input_file->Get(h_MCmatch);
+	  //TH1F* h2 = (TH1F*)input_file->Get(h_Fake);
 
-}//draw_pT()
+	  if ( !h1 ){
+		 std::cout<< "null pointer for histogram named " << h_MCmatch << std::endl;
+		 exit(-1);
+	  }
+	  //if ( !h2 ){
+		// std::cout<< "null pointer for histogram named " << h_Fake << std::endl;
+		// exit(-1);
+	  //}
+	  
+	  TString category1 = MC_category; //, category2 = Fk_category;
+	  //SETUP
+	  histoSetUp(h1, category1, title);
+	  h1->GetYaxis()->SetRangeUser(0.01, 3.);
+	  //histoSetUp(h2, category2, title);
+    h1->GetXaxis()->SetBinLabel(1, "FALSE"); h1->GetXaxis()->SetBinLabel(2, "TRUE");
+
+	  //STATISTICS
+	  gStyle->SetOptStat(0);
+	  gStyle->SetPaintTextFormat("1.4f");
+	  
+
+	  //LEGEND
+	  auto legend = new TLegend(0.62,0.8,.89,.89);
+		legend->SetBorderSize(0);
+	  legend->AddEntry(h1, CategoryLegend(category1) ,"f");
+	  //legend->AddEntry(h2, CategoryLegend(category2) ,"f");
+
+	  TCanvas* c1 = new TCanvas("c1","canvas", 1024, 1024);
+	  gPad->SetLogy();
+	  h1->Draw("HIST TEXT0");
+	  //h2->Draw("HIST TEXT0 SAME");
+
+	  gPad->RedrawAxis();
+	  legend->Draw();
+
+    if (out_name == "") out_name = h_MCmatch;
+	  c1->SaveAs(pngName(out_name));
+    c1->SaveAs(pdfName(out_name));
+	  input_file->Close();
+
+	  return 0;
+
+	}
 
 
-int draw_Eta_histo(const TString histo_name, const TString particle){
+void makeROCcurve(std::vector<TString> SGNhistos, std::vector<TString> BKGhistos, const TString out_name){
 
   TFile* input_file = open_file();
+  TH1F* sigHist = new TH1F();
+  TH1F* bkgHist = new TH1F();
+  
+  int Nobservables = SGNhistos.size();
+  int nbins;  
+  float sig_integral = 0, bkg_integral = 0;
+  
+  TCanvas* c1 = new TCanvas("c1","canvas", 1024, 1024);
+  TGraph* vec_graph[Nobservables]; 
+  TMultiGraph *mg = new TMultiGraph();
 
-  TH1F* h = (TH1F*)input_file->Get(histo_name);
-
-  if ( !h ){
-    std::cout<< "null pointer for histogram named " << histo_name << std::endl;
-    exit(-1);
-  }
-  histoSetUp(h, particle, "\\eta");
-
-  //LEGEND                                                                                                               
-  auto legend = new TLegend(0.75,0.82,.89,.89);
+  //LEGEND
+  auto legend = new TLegend(0.50,0.15,.80,.30);
   legend->SetBorderSize(0);
-  legend->SetTextSize(0.04);
-  legend->AddEntry(h,CategoryLegend(particle),"f");
+  legend->SetTextSize(0.03);
 
-  //STATISTICS                                                                                                           
-  gStyle->SetOptStat(0);
+  for (int j = 0; j < Nobservables; j++){
 
-  TString png_name = pngName(histo_name); 
-  TString pdf_name = pdfName(histo_name); 
-  TCanvas* c1 = new TCanvas("c1","canvas", 1024,1024);
-	gPad->SetLeftMargin(0.13);
-	gPad->SetBottomMargin(0.13);
-  h->Draw("HIST");
-  legend->Draw();
+    sigHist = (TH1F*)input_file->Get(SGNhistos[j]);
+    bkgHist = (TH1F*)input_file->Get(BKGhistos[j]);
 
-  c1->SaveAs(png_name);
-  c1->SaveAs(pdf_name);
+    nbins = sigHist->GetNbinsX();
+    sig_integral = sigHist->Integral(1,nbins);
+    bkg_integral = bkgHist->Integral(1,nbins);
+    std::cout << "Histo number " << j << std::endl;
+    std::cout<<" total int  sig: "<<sig_integral<<" bkg: "<<bkg_integral<<std::endl;
+    std::vector<float> sigPoints(nbins);
+    std::vector<float> bkgPoints(nbins);
+    for ( int i = nbins; i > 0; i-- ) {
+      float sig_slice_integral = sigHist->Integral(i,nbins);
+      float bkg_slice_integral = bkgHist->Integral(i,nbins);
+      sigPoints.push_back(sig_slice_integral/sig_integral);
+      bkgPoints.push_back(bkg_slice_integral/bkg_integral);
 
+      std::cout<<i<<" "<<sig_slice_integral<<" "<<sig_slice_integral/sig_integral<<" "<<bkg_slice_integral<<" "<<bkg_slice_integral/bkg_integral<<std::endl;
+    }
+    
+    vec_graph[j] = new TGraph(sigPoints.size(),&bkgPoints[0], &sigPoints[0]);
+    vec_graph[j]->SetLineWidth(4);
+    vec_graph[j]->SetLineColor(2+j);
+    legend->AddEntry(vec_graph[j], SGNhistos[j], "l");
+    mg->Add(vec_graph[j]);
+    
+    std::cout <<"\n -------------------------\n" << std::endl;
+  } // on observables
+  //g->GetXaxis()->SetTitle("signal efficiency"); g->GetYaxis()->SetTitle("background efficiency");
+
+    c1->cd();
+    mg->Draw("AL");
+    mg->SetTitle("; background efficiency; signal efficiency");
+    legend->Draw();
+    c1->SaveAs(pngName(out_name));
+    c1->SaveAs(pdfName(out_name));
+  
   input_file->Close();
 
-  return 0;
-
-}//drae_Eta()
-
-int draw_Mul(const TString histo_name, const TString particle){
-
-  TString root_file = "analysis_Multiplicity_UL17.root";
-  TFile* input_file = new TFile(root_file);
-
-  TH1I* h = (TH1I*)input_file->Get(histo_name);
-
-  if ( !h ){
-    std::cout<< "null pointer for histogram named " << histo_name << std::endl;
-    exit(-1);
-  }
-
-  histoSetUp(h, particle, "# candidates", true, false);
-  h->GetYaxis()->SetTitle("counts");
-  if(particle == "JPsi"){
-	  int Nbins = h->GetNbinsX();
-	  for (int i = 0; i < Nbins; i++) h->GetXaxis()->SetBinLabel(i+1,std::to_string(i).c_str());
-	  h->GetXaxis()->SetLabelSize(0.05);
-  }
-if(particle == "PiPi") h->GetXaxis()->SetNdivisions(5,kTRUE); 
-	
-  //LEGEND                                                                                                                                                                    
-  auto legend = new TLegend(0.65,0.75,.80,.80);
-  legend->SetBorderSize(0);
-  legend->SetTextSize(0.035);
-  legend->AddEntry(h,CategoryLegend(particle),"f");
-
-  //STATISTICS                                                                                                                                                                
-  gStyle->SetOptStat(0);
-
-  TString png_name = pngName(histo_name); 
-  TString pdf_name = pdfName(histo_name); 
-  TCanvas* c1 = new TCanvas("c1","canvas", 1024,1024);
-	gPad->SetLeftMargin(0.13);
-	gPad->SetBottomMargin(0.13);
-  h->Draw("HIST");
-  legend->Draw();
-
-  c1->SaveAs(png_name);
-  c1->SaveAs(pdf_name);
-
-  input_file->Close();
-  return 0;
-
-}//draw_mul()   
+}
