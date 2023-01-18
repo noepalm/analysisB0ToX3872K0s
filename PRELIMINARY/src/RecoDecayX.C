@@ -43,16 +43,17 @@ void RecoDecayX::Loop(){
     xlow = 0., xhigh = 0.1;
     TH1F h_Pi_dR_HLT_DoubleMu4_JpsiTrk_MC = TH1F("Pi_dR_HLT_DoubleMu4_JpsiTrk_MC", "", Nbins, xlow, xhigh);
     TH1F h_Pi_dR_HLT_DoubleMu4_JpsiTrk_Fk = TH1F("Pi_dR_HLT_DoubleMu4_JpsiTrk_Fk", "", Nbins, xlow, xhigh);
-    Nbins = 50, xlow = 0., xhigh = 1.;
+    Nbins = 20, xlow = 0., xhigh = 1.;
     TH1F h_PiPi_svProb_MC = TH1F("PiPi_svProb_MC", "", Nbins, xlow, xhigh);
     TH1F h_PiPi_svProb_Fk = TH1F("PiPi_svProb_Fk", "", Nbins, xlow, xhigh);
 
     xlow = 0., xhigh = 100;
     TH1F h_K0s_LxySign_wrtBvtx_MC = TH1F("K0s_LxySign_wrtBvtx_MC", "", Nbins, xlow, xhigh);
     TH1F h_K0s_LxySign_wrtBvtx_Fk = TH1F("K0s_LxySign_wrtBvtx_Fk", "", Nbins, xlow, xhigh);
-    Nbins = 20, xlow = 0., xhigh = 1.;
+    Nbins = 20, xlow = 0.999, xhigh = 1.;
     TH1F h_K0s_cosAlpha2D_MC = TH1F("K0s_cosAlpha2D_MC", "", Nbins, xlow, xhigh);
     TH1F h_K0s_cosAlpha2D_Fk = TH1F("K0s_cosAlpha2D_Fk", "", Nbins, xlow, xhigh);
+    xlow = 0., xhigh = 1.;
     TH1F h_K0s_cosAlpha3D_MC = TH1F("K0s_cosAlpha3D_MC", "", Nbins, xlow, xhigh);
     TH1F h_K0s_cosAlpha3D_Fk = TH1F("K0s_cosAlpha3D_Fk", "", Nbins, xlow, xhigh);
     xlow = 0.999, xhigh = 1.;
@@ -113,16 +114,16 @@ void RecoDecayX::Loop(){
             if (Muon_trackQuality[B0_mu1_idx[b]] < 2) h_Mu_TrkQlty_MC.Fill(Muon_trackQuality[B0_mu1_idx[b]]);
             else h_Mu_TrkQlty_MC.Fill(2);
 
-            h_Mu_dR_HLT_Dimuon25_Jpsi_MC.Fill(B0_MuMu_mu1_dr_Dimuon25_Jpsi[b]);
-            h_Mu_dR_HLT_DoubleMu4_JpsiTrk_MC.Fill(B0_MuMu_mu1_dr_DoubleMu4_JpsiTrk_Displaced[b]);
+            if (HLT_Dimuon25_Jpsi) h_Mu_dR_HLT_Dimuon25_Jpsi_MC.Fill(B0_MuMu_mu1_dr_Dimuon25_Jpsi[b]);
+            if (HLT_DoubleMu4_JpsiTrk_Displaced) h_Mu_dR_HLT_DoubleMu4_JpsiTrk_MC.Fill(B0_MuMu_mu1_dr_DoubleMu4_JpsiTrk_Displaced[b]);
         }else{
             h_Mu_SoftID_Fk.Fill(Muon_softId[B0_mu1_idx[b]]);
             h_Mu_GlobalMu_Fk.Fill(Muon_isGlobal[B0_mu1_idx[b]]);
             if (Muon_trackQuality[B0_mu1_idx[b]] < 2) h_Mu_TrkQlty_Fk.Fill(Muon_trackQuality[B0_mu1_idx[b]]);
             else h_Mu_TrkQlty_Fk.Fill(2);
 
-            h_Mu_dR_HLT_Dimuon25_Jpsi_Fk.Fill(B0_MuMu_mu1_dr_Dimuon25_Jpsi[b]);
-            h_Mu_dR_HLT_DoubleMu4_JpsiTrk_Fk.Fill(B0_MuMu_mu1_dr_DoubleMu4_JpsiTrk_Displaced[b]);
+            if (HLT_Dimuon25_Jpsi) h_Mu_dR_HLT_Dimuon25_Jpsi_Fk.Fill(B0_MuMu_mu1_dr_Dimuon25_Jpsi[b]);
+            if (HLT_DoubleMu4_JpsiTrk_Displaced) h_Mu_dR_HLT_DoubleMu4_JpsiTrk_Fk.Fill(B0_MuMu_mu1_dr_DoubleMu4_JpsiTrk_Displaced[b]);
         }
         if (isMCmatched_Mu2){
             h_Mu_SoftID_MC.Fill(Muon_softId[B0_mu2_idx[b]]);
@@ -145,40 +146,45 @@ void RecoDecayX::Loop(){
         
         // *** Rho --> Pi+Pi-  ***
         if(isMCmatched_Pi1){
-            h_Pi_dR_HLT_DoubleMu4_JpsiTrk_MC.Fill(B0_PiPi_p1_dr_DoubleMu4_JpsiTrk_Displaced[b]);
+            if (HLT_DoubleMu4_JpsiTrk_Displaced) h_Pi_dR_HLT_DoubleMu4_JpsiTrk_MC.Fill(B0_PiPi_p1_dr_DoubleMu4_JpsiTrk_Displaced[b]);
         }else{
-            h_Pi_dR_HLT_DoubleMu4_JpsiTrk_Fk.Fill(B0_PiPi_p1_dr_DoubleMu4_JpsiTrk_Displaced[b]);
+            if (HLT_DoubleMu4_JpsiTrk_Displaced) h_Pi_dR_HLT_DoubleMu4_JpsiTrk_Fk.Fill(B0_PiPi_p1_dr_DoubleMu4_JpsiTrk_Displaced[b]);
             //std::cout << B0_PiPi_p1_dr_DoubleMu4_JpsiTrk_Displaced[b]<< std::endl;
         }
         if (isMCmatched_Pi2)
         {
-            h_Pi_dR_HLT_DoubleMu4_JpsiTrk_MC.Fill(B0_PiPi_p2_dr_DoubleMu4_JpsiTrk_Displaced[b]);   
+            if (HLT_DoubleMu4_JpsiTrk_Displaced) h_Pi_dR_HLT_DoubleMu4_JpsiTrk_MC.Fill(B0_PiPi_p2_dr_DoubleMu4_JpsiTrk_Displaced[b]);   
         }else{
-            h_Pi_dR_HLT_DoubleMu4_JpsiTrk_Fk.Fill(B0_PiPi_p2_dr_DoubleMu4_JpsiTrk_Displaced[b]);
+            if (HLT_DoubleMu4_JpsiTrk_Displaced) h_Pi_dR_HLT_DoubleMu4_JpsiTrk_Fk.Fill(B0_PiPi_p2_dr_DoubleMu4_JpsiTrk_Displaced[b]);
         }
         if (isMCmatched_Rho){
-            h_PiPi_svProb_MC.Fill(B0_PiPi_sv_prob[b]);
+            
         }else{
-            h_PiPi_svProb_Fk.Fill(B0_PiPi_sv_prob[b]);
+           
         }
         
 
         // *** K0short ***
         if (isMCmatched_K0s){
-            h_K0s_LxySign_wrtBvtx_MC.Fill(B0_K0_lxySign_wrtBvtx[b]);
-            h_K0s_cosAlpha2D_MC.Fill(fabs(B0_K0_cosAlpha2D[b]));
-            h_K0s_cosAlpha3D_MC.Fill(fabs(B0_K0_cosAlpha3D[b]));
  
         }else{
-            h_K0s_LxySign_wrtBvtx_Fk.Fill(B0_K0_lxySign_wrtBvtx[b]);
-            h_K0s_cosAlpha2D_Fk.Fill(fabs(B0_K0_cosAlpha2D[b]));
-            h_K0s_cosAlpha3D_Fk.Fill(fabs(B0_K0_cosAlpha3D[b]));
+            
 
         }
         
         
         // *** B0 --> X(3872) K0s ***
         if (isMCmatched_B0){
+
+            // Rho
+            h_PiPi_svProb_MC.Fill(B0_PiPi_sv_prob[b]);
+
+            //K0short
+            h_K0s_LxySign_wrtBvtx_MC.Fill(B0_K0_lxySign_wrtBvtx[b]);
+            h_K0s_cosAlpha2D_MC.Fill(fabs(B0_K0_cosAlpha2D[b]));
+            h_K0s_cosAlpha3D_MC.Fill(fabs(B0_K0_cosAlpha3D[b]));
+
+            //B0
             h_B0_cosAlpha2D_MC.Fill(fabs(B0_cosAlpha2D_PV[b]));
             h_B0_cosAlpha2DwrtBS_MC.Fill(fabs(B0_cosAlpha2D_BS[b]));
             h_B0_cosAlpha3D_MC.Fill(fabs(B0_cosAlpha3D_PV[b]));
@@ -186,6 +192,15 @@ void RecoDecayX::Loop(){
             h_B0_LxySign_wrtPV_MC.Fill(B0_lxySign_PV[b]);
             h_B0_LxySign_wrtBS_MC.Fill(B0_lxySign_BS[b]);
         }else{
+
+            // Rho
+            h_PiPi_svProb_Fk.Fill(B0_PiPi_sv_prob[b]);
+
+            //K0short
+            h_K0s_LxySign_wrtBvtx_Fk.Fill(B0_K0_lxySign_wrtBvtx[b]);
+            h_K0s_cosAlpha2D_Fk.Fill(fabs(B0_K0_cosAlpha2D[b]));
+            h_K0s_cosAlpha3D_Fk.Fill(fabs(B0_K0_cosAlpha3D[b]));
+
             h_B0_cosAlpha2D_Fk.Fill(fabs(B0_cosAlpha2D_PV[b]));
             h_B0_cosAlpha2DwrtBS_Fk.Fill(fabs(B0_cosAlpha2D_BS[b]));
             h_B0_cosAlpha3D_Fk.Fill(fabs(B0_cosAlpha3D_PV[b]));

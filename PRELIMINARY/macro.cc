@@ -85,6 +85,9 @@ int main (int argc, char* argv[]){
 	std::string DirPath = argv[1];
 	TString tag = argv[2];
 	std::string channel = argv[3];
+	if(channel == "SGN") tag = "X3872_"+ tag; 
+	else if (channel == "NORM") tag = "Psi2S_" + tag;
+
 	TChain* chain = TChainLoader(DirPath);
 
 	if (channel == "SGN"){
