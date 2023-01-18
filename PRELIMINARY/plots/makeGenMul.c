@@ -2,6 +2,10 @@
 	gStyle->SetLineWidth(3);
 	gStyle->SetPadTickX(1);
 	gStyle->SetPadTickY(1);
+
+  SetInputFile("./outRoot/CheckGenLev_UL17_trkFix_X3872.root");
+  SetOutputFile("/eos/user/c/cbasile/www/B0toX3872K0s/GEN_LEVEL/GenUL17_X3872_trkFixNewReco/");
+
 	// HISTO TRANSVERSE MOMENTUM
   draw_pT_histo("gen_pt_mu", "mu");
   draw_pT_histo("gen_pt_pi", "pi");
@@ -21,15 +25,15 @@
   draw_Eta_histo("gen_eta_Ks", "Ks");
   draw_Eta_histo("gen_eta_B", "B0");
 
-  //HISTO MULTIPLICITY
-  draw_Mul("nB0", "B0");
-  draw_Mul("nK0s", "Ks");
-  draw_Mul("nJPsi", "JPsi");
-  draw_Mul("nPiPi", "PiPi");
-  draw_Mul("nMuon", "mu");
-  draw_Mul("nTracks", "pi");
+//  //HISTO MULTIPLICITY
+//  draw_Mul("nB0", "B0");
+//  draw_Mul("nK0s", "Ks");
+//  draw_Mul("nJPsi", "JPsi");
+//  draw_Mul("nPiPi", "PiPi");
+//  draw_Mul("nMuon", "mu");
+//  draw_Mul("nTracks", "pi");
 
-/*  //HISTO MASS
+ //HISTO MASS
   draw_mass_histo("gen_m_mu", "mu");
   draw_mass_histo("gen_m_pi", "pi");
   draw_mass_histo("gen_m_JPsi", "JPsi");
@@ -37,5 +41,5 @@
   draw_mass_histo("gen_m_X", "X");
   draw_mass_histo("gen_m_Ks", "Ks");
   draw_mass_histo("gen_m_B", "B0");
-*/
+
 }

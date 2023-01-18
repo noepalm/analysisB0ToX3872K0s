@@ -16,14 +16,27 @@ using namespace std;
 // draw_two_histograms()
 
 
-const TString eosPath = "/eos/user/c/cbasile/www/B0toX3872K0s/GEN_LEVEL/GenUL17Psi2S_HLT_Dimuon18_PsiPrime/";
+TString inRootFile_  = "../outRoot/RecoDecay_X3872_UL17_X3872.root"; 
+TString outPath_     = "/eos/user/c/cbasile/www/B0toX3872K0s/GEN_LEVEL/";
+
+
+void SetInputFile(const TString& inFile = ""){
+
+  inRootFile_ = inFile;
+
+}//SetInputFile()
+
+void SetOutputFile(const TString& outPath = ""){
+
+  outPath_ = outPath;
+
+}//SetOutputFile()
 
 TFile* open_file(){
-    TString root_file = "../outRoot/CheckGenLev_UL17_Psi2S_HLT_Dimuon18_PsiPrime.root";
-    TFile* input_file = new TFile(root_file);
+    TFile* input_file = new TFile(inRootFile_);
 
     if ( !input_file->IsOpen() ) {
-       std::cout << "ERROR IN OPENING FILE "<< root_file << std::endl;
+       std::cout << "ERROR IN OPENING FILE "<< inRootFile_ << std::endl;
        exit(-1);
     }
 
@@ -93,12 +106,12 @@ void histoSetUp(TH1* histo, const TString& category, const TString& x_name, bool
 
 TString pngName(TString histo_name){
 
-	TString pngName = eosPath + histo_name + ".png";
+	TString pngName = outPath_ + histo_name + ".png";
 	return pngName;
 }
 TString pdfName(TString histo_name){
 
-	TString pdfName = eosPath + histo_name + ".pdf";
+	TString pdfName = outPath_ + histo_name + ".pdf";
 	return pdfName;
 }
 
@@ -140,8 +153,6 @@ int draw_pT_histo(const TString histo_name, const TString particle){
 
 	 //TEXT
 
-    TString png_name = pngName(histo_name); 
-    TString pdf_name = pdfName(histo_name); 
     TCanvas* c1 = new TCanvas("c1","canvas", 1024,1024);
 	  c1->DrawFrame(0,0,1,1);
     h->Draw("HIST");
@@ -149,8 +160,8 @@ int draw_pT_histo(const TString histo_name, const TString particle){
 	  gPad->SetLeftMargin(0.13);
 	  gPad->SetBottomMargin(0.13);
     c1->Update(); 
-    c1->SaveAs(png_name);
-    c1->SaveAs(pdf_name);
+    c1->SaveAs(pngName(histo_name));
+    c1->SaveAs(pdfName(histo_name));
 
     input_file->Close();
     return 0;
@@ -287,8 +298,8 @@ int draw_Eta_histo(const TString histo_name, const TString particle){
 
 int draw_Mul(const TString histo_name, const TString particle){
 
-  TString root_file = "analysis_Multiplicity_UL17.root";
-  TFile* input_file = new TFile(root_file);
+  TString inRootFile_ = "analysis_Multiplicity_UL17.root";
+  TFile* input_file = new TFile(inRootFile_);
 
   TH1I* h = (TH1I*)input_file->Get(histo_name);
 
