@@ -16,8 +16,7 @@
 
     draw_two_histograms("Pi_dR_HLT_DoubleMu4_JpsiTrk_MC", "pi_MC", "Pi_dR_HLT_DoubleMu4_JpsiTrk_Fk", "pi_Fk", 
             "#Delta R (trk_{HLT}, trk_{reco})", "Pi_dR_HLT_DoubleMu4_JpsiTrk");
-    draw_two_histograms("PiPi_svProb_MC", "MCmatch", "PiPi_svProb_Fk", "MCfake", 
-            "P_{sv}(#pi_{1} #pi_{2})", "PiPi_svProb" );
+    draw_two_histograms("PiPi_svProb_MC", "MCmatch", "PiPi_svProb_Fk", "MCfake", "P_{sv}(#pi_{1} #pi_{2})", "PiPi_svProb" );
      
     
     draw_two_histograms("K0s_LxySign_wrtBvtx_MC", "MCmatch", "K0s_LxySign_wrtBvtx_Fk", "MCfake", 
@@ -38,5 +37,12 @@
             "L_{xy}( PV, B^{0}_{vtx})/#sigma_{xy}", "B0_LxySign_wrtPV" );
     draw_two_histograms("B0_LxySign_wrtBS_MC", "MCmatch", "B0_LxySign_wrtBS_Fk", "MCfake", 
             "L_{xy}( BS, B^{0}_{vtx})/#sigma_{xy}", "B0_LxySign_wrtBS" );
+
+
+// ROC curves
+    makeROCcurve({"B0_cosAlpha2DwrtBS_MC","B0_cosAlpha3D_MC","B0_cosAlpha2D_MC"}, 
+        {"B0_cosAlpha2DwrtBS_Fk","B0_cosAlpha3D_Fk","B0_cosAlpha2D_Fk"}, "ROC_B0_cosAlpha");
+    makeROCcurve({"B0_LxySign_wrtPV_MC", "B0_LxySign_wrtBS_MC"}, 
+                {"B0_LxySign_wrtPV_Fk", "B0_LxySign_wrtBS_Fk"}, "ROC_LxySign_B0");
 
 }
