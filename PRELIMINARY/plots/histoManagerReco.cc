@@ -70,6 +70,8 @@ Color_t PtlColorMap(const TString& particle){
   PtlColor["mu_Fk"]   = kPink + 5;
   PtlColor["pi_MC"]   = kGreen + 1;
   PtlColor["pi_Fk"]   = kYellow - 7;
+  PtlColor["PV"]   = kMagenta -7;
+  PtlColor["BS"]   = kGreen -7;
 
   return PtlColor[particle];
 }
@@ -96,6 +98,8 @@ TString CategoryLegend(const TString& category){
   Leg_entry["mu_Fk"] = "#mu FAKE";
   Leg_entry["pi_MC"] = "#pi MC matching";
   Leg_entry["pi_Fk"] = "#pi FAKE";
+  Leg_entry["PV"] = "wrt chosen PV";
+  Leg_entry["BS"] = "wrt BS";
 
   return Leg_entry[category];
 }
