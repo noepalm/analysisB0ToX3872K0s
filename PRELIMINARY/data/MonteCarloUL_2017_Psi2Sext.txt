@@ -1,0 +1,11 @@
+#####
+# Monte Carlo for B0 -> Psi(2S) K0s channel (extended + 1e6 events)
+#####
+# 
+# FIXES:
+# 	- correct definition of Lxy(B0) significance
+# 	- computation of Lxy and CosAplha(B0) wrt BS and BSwithZ (z BS coordinate = z B0-vtx)
+
+
+/eos/cms/store/group/phys_bphys/crovelli/nanoaod_X/naniX2017_2023Jan24/BuToPsi2SKs_Psi2SToJPsiPiPi_JPsiToMuMu_RhoToPiPi_TuneCP5_13TeV-pythia8-evtgen/crab_BdToPsi2SKs2017ext/230124_223215/0000/
+
