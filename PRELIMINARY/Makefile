@@ -57,6 +57,7 @@ RecoLev:$(INCLUDEDIR)src/RecoChainAnalysis.cc\
 clean:
 		rm -f $(OUTLIB)*.o
 		rm -f GenLev
+		rm -f RecoLev
 
 gen: GenLev
 
