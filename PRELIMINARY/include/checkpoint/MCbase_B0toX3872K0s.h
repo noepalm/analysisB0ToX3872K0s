@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Thu Jan 26 11:23:00 2023 by ROOT version 6.24/08
+// Fri Jan 13 19:18:53 2023 by ROOT version 6.24/08
 // from TTree Events/Events
-// found on file: /eos/cms/store/group/phys_bphys/crovelli/nanoaod_X/naniX2017_2023Jan24/BuToX3872Ks_X3872ToJPsiRho_JPsiToMuMu_RhoToPiPi_TuneCP5_13TeV-pythia8-evtgen/crab_BdToX3872Ks2017/230124_223200/0000/xNANO_mc_2023Jan24_12.root
+// found on file: /eos/cms/store/group/phys_bphys/crovelli/nanoaod_X/B0ToXKs_CentralAfterFix_UpdatedCode_noTrackingFix_/BuToX3872Ks_X3872ToJPsiRho_JPsiToMuMu_RhoToPiPi_TuneCP5_13TeV-pythia8-evtgen/crab_BdToX3872Ks/230111_131047/0000/xNANO_mc_2023Jan11_9.root
 //////////////////////////////////////////////////////////
 
 #ifndef MCbase_B0toX3872K0s_h
@@ -15,6 +15,7 @@
 #include "Math/Vector4D.h"
 #include "Math/GenVector/VectorUtil.h"
 #include "Math/GenVector/PtEtaPhiM4D.h"
+
 
 // Header file for the classes stored in the TTree if any.
 
@@ -30,10 +31,7 @@ public :
    UInt_t          luminosityBlock;
    ULong64_t       event;
    UInt_t          nB0;
-   Float_t         B0_BSxRaw[100];   //[nB0]
-   Float_t         B0_BSxWithZ[100];   //[nB0]
-   Float_t         B0_BSyRaw[100];   //[nB0]
-   Float_t         B0_BSyWithZ[100];   //[nB0]
+   Float_t         B0_K0_cosAlpha2D[100];   //[nB0]
    Float_t         B0_K0_cosAlpha3D[100];   //[nB0]
    Float_t         B0_K0_lxySign_wrtBvtx[100];   //[nB0]
    Float_t         B0_K0s_matchTrack1_D0sign[100];   //[nB0]
@@ -131,7 +129,7 @@ public :
    Float_t         B0_PiPi_prefit_pi2_vz[100];   //[nB0]
    Float_t         B0_PiPi_sv_prob[100];   //[nB0]
    Float_t         B0_cosAlpha2D_BS[100];   //[nB0]
-   Float_t         B0_cosAlpha2D_BSwithZ[100];   //[nB0]
+   Float_t         B0_cosAlpha2D_PV[100];   //[nB0]
    Float_t         B0_cosAlpha3D_PV[100];   //[nB0]
    Float_t         B0_decayVtxX[100];   //[nB0]
    Float_t         B0_decayVtxXE[100];   //[nB0]
@@ -163,7 +161,6 @@ public :
    Float_t         B0_finalFit_pt[100];   //[nB0]
    Float_t         B0_fitted_mass_womc[100];   //[nB0]
    Float_t         B0_lxySign_BS[100];   //[nB0]
-   Float_t         B0_lxySign_BSwithZ[100];   //[nB0]
    Float_t         B0_lxySign_PV[100];   //[nB0]
    Float_t         B0_svchi2[100];   //[nB0]
    Float_t         B0_svprob[100];   //[nB0]
@@ -184,6 +181,7 @@ public :
    Int_t           B0_mu2_idx[100];   //[nB0]
    Int_t           B0_pi1_idx[100];   //[nB0]
    Int_t           B0_pi2_idx[100];   //[nB0]
+   Int_t           B0_pv2D_idx[100];   //[nB0]
    Int_t           B0_pv3D_idx[100];   //[nB0]
    UInt_t          nJPsiToMuMu;
    UInt_t          nK0s;
@@ -252,24 +250,24 @@ public :
    Int_t           PV_npvs;
    Int_t           PV_npvsGood;
    UInt_t          nSV;
-   Float_t         SV_dlen[20];   //[nSV]
-   Float_t         SV_dlenSig[20];   //[nSV]
-   Float_t         SV_dxy[20];   //[nSV]
-   Float_t         SV_dxySig[20];   //[nSV]
-   Float_t         SV_pAngle[20];   //[nSV]
-   Int_t           SV_charge[20];   //[nSV]
+   Float_t         SV_dlen[50];   //[nSV]
+   Float_t         SV_dlenSig[50];   //[nSV]
+   Float_t         SV_dxy[50];   //[nSV]
+   Float_t         SV_dxySig[50];   //[nSV]
+   Float_t         SV_pAngle[50];   //[nSV]
+   Int_t           SV_charge[50];   //[nSV]
    Int_t           Muon_genPartIdx[100];   //[nMuon]
    Int_t           Muon_genPartFlav[100];   //[nMuon]
-   Float_t         SV_chi2[20];   //[nSV]
-   Float_t         SV_eta[20];   //[nSV]
-   Float_t         SV_mass[20];   //[nSV]
-   Float_t         SV_ndof[20];   //[nSV]
-   Float_t         SV_phi[20];   //[nSV]
-   Float_t         SV_pt[20];   //[nSV]
-   Float_t         SV_x[20];   //[nSV]
-   Float_t         SV_y[20];   //[nSV]
-   Float_t         SV_z[20];   //[nSV]
-   UChar_t         SV_ntracks[20];   //[nSV]
+   Float_t         SV_chi2[50];   //[nSV]
+   Float_t         SV_eta[50];   //[nSV]
+   Float_t         SV_mass[50];   //[nSV]
+   Float_t         SV_ndof[50];   //[nSV]
+   Float_t         SV_phi[50];   //[nSV]
+   Float_t         SV_pt[50];   //[nSV]
+   Float_t         SV_x[50];   //[nSV]
+   Float_t         SV_y[50];   //[nSV]
+   Float_t         SV_z[50];   //[nSV]
+   UChar_t         SV_ntracks[50];   //[nSV]
    Int_t           ProbeTracks_genPartIdx[2000];   //[nProbeTracks]
    Int_t           ProbeTracks_genPartFlav[2000];   //[nProbeTracks]
 
@@ -278,10 +276,7 @@ public :
    TBranch        *b_luminosityBlock;   //!
    TBranch        *b_event;   //!
    TBranch        *b_nB0;   //!
-   TBranch        *b_B0_BSxRaw;   //!
-   TBranch        *b_B0_BSxWithZ;   //!
-   TBranch        *b_B0_BSyRaw;   //!
-   TBranch        *b_B0_BSyWithZ;   //!
+   TBranch        *b_B0_K0_cosAlpha2D;   //!
    TBranch        *b_B0_K0_cosAlpha3D;   //!
    TBranch        *b_B0_K0_lxySign_wrtBvtx;   //!
    TBranch        *b_B0_K0s_matchTrack1_D0sign;   //!
@@ -379,7 +374,7 @@ public :
    TBranch        *b_B0_PiPi_prefit_pi2_vz;   //!
    TBranch        *b_B0_PiPi_sv_prob;   //!
    TBranch        *b_B0_cosAlpha2D_BS;   //!
-   TBranch        *b_B0_cosAlpha2D_BSwithZ;   //!
+   TBranch        *b_B0_cosAlpha2D_PV;   //!
    TBranch        *b_B0_cosAlpha3D_PV;   //!
    TBranch        *b_B0_decayVtxX;   //!
    TBranch        *b_B0_decayVtxXE;   //!
@@ -411,7 +406,6 @@ public :
    TBranch        *b_B0_finalFit_pt;   //!
    TBranch        *b_B0_fitted_mass_womc;   //!
    TBranch        *b_B0_lxySign_BS;   //!
-   TBranch        *b_B0_lxySign_BSwithZ;   //!
    TBranch        *b_B0_lxySign_PV;   //!
    TBranch        *b_B0_svchi2;   //!
    TBranch        *b_B0_svprob;   //!
@@ -432,6 +426,7 @@ public :
    TBranch        *b_B0_mu2_idx;   //!
    TBranch        *b_B0_pi1_idx;   //!
    TBranch        *b_B0_pi2_idx;   //!
+   TBranch        *b_B0_pv2D_idx;   //!
    TBranch        *b_B0_pv3D_idx;   //!
    TBranch        *b_nJPsiToMuMu;   //!
    TBranch        *b_nK0s;   //!
@@ -531,9 +526,7 @@ public :
    virtual Bool_t   Notify();
    virtual void     Show(Long64_t entry = -1);
 
-
    virtual void     GenPartFillP4();
-   virtual int      GenB0idx();
 
    // I/O
    TString tags_;
@@ -551,24 +544,26 @@ public :
    ROOT::Math::PtEtaPhiMVector GenP4_K0s_Pim, GenP4_K0s_Pip;   // traks from K0s
 	ROOT::Math::PtEtaPhiMVector GenP4_B0;                       // B0
 
+
 };
 
 #endif
 
 #ifdef MCbase_B0toX3872K0s_cxx
-MCbase_B0toX3872K0s::MCbase_B0toX3872K0s(TTree *tree, const TString & tags) : fChain(0) 
+MCbase_B0toX3872K0s::MCbase_B0toX3872K0s(TTree *tree, const TString & tags ) : fChain(0) 
 {
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("/eos/cms/store/group/phys_bphys/crovelli/nanoaod_X/naniX2017_2023Jan24/BuToX3872Ks_X3872ToJPsiRho_JPsiToMuMu_RhoToPiPi_TuneCP5_13TeV-pythia8-evtgen/crab_BdToX3872Ks2017/230124_223200/0000/xNANO_mc_2023Jan24_12.root");
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("/eos/cms/store/group/phys_bphys/crovelli/nanoaod_X/B0ToXKs_CentralAfterFix_UpdatedCode_noTrackingFix_/BuToX3872Ks_X3872ToJPsiRho_JPsiToMuMu_RhoToPiPi_TuneCP5_13TeV-pythia8-evtgen/crab_BdToX3872Ks/230111_131047/0000/xNANO_mc_2023Jan11_9.root");
       if (!f || !f->IsOpen()) {
-         f = new TFile("/eos/cms/store/group/phys_bphys/crovelli/nanoaod_X/naniX2017_2023Jan24/BuToX3872Ks_X3872ToJPsiRho_JPsiToMuMu_RhoToPiPi_TuneCP5_13TeV-pythia8-evtgen/crab_BdToX3872Ks2017/230124_223200/0000/xNANO_mc_2023Jan24_12.root");
+         f = new TFile("/eos/cms/store/group/phys_bphys/crovelli/nanoaod_X/B0ToXKs_CentralAfterFix_UpdatedCode_noTrackingFix_/BuToX3872Ks_X3872ToJPsiRho_JPsiToMuMu_RhoToPiPi_TuneCP5_13TeV-pythia8-evtgen/crab_BdToX3872Ks/230111_131047/0000/xNANO_mc_2023Jan11_9.root");
       }
       f->GetObject("Events",tree);
 
    }
    Init(tree);
+
    tags_ = tags;
 }
 
@@ -617,10 +612,7 @@ void MCbase_B0toX3872K0s::Init(TTree *tree)
    fChain->SetBranchAddress("luminosityBlock", &luminosityBlock, &b_luminosityBlock);
    fChain->SetBranchAddress("event", &event, &b_event);
    fChain->SetBranchAddress("nB0", &nB0, &b_nB0);
-   fChain->SetBranchAddress("B0_BSxRaw", B0_BSxRaw, &b_B0_BSxRaw);
-   fChain->SetBranchAddress("B0_BSxWithZ", B0_BSxWithZ, &b_B0_BSxWithZ);
-   fChain->SetBranchAddress("B0_BSyRaw", B0_BSyRaw, &b_B0_BSyRaw);
-   fChain->SetBranchAddress("B0_BSyWithZ", B0_BSyWithZ, &b_B0_BSyWithZ);
+   fChain->SetBranchAddress("B0_K0_cosAlpha2D", B0_K0_cosAlpha2D, &b_B0_K0_cosAlpha2D);
    fChain->SetBranchAddress("B0_K0_cosAlpha3D", B0_K0_cosAlpha3D, &b_B0_K0_cosAlpha3D);
    fChain->SetBranchAddress("B0_K0_lxySign_wrtBvtx", B0_K0_lxySign_wrtBvtx, &b_B0_K0_lxySign_wrtBvtx);
    fChain->SetBranchAddress("B0_K0s_matchTrack1_D0sign", B0_K0s_matchTrack1_D0sign, &b_B0_K0s_matchTrack1_D0sign);
@@ -718,7 +710,7 @@ void MCbase_B0toX3872K0s::Init(TTree *tree)
    fChain->SetBranchAddress("B0_PiPi_prefit_pi2_vz", B0_PiPi_prefit_pi2_vz, &b_B0_PiPi_prefit_pi2_vz);
    fChain->SetBranchAddress("B0_PiPi_sv_prob", B0_PiPi_sv_prob, &b_B0_PiPi_sv_prob);
    fChain->SetBranchAddress("B0_cosAlpha2D_BS", B0_cosAlpha2D_BS, &b_B0_cosAlpha2D_BS);
-   fChain->SetBranchAddress("B0_cosAlpha2D_BSwithZ", B0_cosAlpha2D_BSwithZ, &b_B0_cosAlpha2D_BSwithZ);
+   fChain->SetBranchAddress("B0_cosAlpha2D_PV", B0_cosAlpha2D_PV, &b_B0_cosAlpha2D_PV);
    fChain->SetBranchAddress("B0_cosAlpha3D_PV", B0_cosAlpha3D_PV, &b_B0_cosAlpha3D_PV);
    fChain->SetBranchAddress("B0_decayVtxX", B0_decayVtxX, &b_B0_decayVtxX);
    fChain->SetBranchAddress("B0_decayVtxXE", B0_decayVtxXE, &b_B0_decayVtxXE);
@@ -750,7 +742,6 @@ void MCbase_B0toX3872K0s::Init(TTree *tree)
    fChain->SetBranchAddress("B0_finalFit_pt", B0_finalFit_pt, &b_B0_finalFit_pt);
    fChain->SetBranchAddress("B0_fitted_mass_womc", B0_fitted_mass_womc, &b_B0_fitted_mass_womc);
    fChain->SetBranchAddress("B0_lxySign_BS", B0_lxySign_BS, &b_B0_lxySign_BS);
-   fChain->SetBranchAddress("B0_lxySign_BSwithZ", B0_lxySign_BSwithZ, &b_B0_lxySign_BSwithZ);
    fChain->SetBranchAddress("B0_lxySign_PV", B0_lxySign_PV, &b_B0_lxySign_PV);
    fChain->SetBranchAddress("B0_svchi2", B0_svchi2, &b_B0_svchi2);
    fChain->SetBranchAddress("B0_svprob", B0_svprob, &b_B0_svprob);
@@ -771,6 +762,7 @@ void MCbase_B0toX3872K0s::Init(TTree *tree)
    fChain->SetBranchAddress("B0_mu2_idx", B0_mu2_idx, &b_B0_mu2_idx);
    fChain->SetBranchAddress("B0_pi1_idx", B0_pi1_idx, &b_B0_pi1_idx);
    fChain->SetBranchAddress("B0_pi2_idx", B0_pi2_idx, &b_B0_pi2_idx);
+   fChain->SetBranchAddress("B0_pv2D_idx", B0_pv2D_idx, &b_B0_pv2D_idx);
    fChain->SetBranchAddress("B0_pv3D_idx", B0_pv3D_idx, &b_B0_pv3D_idx);
    fChain->SetBranchAddress("nJPsiToMuMu", &nJPsiToMuMu, &b_nJPsiToMuMu);
    fChain->SetBranchAddress("nK0s", &nK0s, &b_nK0s);
