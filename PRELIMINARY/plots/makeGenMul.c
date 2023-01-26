@@ -3,8 +3,8 @@
 	gStyle->SetPadTickX(1);
 	gStyle->SetPadTickY(1);
 
-  SetInputFile("./outRoot/CheckGenLev_UL17_trkFix_X3872.root");
-  SetOutputFile("/eos/user/c/cbasile/www/B0toX3872K0s/GEN_LEVEL/GenUL17_X3872_trkFixNewReco/");
+  SetInputFile("./outRoot/CheckGenLev_X3872_UL17.root");
+  SetOutputFile("/eos/user/c/cbasile/www/B0toX3872K0s/GEN_LEVEL/GenUL17_X3872/");
 
 	// HISTO TRANSVERSE MOMENTUM
   draw_pT_histo("gen_pt_mu", "mu");
