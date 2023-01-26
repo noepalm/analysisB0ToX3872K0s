@@ -129,3 +129,21 @@ void MCbase_B0toX3872K0s::GenPartFillP4(){
 
 	
 }//GenPartFillP4()
+
+int MCbase_B0toX3872K0s::GenB0idx(){
+	
+	ROOT::Math::PtEtaPhiMVector V;
+	int genB0idx = -1;
+	
+	for (UInt_t g = 0; g < nGenPart; g++){
+		if (abs(GenPart_pdgId[g]) != isB0) continue;
+		V.SetPt(GenPart_pt[g]); V.SetEta(GenPart_eta[g]); V.SetPhi(GenPart_phi[g]);
+		if (ROOT::Math::VectorUtil::DeltaR(GenP4_B0, V) < 0.00001) genB0idx = g;
+	}
+
+	if (0) {
+		V.SetPt(GenPart_pt[genB0idx]); V.SetEta(GenPart_eta[genB0idx]); V.SetPhi(GenPart_phi[genB0idx]);
+		std::cout << "GenB0 vs found one pT " << GenP4_B0.Pt() << "\t" << V.Pt() << std::endl;
+	}
+	return genB0idx;
+}//GenB0idx()

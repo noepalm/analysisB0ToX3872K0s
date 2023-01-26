@@ -19,8 +19,11 @@ RecoDecayX::~RecoDecayX(){
 void RecoDecayX::Loop(){
 
     Long64_t nentries = fChain->GetEntriesFast();
-    const Long64_t Nbreak = nentries + 10;
+    const Long64_t Nbreak = nentries + 10; 
     const Long64_t Nprint = (int)(nentries/20.);
+
+    int realB_idx;
+    double Dist_GenV_PV, Dist_GenV_BS, Dist_GenV_BSrk;
 
 
     // **** HISTOGRAMS **** //
@@ -40,7 +43,7 @@ void RecoDecayX::Loop(){
     TH1F h_Mu_dR_HLT_Dimuon25_Jpsi_Fk = TH1F("Mu_dR_HLT_Dimuon25_Jpsi_Fk", "", Nbins, xlow, xhigh);
     TH1F h_Mu_dR_HLT_DoubleMu4_JpsiTrk_MC = TH1F("Mu_dR_HLT_DoubleMu4_JpsiTrk_MC", "", Nbins, xlow, xhigh);
     TH1F h_Mu_dR_HLT_DoubleMu4_JpsiTrk_Fk = TH1F("Mu_dR_HLT_DoubleMu4_JpsiTrk_Fk", "", Nbins, xlow, xhigh);
-    xlow = 0., xhigh = 0.1;
+    xlow = 0., xhigh = 0.03;
     TH1F h_Pi_dR_HLT_DoubleMu4_JpsiTrk_MC = TH1F("Pi_dR_HLT_DoubleMu4_JpsiTrk_MC", "", Nbins, xlow, xhigh);
     TH1F h_Pi_dR_HLT_DoubleMu4_JpsiTrk_Fk = TH1F("Pi_dR_HLT_DoubleMu4_JpsiTrk_Fk", "", Nbins, xlow, xhigh);
     Nbins = 20, xlow = 0., xhigh = 1.;
@@ -51,24 +54,36 @@ void RecoDecayX::Loop(){
     TH1F h_K0s_LxySign_wrtBvtx_MC = TH1F("K0s_LxySign_wrtBvtx_MC", "", Nbins, xlow, xhigh);
     TH1F h_K0s_LxySign_wrtBvtx_Fk = TH1F("K0s_LxySign_wrtBvtx_Fk", "", Nbins, xlow, xhigh);
     Nbins = 20, xlow = 0.999, xhigh = 1.;
-    TH1F h_K0s_cosAlpha2D_MC = TH1F("K0s_cosAlpha2D_MC", "", Nbins, xlow, xhigh);
-    TH1F h_K0s_cosAlpha2D_Fk = TH1F("K0s_cosAlpha2D_Fk", "", Nbins, xlow, xhigh);
+    //TH1F h_K0s_cosAlpha2D_MC = TH1F("K0s_cosAlpha2D_MC", "", Nbins, xlow, xhigh);
+    //TH1F h_K0s_cosAlpha2D_Fk = TH1F("K0s_cosAlpha2D_Fk", "", Nbins, xlow, xhigh);
     xlow = 0., xhigh = 1.;
-    TH1F h_K0s_cosAlpha3D_MC = TH1F("K0s_cosAlpha3D_MC", "", Nbins, xlow, xhigh);
-    TH1F h_K0s_cosAlpha3D_Fk = TH1F("K0s_cosAlpha3D_Fk", "", Nbins, xlow, xhigh);
+    //TH1F h_K0s_cosAlpha3D_MC = TH1F("K0s_cosAlpha3D_MC", "", Nbins, xlow, xhigh);
+    //TH1F h_K0s_cosAlpha3D_Fk = TH1F("K0s_cosAlpha3D_Fk", "", Nbins, xlow, xhigh);
     xlow = 0.999, xhigh = 1.;
-    TH1F h_B0_cosAlpha2D_MC = TH1F("B0_cosAlpha2D_MC", "", Nbins, xlow, xhigh);
-    TH1F h_B0_cosAlpha2D_Fk = TH1F("B0_cosAlpha2D_Fk", "", Nbins, xlow, xhigh);
+    //TH1F h_B0_cosAlpha2D_MC = TH1F("B0_cosAlpha2D_MC", "", Nbins, xlow, xhigh);
+    //TH1F h_B0_cosAlpha2D_Fk = TH1F("B0_cosAlpha2D_Fk", "", Nbins, xlow, xhigh);
+    TH1F h_B0_cosAlpha2DwrtBSrk_MC = TH1F("B0_cosAlpha2DwrtBSrk_MC", "", Nbins, xlow, xhigh);
+    TH1F h_B0_cosAlpha2DwrtBSrk_Fk = TH1F("B0_cosAlpha2DwrtBSrk_Fk", "", Nbins, xlow, xhigh);
     TH1F h_B0_cosAlpha2DwrtBS_MC = TH1F("B0_cosAlpha2DwrtBS_MC", "", Nbins, xlow, xhigh);
     TH1F h_B0_cosAlpha2DwrtBS_Fk = TH1F("B0_cosAlpha2DwrtBS_Fk", "", Nbins, xlow, xhigh);
-    TH1F h_B0_cosAlpha3D_MC = TH1F("B0_cosAlpha3D_MC", "", Nbins, xlow, xhigh);
-    TH1F h_B0_cosAlpha3D_Fk = TH1F("B0_cosAlpha3D_Fk", "", Nbins, xlow, xhigh);
+    TH1F h_B0_cosAlpha3DwrtPV_MC = TH1F("B0_cosAlpha3DwrtPV_MC", "", Nbins, xlow, xhigh);
+    TH1F h_B0_cosAlpha3DwrtPV_Fk = TH1F("B0_cosAlpha3DwrtPV_Fk", "", Nbins, xlow, xhigh);
     Nbins = 50, xlow = 0., xhigh = 100;
     TH1F h_B0_LxySign_wrtPV_MC = TH1F("B0_LxySign_wrtPV_MC", "", Nbins, xlow, xhigh);
     TH1F h_B0_LxySign_wrtPV_Fk = TH1F("B0_LxySign_wrtPV_Fk", "", Nbins, xlow, xhigh);
     TH1F h_B0_LxySign_wrtBS_MC = TH1F("B0_LxySign_wrtBS_MC", "", Nbins, xlow, xhigh);
     TH1F h_B0_LxySign_wrtBS_Fk = TH1F("B0_LxySign_wrtBS_Fk", "", Nbins, xlow, xhigh);
-
+    TH1F h_B0_LxySign_wrtBSrk_MC = TH1F("B0_LxySign_wrtBSrk_MC", "", Nbins, xlow, xhigh);
+    TH1F h_B0_LxySign_wrtBSrk_Fk = TH1F("B0_LxySign_wrtBSrk_Fk", "", Nbins, xlow, xhigh);
+    TH1F h_B0_LxySign_wrtBShlt_MC = TH1F("B0_LxySign_wrtBShlt_MC", "", Nbins, xlow, xhigh);
+    TH1F h_B0_LxySign_wrtBShlt_Fk = TH1F("B0_LxySign_wrtBShlt_Fk", "", Nbins, xlow, xhigh);
+    Nbins = 50, xlow = 0., xhigh = 0.015;
+    TH1F h_B0_DistGenVtx_PV_MC   = TH1F("B0_DistGenVtx_PV_MC", "", Nbins, xlow, xhigh);
+    TH1F h_B0_DistGenVtx_PV_Fk   = TH1F("B0_DistGenVtx_PV_Fk", "", Nbins, xlow, xhigh);
+    TH1F h_B0_DistGenVtx_BS_MC   = TH1F("B0_DistGenVtx_BS_MC", "", Nbins, xlow, xhigh);
+    TH1F h_B0_DistGenVtx_BS_Fk   = TH1F("B0_DistGenVtx_BS_Fk", "", Nbins, xlow, xhigh);
+    TH1F h_B0_DistGenVtx_BSrk_MC = TH1F("B0_DistGenVtx_BSrk_MC", "", Nbins, xlow, xhigh);
+    TH1F h_B0_DistGenVtx_BSrk_Fk = TH1F("B0_DistGenVtx_BSrk_Fk", "", Nbins, xlow, xhigh);
 
     // MCmatching variables
     bool isMCmatched_Mu1, isMCmatched_Mu2, isMCmatched_Pi1, isMCmatched_Pi2;
@@ -85,6 +100,7 @@ void RecoDecayX::Loop(){
 
         // ----- GENERATOR
         GenPartFillP4();
+        realB_idx = GenB0idx();
 
         // ----- FIND THE MONTE CARLO TRUTH
         //std::cout << " --- EV " << jentry << " with #B0 candidates " << nB0 << std::endl;
@@ -104,7 +120,6 @@ void RecoDecayX::Loop(){
         isMCmatched_X3872 =  isMCmatched_Rho && isMCmatched_JPsi;
         isMCmatched_K0s   =  (fabs(ROOT::Math::VectorUtil::DeltaR(GenP4_K0s, RecoP4_K0s) - MCmatch_K0s_DRmin) < 0.0001) && (MCmatch_K0s_Idx  != -1);
         isMCmatched_B0    =  isMCmatched_X3872 &&   isMCmatched_K0s;   
-
 
 
         // *** JPsi --> Mu+Mu-  ***
@@ -172,7 +187,11 @@ void RecoDecayX::Loop(){
 
         }
         
-        
+
+        Dist_GenV_PV = sqrt( (GenPart_vx[realB_idx] - B0_PVx[b])*(GenPart_vx[realB_idx] - B0_PVx[b]) + (GenPart_vy[realB_idx] - B0_PVy[b])*(GenPart_vy[realB_idx] - B0_PVy[b]));
+        Dist_GenV_BS = sqrt( (GenPart_vx[realB_idx] - B0_BSx1[b])*(GenPart_vx[realB_idx] - B0_BSx1[b]) + (GenPart_vy[realB_idx] - B0_BSy1[b])*(GenPart_vy[realB_idx] - B0_BSy1[b]));
+        Dist_GenV_BSrk = sqrt( (GenPart_vx[realB_idx] - B0_BSx2[b])*(GenPart_vx[realB_idx] - B0_BSx2[b]) + (GenPart_vy[realB_idx] - B0_BSy2[b])*(GenPart_vy[realB_idx] - B0_BSy2[b]));
+
         // *** B0 --> X(3872) K0s ***
         if (isMCmatched_B0){
 
@@ -181,16 +200,24 @@ void RecoDecayX::Loop(){
 
             //K0short
             h_K0s_LxySign_wrtBvtx_MC.Fill(B0_K0_lxySign_wrtBvtx[b]);
-            h_K0s_cosAlpha2D_MC.Fill(fabs(B0_K0_cosAlpha2D[b]));
-            h_K0s_cosAlpha3D_MC.Fill(fabs(B0_K0_cosAlpha3D[b]));
+            //h_K0s_cosAlpha2D_MC.Fill(fabs(B0_K0_cosAlpha2D[b]));
+            //h_K0s_cosAlpha3D_MC.Fill(fabs(B0_K0_cosAlpha3D[b]));
 
             //B0
-            h_B0_cosAlpha2D_MC.Fill(fabs(B0_cosAlpha2D_PV[b]));
+            //h_B0_cosAlpha2D_MC.Fill(fabs(B0_cosAlpha2D_PV[b]));
+            h_B0_cosAlpha3DwrtPV_MC.Fill(fabs(B0_cosAlpha3D_PV[b]));
             h_B0_cosAlpha2DwrtBS_MC.Fill(fabs(B0_cosAlpha2D_BS[b]));
-            h_B0_cosAlpha3D_MC.Fill(fabs(B0_cosAlpha3D_PV[b]));
+            h_B0_cosAlpha2DwrtBSrk_MC.Fill(fabs(B0_cosAlpha2D_BS_rk[b]));
+            
 
             h_B0_LxySign_wrtPV_MC.Fill(B0_lxySign_PV[b]);
             h_B0_LxySign_wrtBS_MC.Fill(B0_lxySign_BS[b]);
+            h_B0_LxySign_wrtBSrk_MC.Fill(B0_lxySign_BS_rk[b]);
+            h_B0_LxySign_wrtBShlt_MC.Fill(B0_lxySign_BS_hlt[b]);
+
+            h_B0_DistGenVtx_PV_MC.Fill(Dist_GenV_PV);
+            h_B0_DistGenVtx_BS_MC.Fill(Dist_GenV_BS);
+            h_B0_DistGenVtx_BSrk_MC.Fill(Dist_GenV_BSrk);
         }else{
 
             // Rho
@@ -198,15 +225,24 @@ void RecoDecayX::Loop(){
 
             //K0short
             h_K0s_LxySign_wrtBvtx_Fk.Fill(B0_K0_lxySign_wrtBvtx[b]);
-            h_K0s_cosAlpha2D_Fk.Fill(fabs(B0_K0_cosAlpha2D[b]));
-            h_K0s_cosAlpha3D_Fk.Fill(fabs(B0_K0_cosAlpha3D[b]));
+            //h_K0s_cosAlpha2D_Fk.Fill(fabs(B0_K0_cosAlpha2D[b]));
+            //h_K0s_cosAlpha3D_Fk.Fill(fabs(B0_K0_cosAlpha3D[b]));
 
-            h_B0_cosAlpha2D_Fk.Fill(fabs(B0_cosAlpha2D_PV[b]));
+            //h_B0_cosAlpha2D_Fk.Fill(fabs(B0_cosAlpha2D_PV[b]));
+            h_B0_cosAlpha3DwrtPV_Fk.Fill(fabs(B0_cosAlpha3D_PV[b]));
             h_B0_cosAlpha2DwrtBS_Fk.Fill(fabs(B0_cosAlpha2D_BS[b]));
-            h_B0_cosAlpha3D_Fk.Fill(fabs(B0_cosAlpha3D_PV[b]));
+            h_B0_cosAlpha2DwrtBSrk_Fk.Fill(fabs(B0_cosAlpha2D_BS_rk[b]));
+            
 
             h_B0_LxySign_wrtPV_Fk.Fill(B0_lxySign_PV[b]);
             h_B0_LxySign_wrtBS_Fk.Fill(B0_lxySign_BS[b]);
+            h_B0_LxySign_wrtBSrk_Fk.Fill(B0_lxySign_BS_rk[b]);
+            h_B0_LxySign_wrtBShlt_Fk.Fill(B0_lxySign_BS_hlt[b]);
+
+            h_B0_DistGenVtx_PV_Fk.Fill(Dist_GenV_PV);
+            h_B0_DistGenVtx_BS_Fk.Fill(Dist_GenV_BS);
+            h_B0_DistGenVtx_BSrk_Fk.Fill(Dist_GenV_BSrk);
+        
         }
 
         if (isMCmatched_B0) N_B0matching++;
@@ -241,22 +277,33 @@ void RecoDecayX::Loop(){
 
     h_K0s_LxySign_wrtBvtx_MC.Write();
     h_K0s_LxySign_wrtBvtx_Fk.Write();
-    h_K0s_cosAlpha2D_MC.Write();
-    h_K0s_cosAlpha2D_Fk.Write();
-    h_K0s_cosAlpha3D_MC.Write();
-    h_K0s_cosAlpha3D_Fk.Write();
+    //h_K0s_cosAlpha2D_MC.Write();
+    //h_K0s_cosAlpha2D_Fk.Write();
+    //h_K0s_cosAlpha3D_MC.Write();
+    //h_K0s_cosAlpha3D_Fk.Write();
 
 
-    h_B0_cosAlpha2D_MC.Write();
-    h_B0_cosAlpha2D_Fk.Write();
+    //h_B0_cosAlpha2D_MC.Write();
+    //h_B0_cosAlpha2D_Fk.Write();
     h_B0_cosAlpha2DwrtBS_MC.Write();
     h_B0_cosAlpha2DwrtBS_Fk.Write();
-    h_B0_cosAlpha3D_MC.Write();
-    h_B0_cosAlpha3D_Fk.Write();
+    h_B0_cosAlpha2DwrtBSrk_MC.Write();
+    h_B0_cosAlpha2DwrtBSrk_Fk.Write();
+    h_B0_cosAlpha3DwrtPV_MC.Write();
+    h_B0_cosAlpha3DwrtPV_Fk.Write();
+
     h_B0_LxySign_wrtPV_MC.Write();
     h_B0_LxySign_wrtPV_Fk.Write();
     h_B0_LxySign_wrtBS_MC.Write();
     h_B0_LxySign_wrtBS_Fk.Write();
+    h_B0_LxySign_wrtBSrk_MC.Write();
+    h_B0_LxySign_wrtBSrk_Fk.Write();
+    h_B0_LxySign_wrtBShlt_MC.Write();
+    h_B0_LxySign_wrtBShlt_Fk.Write();
+
+    h_B0_DistGenVtx_PV_MC.Write();
+    h_B0_DistGenVtx_BS_MC.Write();
+    h_B0_DistGenVtx_BSrk_MC.Write();
 
     outFile_->Close();
     std::cout << "  ...[OUTPUT] output histograms written on file " << outFilePath_ << std::endl;
