@@ -14,7 +14,7 @@ RecoDecayX::RecoDecayX(TTree *tree, const TString & tags) : MCbase_B0toX3872K0s 
 RecoDecayX::~RecoDecayX(){
 
     delete outFile_;
-};
+}
 
 void RecoDecayX::Loop(){
 

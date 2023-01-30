@@ -1,7 +1,7 @@
 #ifndef RecoDecayX_h
 #define RecoDecayX_h
 
-#include "../include/MCbase_B0toX3872K0s.h"
+#include "MCbase_B0toX3872K0s.h"
 
 #include "TH1F.h"
 
