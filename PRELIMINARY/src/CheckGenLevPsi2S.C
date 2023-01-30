@@ -87,9 +87,9 @@ void CheckGenLevPsi2S::Loop()
       if (ientry < 0) break;
       nb = fChain->GetEntry(jentry);   nbytes += nb;
 
-      //if (!HLT_DoubleMu4_PsiPrimeTrk_Displaced) continue;
-
       if ((jentry+1) % percentToPrint ==0) std::cout << "--> " << Form("%.0f",(float)(jentry+1)/nentries* 100.) << " \%"<< std::endl;
+
+      if (!HLT_DoubleMu4_JpsiTrk_Displaced) continue;
       // ------- GENERATOR -------//
       GenPartFillP4();
       GenPart_FillKinHist( &GenP4_Mum, &h_Gpt_mu, &h_Geta_mu, &h_Gm_mu);
