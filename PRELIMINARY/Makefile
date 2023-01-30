@@ -32,15 +32,21 @@ $(OUTLIB)Prep.o: $(INCLUDEDIR)src/PrepAnalysis.C
 		$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)PrepAnalysis.o $<
 $(OUTLIB)MCbase_B0toX3872K0s.o: $(INCLUDEDIR)src/MCbase_B0toX3872K0s.C
 		$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)MCbase_B0toX3872K0s.o $<
-$(OUTLIB)RecoDecayX.o: $(INCLUDEDIR)src/RecoDecayX.C
-		$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)RecoDecayX.o $<
+$(OUTLIB)MCbase_B0toPsi2SK0s.o: $(INCLUDEDIR)src/MCbase_B0toPsi2SK0s.C
+		$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)MCbase_B0toPsi2SK0s.o $<
+
 $(OUTLIB)CheckGenLev.o: $(INCLUDEDIR)src/CheckGenLev.C 
 		$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)CheckGenLev.o $<
 $(OUTLIB)CheckGenLevPsi2S.o: $(INCLUDEDIR)src/CheckGenLevPsi2S.C 
 		$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)CheckGenLevPsi2S.o $<
+
+$(OUTLIB)RecoDecayX.o: $(INCLUDEDIR)src/RecoDecayX.C
+		$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)RecoDecayX.o $<
 # ==================== GEN LEVEL CHECK =============================================
-GenLev:$(INCLUDEDIR)macro.cc\
+GenLev:$(INCLUDEDIR)src/GenLevelAnalysis.cc\
 		$(OUTLIB)Prep.o\
+		$(OUTLIB)MCbase_B0toX3872K0s.o\
+		$(OUTLIB)MCbase_B0toPsi2SK0s.o\
 		$(OUTLIB)CheckGenLev.o\
 		$(OUTLIB)CheckGenLevPsi2S.o
 		$(CXX) $(CXXFLAGS) -ldl -o analysisGenLevel $(OUTLIB)/*.o $(GLIBS) $(LDFLAGS) $ $<
