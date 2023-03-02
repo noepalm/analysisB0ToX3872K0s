@@ -533,6 +533,7 @@ public :
    virtual void     Show(Long64_t entry = -1);
 
    virtual void GenPartFillP4();
+   virtual int GenB0idx();
 
 
    // I/O
