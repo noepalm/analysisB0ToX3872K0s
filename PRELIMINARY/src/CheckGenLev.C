@@ -66,6 +66,22 @@ void CheckGenLev::Loop()
   TH1F h_Geta_Ks("gen_eta_Ks","", Nbins, -3.5,3.5);
   TH1F h_Geta_B("gen_eta_B","", Nbins, -3.5,3.5);
 
+  TH1F h_Gphi_mu("gen_phi_mu","", Nbins,-3.5,3.5);
+  TH1F h_Gphi_pi("gen_phi_pi","", Nbins,-3.5,3.5);
+  TH1F h_Gphi_JPsi("gen_phi_JPsi","", Nbins,-3.5,3.5);
+  TH1F h_Gphi_Rho("gen_phi_Rho","", Nbins, -3.5,3.5);
+  TH1F h_Gphi_X("gen_phi_X","", Nbins, -3.5,3.5);
+  TH1F h_Gphi_Ks("gen_phi_Ks","", Nbins, -3.5,3.5);
+  TH1F h_Gphi_B("gen_phi_B","", Nbins, -3.5,3.5);
+
+  TH2F h_Gphi_vs_eta_mu("gen_phi_vs_eta_mu","",  Nbins,-3.5,3.5,  Nbins,-3.5,3.5);
+  TH2F h_Gphi_vs_eta_pi("gen_phi_vs_eta_pi","", Nbins,-3.5,3.5,  Nbins,-3.5,3.5);
+  TH2F h_Gphi_vs_eta_JPsi("gen_phi_vs_eta_JPsi","",Nbins,-3.5,3.5,  Nbins,-3.5,3.5);
+  TH2F h_Gphi_vs_eta_Rho("gen_phi_vs_eta_Rho","", Nbins,-3.5,3.5,  Nbins,-3.5,3.5);
+  TH2F h_Gphi_vs_eta_X("gen_phi_vs_eta_X","", Nbins,-3.5,3.5,  Nbins,-3.5,3.5);
+  TH2F h_Gphi_vs_eta_Ks("gen_phi_vs_eta_Ks","", Nbins,-3.5,3.5,  Nbins,-3.5,3.5);
+  TH2F h_Gphi_vs_eta_B("gen_phi_vs_eta_B","", Nbins,-3.5,3.5,  Nbins,-3.5,3.5);
+
   TH1F h_Gm_mu("gen_m_mu","", Nbins, .05, .15);
   TH1F h_Gm_pi("gen_m_pi","", Nbins, .1, .2);
   TH1F h_Gm_JPsi("gen_m_JPsi","", Nbins, 2.9,3.2);
@@ -97,21 +113,26 @@ void CheckGenLev::Loop()
       // ------- GENERATOR -------//
       GenPartFillP4();
       GenPart_FillKinHist( &GenP4_Mum, &h_Gpt_mu, &h_Geta_mu, &h_Gm_mu);
+      GenPart_FillPhiEtaHist(&GenP4_Mum, &h_Gphi_mu, &h_Gphi_vs_eta_mu);
       GenPart_FillKinHist( &GenP4_Mup, &h_Gpt_mu, &h_Geta_mu, &h_Gm_mu);
+      GenPart_FillPhiEtaHist(&GenP4_Mup, &h_Gphi_mu, &h_Gphi_vs_eta_mu);
       GenPart_FillKinHist( &GenP4_JPsi ,&h_Gpt_JPsi, &h_Geta_JPsi, &h_Gm_JPsi);
       GenPart_FillKinHist( &GenP4_Pim, &h_Gpt_pi, &h_Geta_pi, &h_Gm_pi);
+      GenPart_FillPhiEtaHist(&GenP4_Pim, &h_Gphi_pi, &h_Gphi_vs_eta_pi);
       GenPart_FillKinHist( &GenP4_Pip, &h_Gpt_pi, &h_Geta_pi, &h_Gm_pi);
+      GenPart_FillPhiEtaHist(&GenP4_Pip, &h_Gphi_pi, &h_Gphi_vs_eta_pi);
       GenPart_FillKinHist( &GenP4_Rho, &h_Gpt_Rho, &h_Geta_Rho, &h_Gm_Rho);
       GenPart_FillKinHist( &GenP4_X3872, &h_Gpt_X ,&h_Geta_X, &h_Gm_X);
-      GenPart_FillKinHist( &GenP4_K0s, &h_Gpt_Ks, &h_Geta_Ks, &h_Gm_Ks);
+      GenPart_FillPhiEtaHist(&GenP4_K0s, &h_Gphi_Ks, &h_Gphi_vs_eta_Ks);
+      GenPart_FillKinHist( &GenP4_K0s, &h_Gpt_Ks,&h_Geta_Ks, &h_Gm_Ks);
       GenPart_FillKinHist( &GenP4_B0,&h_Gpt_B, &h_Geta_B, &h_Gm_B);
       if(GenP4_Mum.Pt() > GenP4_Mup.Pt()){
 			h_GptL_mu.Fill(GenP4_Mum.Pt());
 			h_GptSL_mu.Fill(GenP4_Mup.Pt());
-		}else{
+		  }else{
 			h_GptL_mu.Fill(GenP4_Mup.Pt());
 			h_GptSL_mu.Fill(GenP4_Mum.Pt());
-		}
+		  }
     }
     TFile gen_outfile(outFilePath_,"RECREATE"); // create the output file
     std::cout << " ---> [OUT] output saved in file " << gen_outfile.GetName() << std::endl;
@@ -132,6 +153,13 @@ void CheckGenLev::Loop()
     h_Geta_X.Write();
     h_Geta_Ks.Write();
     h_Geta_B.Write();
+
+    h_Gphi_pi.Write();
+    h_Gphi_vs_eta_pi.Write();
+    h_Gphi_mu.Write();
+    h_Gphi_vs_eta_mu.Write();
+    h_Gphi_Ks.Write();
+    h_Gphi_vs_eta_Ks.Write();
 
     h_Gm_mu.Write();
     h_Gm_pi.Write();
@@ -154,3 +182,10 @@ void CheckGenLev::GenPart_FillKinHist(ROOT::Math::PtEtaPhiMVector* GenVec, TH1* 
 	h_mass->Fill(GenVec->M());
 
 }//GenPart_FillKinHist()
+
+void CheckGenLev::GenPart_FillPhiEtaHist(ROOT::Math::PtEtaPhiMVector* GenVec, TH1* h_phi, TH2* h_phi_vs_eta){
+
+  h_phi->Fill(GenVec->Phi());
+  h_phi_vs_eta->Fill(GenVec->Phi(),GenVec->Eta());
+
+}// GenPart_FillPhiEtaHist()

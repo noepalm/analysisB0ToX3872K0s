@@ -33,8 +33,6 @@ TChain* TChainLoader(const std::string& inputFileName) {
 	}
 	std::string DirPath = std::string(cDirPath);
 	std::cout << " ... Loading file from directory " << DirPath << std::endl;
-//	std::string DirPath = "/eos/cms/store/group/phys_bphys/crovelli/nanoaod_X/B0ToXKs_CentralAfterFix_2022Dec09/BuToX3872Ks_X3872ToJPsiRho_JPsiToMuMu_RhoToPiPi_TuneCP5_13TeV-pythia8-evtgen/crab_BdToX3872Ks/221209_153554/0000/"; 
-//"/eos/cms/store/group/phys_bphys/crovelli/nanoaod_X/B0ToXKs_2022Apr29/BdToX3872Ks_X3872ToJpsiRho_BMuonFilter_DGamma0_TuneCUEP8M1_13TeV-pythia8-evtgen/crab_BdToX3872Ks/220429_084035/0000/";
 
 	int Nfiles = 0; 
 	TString tree_path = "";
@@ -60,7 +58,10 @@ TChain* TChainLoader(const std::string& inputFileName) {
 		}
 
 		if (strcmp(file->d_name, "xNANO_") < 0) continue; // skip "." and ".." and "log"
-
+        std::string file_path = DirPath + std::string(file->d_name);   
+        stat(file_path.c_str(), &file_stats); 
+        //std::cout << file_stats.st_size/1000. << " Kb" << std::endl;
+        if(file_stats.st_size/1000. < 2378 ) continue;
 		Nfiles ++;
 		//std::cout << file->d_name << std::endl;
 		tree_path = DirPath + "/" + file->d_name + treeName; 

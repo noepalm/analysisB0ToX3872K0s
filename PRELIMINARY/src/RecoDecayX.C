@@ -27,41 +27,71 @@ void RecoDecayX::Loop(){
 
 
     // **** HISTOGRAMS **** //
+    // muons tracks quality
     TH1F h_Mu_SoftID_MC = TH1F("Mu_SoftID_MC", "", 2, -0.5, 1.5);
     TH1F h_Mu_SoftID_Fk = TH1F("Mu_SoftID_Fk", "", 2, -0.5, 1.5);
     TH1F h_Mu_GlobalMu_MC = TH1F("Mu_GlobalMu_MC", "", 2, -0.5, 1.5);
     TH1F h_Mu_GlobalMu_Fk = TH1F("Mu_GlobalMu_Fk", "", 2, -0.5, 1.5);
     TH1F h_Mu_TrkQlty_MC = TH1F("Mu_TrkQlty_MC", "", 3, -0.5, 2.5);
     TH1F h_Mu_TrkQlty_Fk = TH1F("Mu_TrkQlty_Fk", "", 3, -0.5, 2.5);
-
+    // pions track quality
     TH1F h_Pi_TrkQlty_MC = TH1F("Pi_TrkQlty_MC", "", 3, -0.5, 2.5);
     TH1F h_Pi_TrkQlty_Fk = TH1F("Pi_TrkQlty_Fk", "", 3, -0.5, 2.5);
 
     int Nbins = 20;
     double xlow = 0., xhigh = 0.005;
+    // DeltaR(trigger-Mu; reco-Mu)
     TH1F h_Mu_dR_HLT_Dimuon25_Jpsi_MC = TH1F("Mu_dR_HLT_Dimuon25_Jpsi_MC", "", Nbins, xlow, xhigh);
     TH1F h_Mu_dR_HLT_Dimuon25_Jpsi_Fk = TH1F("Mu_dR_HLT_Dimuon25_Jpsi_Fk", "", Nbins, xlow, xhigh);
     TH1F h_Mu_dR_HLT_DoubleMu4_JpsiTrk_MC = TH1F("Mu_dR_HLT_DoubleMu4_JpsiTrk_MC", "", Nbins, xlow, xhigh);
     TH1F h_Mu_dR_HLT_DoubleMu4_JpsiTrk_Fk = TH1F("Mu_dR_HLT_DoubleMu4_JpsiTrk_Fk", "", Nbins, xlow, xhigh);
     xlow = 0., xhigh = 0.03;
+    // DeltaR(trigger-Pi; reco-Pi)
     TH1F h_Pi_dR_HLT_DoubleMu4_JpsiTrk_MC = TH1F("Pi_dR_HLT_DoubleMu4_JpsiTrk_MC", "", Nbins, xlow, xhigh);
     TH1F h_Pi_dR_HLT_DoubleMu4_JpsiTrk_Fk = TH1F("Pi_dR_HLT_DoubleMu4_JpsiTrk_Fk", "", Nbins, xlow, xhigh);
-    Nbins = 20, xlow = 0., xhigh = 1.;
-    TH1F h_PiPi_svProb_MC = TH1F("PiPi_svProb_MC", "", Nbins, xlow, xhigh);
-    TH1F h_PiPi_svProb_Fk = TH1F("PiPi_svProb_Fk", "", Nbins, xlow, xhigh);
+    
+    // JPsi --> MuMu
+    Nbins =35 , xlow = 2.9, xhigh = 3.25;
+    TH1F h_MuMu_M_MC = TH1F("MuMu_M_MC", "", Nbins, xlow, xhigh);
+    TH1F h_MuMu_M_Fk = TH1F("MuMu_M_Fk", "", Nbins, xlow, xhigh);
 
+    // Rho --> PiPi
+    Nbins = 50 , xlow = 0., xhigh = 1.;
+    TH1F h_PiPi_M_MC        = TH1F("PiPi_M_MC", "", Nbins, xlow, xhigh);
+    TH1F h_PiPi_M_Fk        = TH1F("PiPi_M_Fk", "", Nbins, xlow, xhigh);
+    Nbins = 30, xlow = 0., xhigh = .30; 
+    TH1F h_Pi1_pT_MC        = TH1F("Pi1_pT_MC", "", Nbins, xlow, xhigh);
+    TH1F h_Pi1_pT_Fk        = TH1F("Pi1_pT_Fk", "", Nbins, xlow, xhigh);
+    Nbins = 30, xlow = 0., xhigh = 0.60; 
+    TH1F h_Pi1_DRwrtB_MC    = TH1F("Pi1_DRwrtB_MC", "", Nbins, xlow, xhigh);
+    TH1F h_Pi1_DRwrtB_Fk    = TH1F("Pi1_DRwrtB_Fk", "", Nbins, xlow, xhigh);
+    Nbins = 15, xlow = 0., xhigh = 30; 
+    TH1F h_Pi1_D0_MC        = TH1F("Pi1_D0_MC", "", Nbins, xlow, xhigh);
+    TH1F h_Pi1_D0_Fk        = TH1F("Pi1_D0_Fk", "", Nbins, xlow, xhigh);
+    Nbins = 20, xlow = 0., xhigh = 1.;
+    TH1F h_PiPi_svProb_MC   = TH1F("PiPi_svProb_MC", "", Nbins, xlow, xhigh);
+    TH1F h_PiPi_svProb_Fk   = TH1F("PiPi_svProb_Fk", "", Nbins, xlow, xhigh);
+    Nbins = 40, xlow = 0., xhigh = 0.4;
+    TH1F h_PiPi_pT_MC       = TH1F("PiPi_pT_MC", "", Nbins, xlow, xhigh);
+    TH1F h_PiPi_pT_Fk       = TH1F("PiPi_pT_Fk", "", Nbins, xlow, xhigh);
+
+    // X3872 --> Jpsi PiPi
+    Nbins = 50 , xlow = 3.75, xhigh = 4.0;
+    TH1F h_X3872_M_MC        = TH1F("X3872_M_MC", "", Nbins, xlow, xhigh);
+    TH1F h_X3872_M_Fk        = TH1F("X3872_M_Fk", "", Nbins, xlow, xhigh);
+
+    // K0s --> PiPi
+    Nbins = 50 , xlow = .300, xhigh = .600;
+    TH1F h_K0s_M_MC        = TH1F("K0s_M_MC", "", Nbins, xlow, xhigh);
+    TH1F h_K0s_M_Fk        = TH1F("K0s_M_Fk", "", Nbins, xlow, xhigh);
     xlow = 0., xhigh = 100;
     TH1F h_K0s_LxySign_wrtBvtx_MC = TH1F("K0s_LxySign_wrtBvtx_MC", "", Nbins, xlow, xhigh);
     TH1F h_K0s_LxySign_wrtBvtx_Fk = TH1F("K0s_LxySign_wrtBvtx_Fk", "", Nbins, xlow, xhigh);
-    Nbins = 20, xlow = 0.999, xhigh = 1.;
-    //TH1F h_K0s_cosAlpha2D_MC = TH1F("K0s_cosAlpha2D_MC", "", Nbins, xlow, xhigh);
-    //TH1F h_K0s_cosAlpha2D_Fk = TH1F("K0s_cosAlpha2D_Fk", "", Nbins, xlow, xhigh);
-    xlow = 0., xhigh = 1.;
-    //TH1F h_K0s_cosAlpha3D_MC = TH1F("K0s_cosAlpha3D_MC", "", Nbins, xlow, xhigh);
-    //TH1F h_K0s_cosAlpha3D_Fk = TH1F("K0s_cosAlpha3D_Fk", "", Nbins, xlow, xhigh);
+    // B0 --> X K0s
+    Nbins = 60 , xlow = 5., xhigh = 5.6;
+    TH1F h_B0_M_MC        = TH1F("B0_M_MC", "", Nbins, xlow, xhigh);
+    TH1F h_B0_M_Fk        = TH1F("B0_M_Fk", "", Nbins, xlow, xhigh);
     xlow = 0.999, xhigh = 1.;
-    //TH1F h_B0_cosAlpha2D_MC = TH1F("B0_cosAlpha2D_MC", "", Nbins, xlow, xhigh);
-    //TH1F h_B0_cosAlpha2D_Fk = TH1F("B0_cosAlpha2D_Fk", "", Nbins, xlow, xhigh);
     TH1F h_B0_cosAlpha2DwrtBSwithZ_MC = TH1F("B0_cosAlpha2DwrtBSwithZ_MC", "", Nbins, xlow, xhigh);
     TH1F h_B0_cosAlpha2DwrtBSwithZ_Fk = TH1F("B0_cosAlpha2DwrtBSwithZ_Fk", "", Nbins, xlow, xhigh);
     TH1F h_B0_cosAlpha2DwrtBS_MC = TH1F("B0_cosAlpha2DwrtBS_MC", "", Nbins, xlow, xhigh);
@@ -82,11 +112,21 @@ void RecoDecayX::Loop(){
     TH1F h_B0_DistGenVtx_BS_Fk   = TH1F("B0_DistGenVtx_BS_Fk", "", Nbins, xlow, xhigh);
     TH1F h_B0_DistGenVtx_BSwithZ_MC = TH1F("B0_DistGenVtx_BSwithZ_MC", "", Nbins, xlow, xhigh);
     TH1F h_B0_DistGenVtx_BSwithZ_Fk = TH1F("B0_DistGenVtx_BSwithZ_Fk", "", Nbins, xlow, xhigh);
+    Nbins = 20, xlow = 0., xhigh = 1.;
+    TH1F h_B0_svProb_MC   = TH1F("B0_svProb_MC", "", Nbins, xlow, xhigh);
+    TH1F h_B0_svProb_Fk   = TH1F("B0_svProb_Fk", "", Nbins, xlow, xhigh);
+    Nbins = 30, xlow = 0., xhigh = 15;
+    TH1F h_B0_pT_MC       = TH1F("B0_pT_MC", "", Nbins, xlow, xhigh);
+    TH1F h_B0_pT_Fk       = TH1F("B0_pT_Fk", "", Nbins, xlow, xhigh);
 
     // MCmatching variables
     bool isMCmatched_Mu1, isMCmatched_Mu2, isMCmatched_Pi1, isMCmatched_Pi2;
     bool isMCmatched_JPsi, isMCmatched_Rho, isMCmatched_X3872, isMCmatched_K0s, isMCmatched_B0;
-    int N_B0matching = 0;
+   
+    // toCount variables
+    int  N_FiredEvents = 0, N_PassedEvents = 0, n_PassedB0 = 0, N_PassedB0 = 0, N_B0matching = 0;
+    bool toCountJPsi = true, toCountPiPi= true, toCountK0s = true;
+    int  prevMu1_idx, prevMu2_idx, prevPi1_idx, prevPi2_idx;
 
     Long64_t nbytes = 0, nb = 0;
     for (Long64_t jentry=0; jentry<nentries;jentry++) {
@@ -95,7 +135,9 @@ void RecoDecayX::Loop(){
         if (ientry < 0 || jentry == Nbreak) break;
         if ((jentry+1) % Nprint == 0) std::cout << "--> " << Form("%3.0f",(float)(jentry+1)/nentries* 100.) << " \%"<< std::endl;
         nb = fChain->GetEntry(jentry);   nbytes += nb;
-
+        // ----- CHECK IF THE TRIGGER FIRED
+        if(!HLT_DoubleMu4_JpsiTrk_Displaced) continue;
+        N_FiredEvents++;
         // ----- GENERATOR
         GenPartFillP4();
         realB_idx = GenB0idx();
@@ -104,85 +146,106 @@ void RecoDecayX::Loop(){
         //std::cout << " --- EV " << jentry << " with #B0 candidates " << nB0 << std::endl;
         MCtruthMatching();
 
+        n_PassedB0 = 0;
         for (Int_t b = 0; b  < nB0; b++){
             
-           if ( !RecoPartFillP4(b)) continue; 
+            if ( !RecoPartFillP4(b)) continue; 
             
-        // --> check the MC matching of the chain
-        isMCmatched_Mu1   =  (B0_mu1_idx[b] == MCmatch_Mum_Idx) || (B0_mu1_idx[b] == MCmatch_Mup_Idx);
-        isMCmatched_Mu2   =  (B0_mu2_idx[b] == MCmatch_Mum_Idx) || (B0_mu2_idx[b] == MCmatch_Mup_Idx);
-        isMCmatched_JPsi  =  isMCmatched_Mu1 && isMCmatched_Mu2;
-        isMCmatched_Pi1   =  (B0_pi1_idx[b] == MCmatch_Pim_Idx) || (B0_pi1_idx[b] == MCmatch_Pip_Idx);
-        isMCmatched_Pi2   =  (B0_pi2_idx[b] == MCmatch_Pim_Idx) || (B0_pi2_idx[b] == MCmatch_Pip_Idx);
-        isMCmatched_Rho   =  isMCmatched_Pi1 && isMCmatched_Pi2;
-        isMCmatched_X3872 =  isMCmatched_Rho && isMCmatched_JPsi;
-        isMCmatched_K0s   =  (fabs(ROOT::Math::VectorUtil::DeltaR(GenP4_K0s, RecoP4_K0s) - MCmatch_K0s_DRmin) < 0.0001) && (MCmatch_K0s_Idx  != -1);
-        isMCmatched_B0    =  isMCmatched_X3872 &&   isMCmatched_K0s;   
+            // --> check the MC matching of the chain
+            isMCmatched_Mu1   =  (B0_mu1_idx[b] == MCmatch_Mum_Idx) || (B0_mu1_idx[b] == MCmatch_Mup_Idx);
+            isMCmatched_Mu2   =  (B0_mu2_idx[b] == MCmatch_Mum_Idx) || (B0_mu2_idx[b] == MCmatch_Mup_Idx);
+            isMCmatched_JPsi  =  isMCmatched_Mu1 && isMCmatched_Mu2;
+            isMCmatched_Pi1   =  (B0_pi1_idx[b] == MCmatch_Pim_Idx) || (B0_pi1_idx[b] == MCmatch_Pip_Idx);
+            isMCmatched_Pi2   =  (B0_pi2_idx[b] == MCmatch_Pim_Idx) || (B0_pi2_idx[b] == MCmatch_Pip_Idx);
+            isMCmatched_Rho   =  isMCmatched_Pi1 && isMCmatched_Pi2;
+            isMCmatched_X3872 =  isMCmatched_Rho && isMCmatched_JPsi;
+            isMCmatched_K0s   =  (fabs(ROOT::Math::VectorUtil::DeltaR(GenP4_K0s, RecoP4_K0s) - MCmatch_K0s_DRmin) < 0.0001) && (MCmatch_K0s_Idx  != -1);
+            isMCmatched_B0    =  isMCmatched_X3872 &&   isMCmatched_K0s;   
 
-
-        // *** JPsi --> Mu+Mu-  ***
-        if (isMCmatched_Mu1){
-            h_Mu_SoftID_MC.Fill(Muon_softId[B0_mu1_idx[b]]);
-            h_Mu_GlobalMu_MC.Fill(Muon_isGlobal[B0_mu1_idx[b]]);
-            if (Muon_trackQuality[B0_mu1_idx[b]] < 2) h_Mu_TrkQlty_MC.Fill(Muon_trackQuality[B0_mu1_idx[b]]);
-            else h_Mu_TrkQlty_MC.Fill(2);
-
-            if (HLT_Dimuon25_Jpsi) h_Mu_dR_HLT_Dimuon25_Jpsi_MC.Fill(B0_MuMu_mu1_dr_Dimuon25_Jpsi[b]);
-            if (HLT_DoubleMu4_JpsiTrk_Displaced) h_Mu_dR_HLT_DoubleMu4_JpsiTrk_MC.Fill(B0_MuMu_mu1_dr_DoubleMu4_JpsiTrk_Displaced[b]);
-        }else{
-            h_Mu_SoftID_Fk.Fill(Muon_softId[B0_mu1_idx[b]]);
-            h_Mu_GlobalMu_Fk.Fill(Muon_isGlobal[B0_mu1_idx[b]]);
-            if (Muon_trackQuality[B0_mu1_idx[b]] < 2) h_Mu_TrkQlty_Fk.Fill(Muon_trackQuality[B0_mu1_idx[b]]);
-            else h_Mu_TrkQlty_Fk.Fill(2);
-
-            if (HLT_Dimuon25_Jpsi) h_Mu_dR_HLT_Dimuon25_Jpsi_Fk.Fill(B0_MuMu_mu1_dr_Dimuon25_Jpsi[b]);
-            if (HLT_DoubleMu4_JpsiTrk_Displaced) h_Mu_dR_HLT_DoubleMu4_JpsiTrk_Fk.Fill(B0_MuMu_mu1_dr_DoubleMu4_JpsiTrk_Displaced[b]);
-        }
-        if (isMCmatched_Mu2){
-            h_Mu_SoftID_MC.Fill(Muon_softId[B0_mu2_idx[b]]);
-            h_Mu_GlobalMu_MC.Fill(Muon_isGlobal[B0_mu2_idx[b]]);
-            if (Muon_trackQuality[B0_mu1_idx[b]] < 2) h_Mu_TrkQlty_MC.Fill(Muon_trackQuality[B0_mu2_idx[b]]);
-            else  h_Mu_TrkQlty_MC.Fill(2);
-
-            h_Mu_dR_HLT_Dimuon25_Jpsi_MC.Fill(B0_MuMu_mu2_dr_Dimuon25_Jpsi[b]);
-            h_Mu_dR_HLT_DoubleMu4_JpsiTrk_MC.Fill(B0_MuMu_mu2_dr_DoubleMu4_JpsiTrk_Displaced[b]);
-        }else{
-            h_Mu_SoftID_Fk.Fill(Muon_softId[B0_mu2_idx[b]]);
-            h_Mu_GlobalMu_Fk.Fill(Muon_isGlobal[B0_mu2_idx[b]]);
-            if (Muon_trackQuality[B0_mu1_idx[b]] < 2) h_Mu_TrkQlty_Fk.Fill(Muon_trackQuality[B0_mu2_idx[b]]);
-            else h_Mu_TrkQlty_Fk.Fill(2);
-
-            h_Mu_dR_HLT_Dimuon25_Jpsi_Fk.Fill(B0_MuMu_mu2_dr_Dimuon25_Jpsi[b]);
-            h_Mu_dR_HLT_DoubleMu4_JpsiTrk_Fk.Fill(B0_MuMu_mu2_dr_DoubleMu4_JpsiTrk_Displaced[b]);
-        }
-        
-        
-        // *** Rho --> Pi+Pi-  ***
-        if(isMCmatched_Pi1){
-            if (HLT_DoubleMu4_JpsiTrk_Displaced) h_Pi_dR_HLT_DoubleMu4_JpsiTrk_MC.Fill(B0_PiPi_p1_dr_DoubleMu4_JpsiTrk_Displaced[b]);
-        }else{
-            if (HLT_DoubleMu4_JpsiTrk_Displaced) h_Pi_dR_HLT_DoubleMu4_JpsiTrk_Fk.Fill(B0_PiPi_p1_dr_DoubleMu4_JpsiTrk_Displaced[b]);
-            //std::cout << B0_PiPi_p1_dr_DoubleMu4_JpsiTrk_Displaced[b]<< std::endl;
-        }
-        if (isMCmatched_Pi2)
-        {
-            if (HLT_DoubleMu4_JpsiTrk_Displaced) h_Pi_dR_HLT_DoubleMu4_JpsiTrk_MC.Fill(B0_PiPi_p2_dr_DoubleMu4_JpsiTrk_Displaced[b]);   
-        }else{
-            if (HLT_DoubleMu4_JpsiTrk_Displaced) h_Pi_dR_HLT_DoubleMu4_JpsiTrk_Fk.Fill(B0_PiPi_p2_dr_DoubleMu4_JpsiTrk_Displaced[b]);
-        }
-        if (isMCmatched_Rho){
+            // ----- TRIGGER SELECTION TO THE B0 CANDIDATE
+            //std::cout << " - muon selection " << TriggerSelection_Muons(b) << std::endl;
+            //std::cout << " - track selection " << TriggerSelection_Track(b) << std::endl;
+            if(!TriggerSelection_Muons(b)) continue;
+            if(!TriggerSelection_Track(b)) continue;
+            n_PassedB0++;
+            //std::cout << " = passed B0 " << n_PassedB0 << std::endl;
             
-        }else{
-           
-        }
+
+            // *** JPsi --> Mu+Mu-  ***
+            toCountJPsi = (B0_mu1_idx[b] != prevMu1_idx) || (B0_mu2_idx[b] != prevMu2_idx);
+            if(toCountJPsi){
+
+                prevMu1_idx = B0_mu1_idx[b]; prevMu2_idx = B0_mu2_idx[b];
+
+                if (isMCmatched_Mu1){
+                    h_Mu_SoftID_MC.Fill(Muon_softId[B0_mu1_idx[b]]);
+                    h_Mu_GlobalMu_MC.Fill(Muon_isGlobal[B0_mu1_idx[b]]);
+                    if (Muon_trackQuality[B0_mu1_idx[b]] < 2) h_Mu_TrkQlty_MC.Fill(Muon_trackQuality[B0_mu1_idx[b]]);
+                    else h_Mu_TrkQlty_MC.Fill(2);
+
+                    if (HLT_Dimuon25_Jpsi) h_Mu_dR_HLT_Dimuon25_Jpsi_MC.Fill(B0_MuMu_mu1_dr_Dimuon25_Jpsi[b]);
+                    if (HLT_DoubleMu4_JpsiTrk_Displaced) h_Mu_dR_HLT_DoubleMu4_JpsiTrk_MC.Fill(B0_MuMu_mu1_dr_DoubleMu4_JpsiTrk_Displaced[b]);
+                }else{
+                    h_Mu_SoftID_Fk.Fill(Muon_softId[B0_mu1_idx[b]]);
+                    h_Mu_GlobalMu_Fk.Fill(Muon_isGlobal[B0_mu1_idx[b]]);
+                    if (Muon_trackQuality[B0_mu1_idx[b]] < 2) h_Mu_TrkQlty_Fk.Fill(Muon_trackQuality[B0_mu1_idx[b]]);
+                    else h_Mu_TrkQlty_Fk.Fill(2);
+
+                    if (HLT_Dimuon25_Jpsi) h_Mu_dR_HLT_Dimuon25_Jpsi_Fk.Fill(B0_MuMu_mu1_dr_Dimuon25_Jpsi[b]);
+                    if (HLT_DoubleMu4_JpsiTrk_Displaced) h_Mu_dR_HLT_DoubleMu4_JpsiTrk_Fk.Fill(B0_MuMu_mu1_dr_DoubleMu4_JpsiTrk_Displaced[b]);
+                }
+                if (isMCmatched_Mu2){
+                    h_Mu_SoftID_MC.Fill(Muon_softId[B0_mu2_idx[b]]);
+                    h_Mu_GlobalMu_MC.Fill(Muon_isGlobal[B0_mu2_idx[b]]);
+                    if (Muon_trackQuality[B0_mu1_idx[b]] < 2) h_Mu_TrkQlty_MC.Fill(Muon_trackQuality[B0_mu2_idx[b]]);
+                    else  h_Mu_TrkQlty_MC.Fill(2);
+
+                    h_Mu_dR_HLT_Dimuon25_Jpsi_MC.Fill(B0_MuMu_mu2_dr_Dimuon25_Jpsi[b]);
+                    h_Mu_dR_HLT_DoubleMu4_JpsiTrk_MC.Fill(B0_MuMu_mu2_dr_DoubleMu4_JpsiTrk_Displaced[b]);
+                }else{
+                    h_Mu_SoftID_Fk.Fill(Muon_softId[B0_mu2_idx[b]]);
+                    h_Mu_GlobalMu_Fk.Fill(Muon_isGlobal[B0_mu2_idx[b]]);
+                    if (Muon_trackQuality[B0_mu1_idx[b]] < 2) h_Mu_TrkQlty_Fk.Fill(Muon_trackQuality[B0_mu2_idx[b]]);
+                    else h_Mu_TrkQlty_Fk.Fill(2);
+
+                    h_Mu_dR_HLT_Dimuon25_Jpsi_Fk.Fill(B0_MuMu_mu2_dr_Dimuon25_Jpsi[b]);
+                    h_Mu_dR_HLT_DoubleMu4_JpsiTrk_Fk.Fill(B0_MuMu_mu2_dr_DoubleMu4_JpsiTrk_Displaced[b]);
+                }
+                
+                if(isMCmatched_Mu1&&isMCmatched_Mu2) h_MuMu_M_MC.Fill(B0_MuMu_fitted_mass[b]);
+                else h_MuMu_M_Fk.Fill(B0_MuMu_fitted_mass[b]);
+
+            }
+
         
+            // *** Rho --> Pi+Pi-  ***
+            toCountPiPi = (prevPi1_idx != B0_pi1_idx[b]) || (prevPi2_idx != B0_pi2_idx[b]) ; 
+            if(toCountPiPi){
+                prevPi1_idx = B0_pi1_idx[b]; prevPi2_idx = B0_pi2_idx[b];
+
+                if(isMCmatched_Pi1){
+                    if (HLT_DoubleMu4_JpsiTrk_Displaced) h_Pi_dR_HLT_DoubleMu4_JpsiTrk_MC.Fill(B0_PiPi_p1_dr_DoubleMu4_JpsiTrk_Displaced[b]);
+                }else{
+                    if (HLT_DoubleMu4_JpsiTrk_Displaced) h_Pi_dR_HLT_DoubleMu4_JpsiTrk_Fk.Fill(B0_PiPi_p1_dr_DoubleMu4_JpsiTrk_Displaced[b]);
+                }
+                if (isMCmatched_Pi2)
+                {
+                    if (HLT_DoubleMu4_JpsiTrk_Displaced) h_Pi_dR_HLT_DoubleMu4_JpsiTrk_MC.Fill(B0_PiPi_p2_dr_DoubleMu4_JpsiTrk_Displaced[b]);   
+                }else{
+                    if (HLT_DoubleMu4_JpsiTrk_Displaced) h_Pi_dR_HLT_DoubleMu4_JpsiTrk_Fk.Fill(B0_PiPi_p2_dr_DoubleMu4_JpsiTrk_Displaced[b]);
+                }
+                if(isMCmatched_Pi1&&isMCmatched_Pi2) h_PiPi_M_MC.Fill(B0_finalFit_Rho_mass[b]);
+                else h_PiPi_M_Fk.Fill(B0_finalFit_Rho_mass[b]); 
+            }
+            
+            if (isMCmatched_Mu1&&isMCmatched_Mu2&&isMCmatched_Pi1&&isMCmatched_Pi2) h_X3872_M_MC.Fill(B0_finalFit_X_mass[b]);
+            else h_X3872_M_Fk.Fill(B0_finalFit_X_mass[b]);
 
         // *** K0short ***
         if (isMCmatched_K0s){
- 
+            h_K0s_M_MC.Fill(B0_K0s_nmcFitted_mass[b]);
         }else{
-            
-
+            h_K0s_M_Fk.Fill(B0_K0s_nmcFitted_mass[b]);
         }
         
 
@@ -192,17 +255,21 @@ void RecoDecayX::Loop(){
 
         // *** B0 --> X(3872) K0s ***
         if (isMCmatched_B0){
+             
+            // ... masses ...
+            h_B0_M_MC.Fill(B0_finalFit_mass[b]);
+            
 
             // Rho
+            h_Pi1_pT_MC.Fill(RecoP4_Pi1.Pt()/RecoP4_B0.Pt());
+            h_Pi1_D0_MC.Fill( B0_PiPi_pi1_d0sig[b] );
+            h_Pi1_DRwrtB_MC.Fill(ROOT::Math::VectorUtil::DeltaR(RecoP4_Pi1, RecoP4_B0));
             h_PiPi_svProb_MC.Fill(B0_PiPi_sv_prob[b]);
+            h_PiPi_pT_MC.Fill( (RecoP4_Pi1 + RecoP4_Pi2).Pt()/RecoP4_B0.Pt() );
 
             //K0short
             h_K0s_LxySign_wrtBvtx_MC.Fill(B0_K0_lxySign_wrtBvtx[b]);
-            //h_K0s_cosAlpha2D_MC.Fill(fabs(B0_K0_cosAlpha2D[b]));
-            //h_K0s_cosAlpha3D_MC.Fill(fabs(B0_K0_cosAlpha3D[b]));
-
             //B0
-            //h_B0_cosAlpha2D_MC.Fill(fabs(B0_cosAlpha2D_PV[b]));
             h_B0_cosAlpha3DwrtPV_MC.Fill(fabs(B0_cosAlpha3D_PV[b]));
             h_B0_cosAlpha2DwrtBS_MC.Fill(fabs(B0_cosAlpha2D_BS[b]));
             h_B0_cosAlpha2DwrtBSwithZ_MC.Fill(fabs(B0_cosAlpha2D_BSwithZ[b]));
@@ -211,24 +278,34 @@ void RecoDecayX::Loop(){
             h_B0_LxySign_wrtPV_MC.Fill(B0_lxySign_PV[b]);
             h_B0_LxySign_wrtBS_MC.Fill(B0_lxySign_BS[b]);
             h_B0_LxySign_wrtBSwithZ_MC.Fill(B0_lxySign_BSwithZ[b]);
-            
+
+            h_B0_svProb_MC.Fill(B0_svprob[b]);
+            h_B0_pT_MC.Fill(RecoP4_B0.Pt()/B0_finalFit_mass[b]);
+           
             h_B0_DistGenVtx_PV_MC.Fill(Dist_GenV_PV);
             h_B0_DistGenVtx_BS_MC.Fill(Dist_GenV_BS);
             h_B0_DistGenVtx_BSwithZ_MC.Fill(Dist_GenV_BSwithZ);
         }else{
 
+            // ... masses ...
+            h_B0_M_Fk.Fill(B0_finalFit_mass[b]);
+
             // Rho
+            h_Pi1_pT_Fk.Fill(RecoP4_Pi1.Pt()/RecoP4_B0.Pt());
+            h_Pi1_D0_Fk.Fill( B0_PiPi_pi1_d0sig[b] );
+            h_Pi1_DRwrtB_Fk.Fill(ROOT::Math::VectorUtil::DeltaR(RecoP4_Pi1, RecoP4_B0));
             h_PiPi_svProb_Fk.Fill(B0_PiPi_sv_prob[b]);
+            h_PiPi_pT_Fk.Fill( (RecoP4_Pi1 + RecoP4_Pi2).Pt()/RecoP4_B0.Pt() );
 
             //K0short
             h_K0s_LxySign_wrtBvtx_Fk.Fill(B0_K0_lxySign_wrtBvtx[b]);
-            //h_K0s_cosAlpha2D_Fk.Fill(fabs(B0_K0_cosAlpha2D[b]));
-            //h_K0s_cosAlpha3D_Fk.Fill(fabs(B0_K0_cosAlpha3D[b]));
 
-            //h_B0_cosAlpha2D_Fk.Fill(fabs(B0_cosAlpha2D_PV[b]));
             h_B0_cosAlpha3DwrtPV_Fk.Fill(fabs(B0_cosAlpha3D_PV[b]));
             h_B0_cosAlpha2DwrtBS_Fk.Fill(fabs(B0_cosAlpha2D_BS[b]));
             h_B0_cosAlpha2DwrtBSwithZ_Fk.Fill(fabs(B0_cosAlpha2D_BSwithZ[b]));
+
+            h_B0_svProb_Fk.Fill(B0_svprob[b]);
+            h_B0_pT_Fk.Fill(RecoP4_B0.Pt()/B0_finalFit_mass[b]);
             
 
             h_B0_LxySign_wrtPV_Fk.Fill(B0_lxySign_PV[b]);
@@ -246,10 +323,17 @@ void RecoDecayX::Loop(){
         
         } // loop on B0 candidates
        
+        if(n_PassedB0 > 0){
+            N_PassedB0 += n_PassedB0;
+            N_PassedEvents++;
+        } 
 
 
     }// loop on events
 
+    std::cout << " Events which fired the HLT "  << N_FiredEvents << std::endl;
+    std::cout << " Events which passed the HLT " << N_PassedEvents << std::endl;
+    std::cout << " B0 cand. which passed the HLT " << N_PassedB0 << std::endl;
     std::cout << " B0 cand. MC matching " << N_B0matching << std::endl;
     
     outFile_ = new TFile(outFilePath_, "RECREATE");
@@ -266,21 +350,27 @@ void RecoDecayX::Loop(){
     h_Mu_dR_HLT_DoubleMu4_JpsiTrk_MC.Write();
     h_Mu_dR_HLT_DoubleMu4_JpsiTrk_Fk.Write();
 
+    h_MuMu_M_MC.Write();
+    h_MuMu_M_Fk.Write();
+    h_PiPi_M_MC.Write();
+    h_PiPi_M_Fk.Write();
+
     h_Pi_dR_HLT_DoubleMu4_JpsiTrk_MC.Write();
     h_Pi_dR_HLT_DoubleMu4_JpsiTrk_Fk.Write();
+    h_Pi1_pT_MC.Write();
+    h_Pi1_pT_Fk.Write();
+    h_Pi1_D0_MC.Write();
+    h_Pi1_D0_Fk.Write();
+    h_Pi1_DRwrtB_MC.Write();
+    h_Pi1_DRwrtB_Fk.Write();
+    h_PiPi_pT_MC.Write();
+    h_PiPi_pT_Fk.Write();
     h_PiPi_svProb_MC.Write();
     h_PiPi_svProb_Fk.Write();
 
     h_K0s_LxySign_wrtBvtx_MC.Write();
     h_K0s_LxySign_wrtBvtx_Fk.Write();
-    //h_K0s_cosAlpha2D_MC.Write();
-    //h_K0s_cosAlpha2D_Fk.Write();
-    //h_K0s_cosAlpha3D_MC.Write();
-    //h_K0s_cosAlpha3D_Fk.Write();
 
-
-    //h_B0_cosAlpha2D_MC.Write();
-    //h_B0_cosAlpha2D_Fk.Write();
     h_B0_cosAlpha2DwrtBS_MC.Write();
     h_B0_cosAlpha2DwrtBS_Fk.Write();
     h_B0_cosAlpha2DwrtBSwithZ_MC.Write();
@@ -295,9 +385,24 @@ void RecoDecayX::Loop(){
     h_B0_LxySign_wrtBSwithZ_MC.Write();
     h_B0_LxySign_wrtBSwithZ_Fk.Write();
     
+    h_B0_svProb_MC.Write();
+    h_B0_svProb_Fk.Write();
+    h_B0_pT_MC.Write();
+    h_B0_pT_Fk.Write();
     h_B0_DistGenVtx_PV_MC.Write();
     h_B0_DistGenVtx_BS_MC.Write();
     h_B0_DistGenVtx_BSwithZ_MC.Write();
+
+    h_MuMu_M_MC.Write();
+    h_MuMu_M_Fk.Write();
+    h_PiPi_M_MC.Write();
+    h_PiPi_M_Fk.Write();
+    h_X3872_M_MC.Write();
+    h_X3872_M_Fk.Write();
+    h_K0s_M_MC.Write();
+    h_K0s_M_Fk.Write();
+    h_B0_M_MC.Write();
+    h_B0_M_Fk.Write();
 
     outFile_->Close();
     std::cout << "  ...[OUTPUT] output histograms written on file " << outFilePath_ << std::endl;
@@ -318,6 +423,8 @@ int RecoDecayX::RecoPartFillP4(const int Bidx){
     RecoP4_Pi1.SetPt(B0_PiPi_prefit_pi1_pt[Bidx]); RecoP4_Pi1.SetEta(B0_PiPi_prefit_pi1_eta[Bidx]); RecoP4_Pi1.SetPhi(B0_PiPi_prefit_pi1_phi[Bidx]);
     RecoP4_Pi2.SetPt(B0_PiPi_prefit_pi2_pt[Bidx]); RecoP4_Pi2.SetEta(B0_PiPi_prefit_pi2_eta[Bidx]); RecoP4_Pi2.SetPhi(B0_PiPi_prefit_pi2_phi[Bidx]);
     RecoP4_K0s.SetPt(B0_K0s_mcFitted_pt[Bidx]); RecoP4_K0s.SetEta(B0_K0s_mcFitted_eta[Bidx]); RecoP4_K0s.SetPhi(B0_K0s_mcFitted_phi[Bidx]);
+
+    RecoP4_B0.SetPt(B0_finalFit_pt[Bidx]); RecoP4_B0.SetEta(B0_finalFit_eta[Bidx]); RecoP4_B0.SetPhi(B0_finalFit_phi[Bidx]); RecoP4_B0.SetM(B0_finalFit_mass[Bidx]);
  
     return TrackQualityCheck;
  
@@ -455,3 +562,97 @@ void RecoDecayX::MCtruthMatching(const bool verbose){
 float RecoDecayX::DeltaPT(ROOT::Math::PtEtaPhiMVector& genV, ROOT::Math::PtEtaPhiMVector& recV){
 	return fabs(genV.Pt() - recV.Pt()) / genV.Pt();
 }//DeltaPT()
+
+int RecoDecayX::TriggerSelection_Muons(const int Bidx){
+   // TRIGGER SETTINGS 
+    const float Min_Mu_pT = 4.,Max_Mu_eta = 2.5, Max_Mu_dr = 2.;
+    const float Min_MuMu_pT = 6.9, Low_MuMu_M = 3.0,  High_MuMu_M = 3.2, Max_MuMu_DCA = 0.5;
+    const float Min_MuMu_LxyS = 3, Min_MuMu_cosAlpha = 0.9, Min_MuMu_SVp = 0.1;
+
+    int mu1_idx, mu2_idx;
+    bool isFiredMu1, isFiredMu2;
+    bool isOK_mu1_step0 = false, isOK_mu2_step0 = false, MassCut = false, isOK_mumu_step1 = false, isOK_mumu_step2 = false; 
+
+    int RETURN_VALUE = 0;
+
+    mu1_idx = B0_mu1_idx[Bidx];
+    mu2_idx = B0_mu2_idx[Bidx];
+
+    // Fired Mu + muon tracks QUALITY CHECK
+    isFiredMu1 = (bool)B0_MuMu_mu1_fired_DoubleMu4_JpsiTrk_Displaced[Bidx];
+    isFiredMu2 = (bool)B0_MuMu_mu2_fired_DoubleMu4_JpsiTrk_Displaced[Bidx]; 
+    if ( (isFiredMu1 && isFiredMu2) && ( Muon_softId[mu1_idx] && Muon_softId[mu2_idx] )){ 
+            // STEP 0
+            isOK_mu1_step0 = true;
+            if((RecoP4_Mu1.Pt() < Min_Mu_pT) || (fabs(RecoP4_Mu1.Eta()) > Max_Mu_eta)  || ( B0_MuMu_mu1_dr[Bidx]) > Max_Mu_dr ) isOK_mu1_step0 = false;
+            isOK_mu2_step0 = true;
+            if((RecoP4_Mu2.Pt() < Min_Mu_pT) || (fabs(RecoP4_Mu2.Eta()) > Max_Mu_eta)  || ( B0_MuMu_mu2_dr[Bidx]) > Max_Mu_dr ) isOK_mu2_step0 = false;
+
+            if (isOK_mu1_step0 && isOK_mu2_step0){ 
+
+                // STEP 1 
+                isOK_mumu_step1 = true;
+                MassCut = ( (RecoP4_Mu1 + RecoP4_Mu2).M() > Low_MuMu_M ) && ( (RecoP4_Mu1 + RecoP4_Mu2).M() < High_MuMu_M  );
+                if ( !MassCut || ((RecoP4_Mu1 + RecoP4_Mu2).Pt() < Min_MuMu_pT ) || ( B0_MuMu_DCA[Bidx] > Max_MuMu_DCA )  )	isOK_mumu_step1 = false;
+                // STEP 2	
+                isOK_mumu_step2 = true;
+                if((B0_MuMu_LxySign[Bidx] < Min_MuMu_LxyS) || (B0_MuMu_cosAlpha[Bidx] < Min_MuMu_cosAlpha ) || (B0_MuMu_sv_prob[Bidx] < Min_MuMu_SVp )) isOK_mumu_step2 = false;
+            }
+    }
+
+    if (isOK_mu1_step0 && isOK_mu2_step0 && isOK_mumu_step1 && isOK_mumu_step2) RETURN_VALUE = 1; 
+
+    return RETURN_VALUE;
+
+}//TriggerSelection_Muons()
+
+int RecoDecayX::TriggerSelection_Track(const int Bidx){
+   //TRIGGER SETTINGS
+   const float Min_Trk_pT = 1.2, Max_Trk_eta = 2.5, Min_Trk_D0S = 2.;
+   bool isOK_trk_step0 = false, isOK_trk_step1 = false;
+
+   int RETURN_VALUE = 0;
+
+	bool isFired_RhoPi1 = (bool)B0_PiPi_p1_fired_DoubleMu4_JpsiTrk_Displaced[Bidx];
+	bool isMatchedToMuon_Rho_Pi1	= ProbeTracks_isMatchedToMuon[B0_pi1_idx[Bidx]];
+	bool isFired_RhoPi2 = (bool)B0_PiPi_p2_fired_DoubleMu4_JpsiTrk_Displaced[Bidx];
+	bool isMatchedToMuon_Rho_Pi2 = ProbeTracks_isMatchedToMuon[B0_pi2_idx[Bidx]];
+
+	bool isFired_K0sPi1 = (bool)B0_K0s_matchTrack1_fired_DoubleMu4_JpsiTrk_Displaced[Bidx];
+	bool isFired_K0sPi2 = (bool)B0_K0s_matchTrack2_fired_DoubleMu4_JpsiTrk_Displaced[Bidx];
+
+	//LEVEL 0 
+	isOK_trk_step0 =  (isFired_RhoPi1 || isFired_RhoPi2 || isFired_K0sPi1 || isFired_K0sPi2); // is fired at least 1
+
+   // LEVEL 1
+   isOK_trk_step1 = false;
+   if (isFired_RhoPi1 && !isMatchedToMuon_Rho_Pi1){ 
+		if( (RecoP4_Pi1.Pt() > Min_Trk_pT) && (fabs(RecoP4_Pi1.Eta()) < Max_Trk_eta) && (B0_PiPi_pi1_d0sig[Bidx] > Min_Trk_D0S) ){
+			isOK_trk_step1 = true;
+			RETURN_VALUE = 1;
+		}
+   } 
+   if (isFired_RhoPi2 && !isMatchedToMuon_Rho_Pi2){ 
+      if( (RecoP4_Pi2.Pt() > Min_Trk_pT) && (fabs(RecoP4_Pi2.Eta()) < Max_Trk_eta) && (B0_PiPi_pi2_d0sig[Bidx] > Min_Trk_D0S) ){
+			isOK_trk_step1 = true;
+			RETURN_VALUE = 2;
+		}
+   }
+   if (isFired_K0sPi1){
+      if( (B0_K0s_matchTrack1_pt[Bidx] > Min_Trk_pT) && (fabs(B0_K0s_matchTrack1_eta[Bidx]) < Max_Trk_eta) && (B0_K0s_matchTrack1_D0sign[Bidx] > Min_Trk_D0S) ){
+			isOK_trk_step1 = true;
+			RETURN_VALUE = 3;
+		}
+   }
+   if (isFired_K0sPi2){
+      if( (B0_K0s_matchTrack2_pt[Bidx] > Min_Trk_pT) && (fabs(B0_K0s_matchTrack2_eta[Bidx]) < Max_Trk_eta) && (B0_K0s_matchTrack2_D0sign[Bidx] > Min_Trk_D0S) ){
+			isOK_trk_step1 = true;
+			RETURN_VALUE = 3;
+		}
+   }
+
+	//if (isOK_trk_step0 && isOK_trk_step1) RETURN_VALUE = 1;	
+
+	return RETURN_VALUE;
+
+}//TriggerSelection_Tracks
