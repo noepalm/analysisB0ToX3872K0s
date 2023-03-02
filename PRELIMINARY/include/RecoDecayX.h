@@ -15,10 +15,12 @@ virtual ~RecoDecayX();
 
 
 // methods for the analysis
-void Loop();
-void MCtruthMatching(const bool verbose = false);
-float DeltaPT(ROOT::Math::PtEtaPhiMVector& genV, ROOT::Math::PtEtaPhiMVector& recV);
-int  RecoPartFillP4(const int Bidx);
+void    Loop();
+void    MCtruthMatching(const bool verbose = false);
+float   DeltaPT(ROOT::Math::PtEtaPhiMVector& genV, ROOT::Math::PtEtaPhiMVector& recV);
+int     RecoPartFillP4(const int Bidx);
+int     TriggerSelection_Muons(const int Bidx);
+int     TriggerSelection_Track(const int Bidx);
 
 private:
 
