@@ -48,7 +48,7 @@ int main(int argc, char* argv[]) {
         {
             sscanf(Buffer,"%s",MyRootFile);
             std::cout << MyRootFile << std::endl;
-            for(int i = 1; i < 100; i++){
+            for(int i = 1; i < 1000; i++){
                 ChainPath = TString(MyRootFile); 
                 if(ChainPath.EndsWith("_")) ChainPath.Append(Form("%d.root", i));
                 else ChainPath.Append(Form("%.3d.root", i));

@@ -16,6 +16,7 @@ void HLTapply::Loop(){
     Long64_t nentries = fChain->GetEntriesFast();
     Long64_t nbytes = 0, nb = 0;
     Long64_t Nbreak =  nentries + 10, Nprint = 1000;//(int)((double)nentries/20.); 
+    long int TotalEvents = 0;
 
 
     // ----- VARIABLES ----- //
@@ -33,6 +34,7 @@ void HLTapply::Loop(){
 
         Long64_t ientry = LoadTree(jentry);
         if (ientry < 0 || jentry == Nbreak) break;
+        TotalEvents++;
 
         if ((jentry+1) % Nprint == 0) std::cout << " --> " <<  (jentry+1) << std::endl;//std::cout << "--> " << Form("%3.0f",(float)(jentry+1)/nentries* 100.) << " \%"<< std::endl;
         nb = fChain->GetEntry(jentry);   nbytes += nb;
@@ -113,6 +115,7 @@ void HLTapply::Loop(){
 
     }// loop on events
 
+    std::cout << " Total processed events "  << TotalEvents << std::endl;
     std::cout << " Events which fired the HLT "  << N_FiredEvents << std::endl;
     std::cout << " Events which passed the HLT " << N_PassedEvents << std::endl;
     std::cout << " B0 cand. which passed the HLT " << N_PassedB0 << std::endl;
