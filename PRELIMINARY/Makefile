@@ -42,6 +42,8 @@ $(OUTLIB)CheckGenLevPsi2S.o: $(INCLUDEDIR)src/CheckGenLevPsi2S.C
 
 $(OUTLIB)RecoDecayX.o: $(INCLUDEDIR)src/RecoDecayX.C
 		$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)RecoDecayX.o $<
+$(OUTLIB)RecoDecayPsi.o: $(INCLUDEDIR)src/RecoDecayPsi.C
+		$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)RecoDecayPsi.o $<
 # ==================== GEN LEVEL CHECK =============================================
 GenLev:$(INCLUDEDIR)src/GenLevelAnalysis.cc\
 		$(OUTLIB)Prep.o\
@@ -57,7 +59,9 @@ GenLev.clean:
 # ==================== RECO LEVEL STUDY =============================================
 RecoLev:$(INCLUDEDIR)src/RecoChainAnalysis.cc\
 		$(OUTLIB)MCbase_B0toX3872K0s.o\
-		$(OUTLIB)RecoDecayX.o
+		$(OUTLIB)MCbase_B0toPsi2SK0s.o\
+		$(OUTLIB)RecoDecayX.o\
+		$(OUTLIB)RecoDecayPsi.o
 		$(CXX) $(CXXFLAGS) -ldl -o RecoChainAnalysis $(OUTLIB)/*.o $(GLIBS) $(LDFLAGS) $ $<
 
 clean:
