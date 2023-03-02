@@ -1,4 +1,5 @@
 #include "../include/RecoDecayX.h"
+#include "../include/RecoDecayPsi.h"
 
 #include <iostream>
 #include <fstream>
@@ -78,13 +79,15 @@ int main (int argc, char* argv[]){
 	TString tag = argv[2];
 	std::string channel = argv[3];
 	TChain* chain = TChainLoader(DirPath);
-
+	
 	if (channel == "SGN"){
 		RecoDecayX* RecoAnalyzer = new RecoDecayX(chain, tag);
 		RecoAnalyzer->Loop();
 		delete RecoAnalyzer;
 	} else if (channel == "NORM"){
-        cout << "[ERROR] Reco analysis for B0 -> Psi(2S) K0s not yet implemented ..." << endl;
+		RecoDecayPsi* RecoAnalyzer = new RecoDecayPsi(chain, tag);
+		RecoAnalyzer->Loop();
+		delete RecoAnalyzer;
 	}
 
 	delete chain;
