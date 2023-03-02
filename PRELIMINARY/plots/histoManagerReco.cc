@@ -56,13 +56,18 @@ Color_t PtlColorMap(const TString& particle){
   PtlColor["muL"] = kAzure + 5;
   PtlColor["muSL"] = kPink + 5;
   PtlColor["pi"] = kBlue - 4;
-  PtlColor["PiPi"] = kOrange + 6;
+  PtlColor["PiPi"] = kGreen + 1;
+  PtlColor["PiPi_Fk"] = kYellow - 7; 
   PtlColor["JPsi"] = kRed;
   PtlColor["Rho"] = kOrange + 8;
-  PtlColor["Ks"] = kGreen;
-  PtlColor["X"] = kBlack + 3;
-  PtlColor["Psi"] = kBlack + 3;
-  PtlColor["B0"] = kViolet + 8;
+  PtlColor["K0s"] = kGreen;
+  PtlColor["K0s_Fk"] = kPink - 6;
+  PtlColor["X"] = kBlue - 9;
+  PtlColor["X_Fk"] = kMagenta - 6;
+  PtlColor["Psi"] = kBlue - 9;
+  PtlColor["Psi_Fk"] = kMagenta - 6;
+  PtlColor["B0"] = kAzure + 1;
+  PtlColor["B0"] = kRed;
 
   PtlColor["MCmatch"] = kAzure +1;
   PtlColor["MCfake"]  = kRed;
@@ -72,6 +77,11 @@ Color_t PtlColorMap(const TString& particle){
   PtlColor["pi_Fk"]   = kYellow - 7;
   PtlColor["PV"]   = kMagenta -7;
   PtlColor["BS"]   = kGreen -7;
+
+  PtlColor["16preVFP"] = kRed; 
+  PtlColor["16"] = kOrange; 
+  PtlColor["17"] = kBlue; 
+  PtlColor["18"] = kBlack; 
 
   return PtlColor[particle];
 }
@@ -84,12 +94,17 @@ TString CategoryLegend(const TString& category){
   Leg_entry["muL"] = "Leading #mu";
   Leg_entry["muSL"] = "Sub-leading #mu";
   Leg_entry["pi"] = "pions";
-  Leg_entry["PiPi"] = "#pi^{+} #pi^{-}";
-  Leg_entry["JPsi"] = "J/#psi";
+  Leg_entry["PiPi"] = "#pi^{+} #pi^{-} MC match";
+  Leg_entry["PiPi_Fk"] = "#pi^{+} #pi^{-} fake";
+  Leg_entry["JPsi"] = "J/#psi MC match";
+  Leg_entry["JPsi_Fk"] = "J/#psi fake";
   Leg_entry["Rho"] = "#rho(770)";
-  Leg_entry["Ks"] = "K_{s}^{0}";
-  Leg_entry["X"] = "X(3872)";
-  Leg_entry["Psi"] = "#psi (2S)";
+  Leg_entry["K0s"] = "K_{s}^{0} MC match";
+  Leg_entry["K0s"] = "K_{s}^{0} fake";
+  Leg_entry["X"] = "X(3872) MC match";
+  Leg_entry["X_Fk"] = "X(3872) fake";
+  Leg_entry["Psi"] = "#psi (2S) MC match";
+  Leg_entry["Psi_Fk"] = "#psi (2S) fake";
   Leg_entry["B0"] = "B_{0} ";
 
   Leg_entry["MCmatch"] = "B^{0} MC matching";
@@ -100,6 +115,11 @@ TString CategoryLegend(const TString& category){
   Leg_entry["pi_Fk"] = "#pi FAKE";
   Leg_entry["PV"] = "wrt chosen PV";
   Leg_entry["BS"] = "wrt BS";
+
+  Leg_entry["16preVFP"] = "2016 pre VFP"; 
+  Leg_entry["16"] = "2016 post VFP"; 
+  Leg_entry["17"] = "2017"; 
+  Leg_entry["18"] = "2018"; 
 
   return Leg_entry[category];
 }
@@ -357,3 +377,58 @@ void makeROCcurve(std::vector<TString> SGNhistos, std::vector<TString> BKGhistos
   input_file->Close();
 
 }
+
+
+
+
+void compare_years(const TString& h_name, const TString& x_name){
+
+    TFile* file_16preVFP = new TFile("outRoot/RecoDecay_X3872_UL16preVFP.root"); 
+    TFile* file_16       = new TFile("outRoot/RecoDecay_X3872_UL16.root"); 
+    TFile* file_17       = new TFile("outRoot/RecoDecay_X3872_UL17.root"); 
+    TFile* file_18       = new TFile("outRoot/RecoDecay_X3872_UL18.root"); 
+
+    TH1F* h_16preVFP = (TH1F*)file_16preVFP->Get(h_name);
+    TH1F* h_16= (TH1F*)file_16->Get(h_name);
+    TH1F* h_17= (TH1F*)file_17->Get(h_name);
+    TH1F* h_18= (TH1F*)file_18->Get(h_name);
+
+    
+    //histoSetUp(TH1* histo, const TString& category, const TString& x_name, bool fill = true , bool norm = true)
+    histoSetUp(h_16preVFP, "16preVFP", x_name, false, true);
+    histoSetUp(h_16      , "16"      , x_name, false, true);
+    histoSetUp(h_17      , "17"      , x_name, false, true);
+    histoSetUp(h_18      , "18"      , x_name, false, true);
+
+    gStyle->SetOptStat(0);
+    gStyle->SetLineWidth(2);
+
+    //LEGEND                                                                                                                                                                    
+    auto legend = new TLegend(0.15,0.65,.40,.80);
+    legend->SetBorderSize(0);
+    legend->SetTextSize(0.035);
+    legend->AddEntry(h_16preVFP,CategoryLegend("16preVFP"),"f");
+    legend->AddEntry(h_16,CategoryLegend("16"),"f");
+    legend->AddEntry(h_17,CategoryLegend("17"),"f");
+    legend->AddEntry(h_18,CategoryLegend("18"),"f");
+
+    TCanvas* c = new TCanvas("c", "", 1024, 1024);
+    gPad->SetLeftMargin(0.13);
+    gPad->SetBottomMargin(0.13);
+    h_16preVFP->Draw("hist");
+    h_16preVFP->SetMaximum(1.5*std::max( std::max(h_16preVFP->GetBinContent(h_16preVFP->GetMaximumBin()), h_16->GetBinContent(h_16->GetMaximumBin())) , 
+                                            std::max(h_17->GetBinContent(h_17->GetMaximumBin()), h_18->GetBinContent(h_18->GetMaximumBin()) ) ) ); 
+    h_16->Draw("same hist");
+    h_17->Draw("same hist");
+    h_18->Draw("same hist");
+    legend->Draw();
+    c->SaveAs("/eos/user/c/cbasile/www/B0toX3872K0s/RECO_LEVEL/FullRun2_X3872/Run2_" +  h_name + ".png");
+    c->SaveAs("/eos/user/c/cbasile/www/B0toX3872K0s/RECO_LEVEL/FullRun2_X3872/Run2_" +  h_name + ".pdf");
+
+
+    file_16preVFP->Close();
+    file_16->Close();
+    file_17->Close();
+    file_18->Close();
+
+}//compare_years()

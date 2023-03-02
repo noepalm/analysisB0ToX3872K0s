@@ -1,4 +1,7 @@
 {
+  SetInputFile("./outRoot/CheckGenLev_Psi2S_22.root");
+  SetOutputFile("/eos/user/c/cbasile/www/B0toX3872K0s/GEN_LEVEL/Gen22_Psi2S/");
+
 	gStyle->SetLineWidth(3);
 	gStyle->SetPadTickX(1);
 	gStyle->SetPadTickY(1);

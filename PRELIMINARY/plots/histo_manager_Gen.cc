@@ -16,7 +16,7 @@ using namespace std;
 // draw_two_histograms()
 
 
-TString inRootFile_  = "../outRoot/RecoDecay_X3872_UL17_X3872.root"; 
+TString inRootFile_  = "../outRoot/CheckGenLev_X3872_UL17.root";
 TString outPath_     = "/eos/user/c/cbasile/www/B0toX3872K0s/GEN_LEVEL/";
 
 
@@ -59,6 +59,11 @@ Color_t PtlColorMap(const TString& particle){
   PtlColor["Psi"] = kBlack + 3;
   PtlColor["B0"] = kViolet + 8;
 
+  PtlColor["16preVFP"] = kRed; 
+  PtlColor["16"] = kOrange; 
+  PtlColor["17"] = kBlue; 
+  PtlColor["18"] = kBlack; 
+
   return PtlColor[particle];
 }
 
@@ -77,6 +82,11 @@ TString CategoryLegend(const TString& category){
   Leg_entry["X"] = "X(3872)";
   Leg_entry["Psi"] = "#psi (2S)";
   Leg_entry["B0"] = "B_{0} ";
+
+  Leg_entry["16preVFP"] = "2016 pre VFP"; 
+  Leg_entry["16"] = "2016 post VFP"; 
+  Leg_entry["17"] = "2017"; 
+  Leg_entry["18"] = "2018"; 
 
   return Leg_entry[category];
 }
@@ -329,8 +339,8 @@ if(particle == "PiPi") h->GetXaxis()->SetNdivisions(5,kTRUE);
   TString png_name = pngName(histo_name); 
   TString pdf_name = pdfName(histo_name); 
   TCanvas* c1 = new TCanvas("c1","canvas", 1024,1024);
-	gPad->SetLeftMargin(0.13);
-	gPad->SetBottomMargin(0.13);
+  gPad->SetLeftMargin(0.13);
+  gPad->SetBottomMargin(0.13);
   h->Draw("HIST");
   legend->Draw();
 
@@ -341,3 +351,55 @@ if(particle == "PiPi") h->GetXaxis()->SetNdivisions(5,kTRUE);
   return 0;
 
 }//draw_mul()   
+
+void compare_years(const TString& h_name, const TString& x_name){
+
+    TFile* file_16preVFP = new TFile("outRoot/CheckGenLev_X3872_UL16preVFP.root"); 
+    TFile* file_16       = new TFile("outRoot/CheckGenLev_X3872_UL16.root"); 
+    TFile* file_17       = new TFile("outRoot/CheckGenLev_X3872_UL17.root"); 
+    TFile* file_18       = new TFile("outRoot/CheckGenLev_X3872_UL18.root"); 
+
+    TH1F* h_16preVFP = (TH1F*)file_16preVFP->Get(h_name);
+    TH1F* h_16= (TH1F*)file_16->Get(h_name);
+    TH1F* h_17= (TH1F*)file_17->Get(h_name);
+    TH1F* h_18= (TH1F*)file_18->Get(h_name);
+
+    
+    //histoSetUp(TH1* histo, const TString& category, const TString& x_name, bool fill = true , bool norm = true)
+    histoSetUp(h_16preVFP, "16preVFP", x_name, false, true);
+    histoSetUp(h_16      , "16"      , x_name, false, true);
+    histoSetUp(h_17      , "17"      , x_name, false, true);
+    histoSetUp(h_18      , "18"      , x_name, false, true);
+
+    gStyle->SetOptStat(0);
+    gStyle->SetLineWidth(2);
+
+    //LEGEND                                                                                                                                                                    
+    auto legend = new TLegend(0.15,0.65,.40,.80);
+    legend->SetBorderSize(0);
+    legend->SetTextSize(0.035);
+    legend->AddEntry(h_16preVFP,CategoryLegend("16preVFP"),"f");
+    legend->AddEntry(h_16,CategoryLegend("16"),"f");
+    legend->AddEntry(h_17,CategoryLegend("17"),"f");
+    legend->AddEntry(h_18,CategoryLegend("18"),"f");
+
+    TCanvas* c = new TCanvas("c", "", 1024, 1024);
+    gPad->SetLeftMargin(0.13);
+    gPad->SetBottomMargin(0.13);
+    h_16preVFP->Draw("hist");
+    h_16preVFP->SetMaximum(1.5*std::max( std::max(h_16preVFP->GetBinContent(h_16preVFP->GetMaximumBin()), h_16->GetBinContent(h_16->GetMaximumBin())) , 
+                                            std::max(h_17->GetBinContent(h_17->GetMaximumBin()), h_18->GetBinContent(h_18->GetMaximumBin()) ) ) ); 
+    h_16->Draw("same hist");
+    h_17->Draw("same hist");
+    h_18->Draw("same hist");
+    legend->Draw();
+    c->SaveAs("/eos/user/c/cbasile/www/B0toX3872K0s/GEN_LEVEL/FullRun2_X3872/Run2_" +  h_name + ".png");
+    c->SaveAs("/eos/user/c/cbasile/www/B0toX3872K0s/GEN_LEVEL/FullRun2_X3872/Run2_" +  h_name + ".pdf");
+
+
+    file_16preVFP->Close();
+    file_16->Close();
+    file_17->Close();
+    file_18->Close();
+
+}//compare_years()
