@@ -1,6 +1,9 @@
 # Prerequisites
 *.d
 
+# TextFiles
+*.txt
+
 # Compiled Object files
 *.slo
 *.lo
