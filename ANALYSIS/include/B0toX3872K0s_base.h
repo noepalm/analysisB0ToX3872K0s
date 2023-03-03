@@ -458,7 +458,7 @@ public :
    TBranch        *b_SV_z;   //!
    TBranch        *b_SV_ntracks;   //!
 
-   B0toX3872K0s_base(TTree *tree=0, const TString channel = "X3872");
+   B0toX3872K0s_base(TTree *tree=0);
    virtual ~B0toX3872K0s_base();
    virtual Int_t    Cut(Long64_t entry);
    virtual Int_t    GetEntry(Long64_t entry);
@@ -468,8 +468,6 @@ public :
    virtual Bool_t   Notify();
    virtual void     Show(Long64_t entry = -1);
 
-   // CHANNEL
-   TString channel_; // SGN = X3872 and NORM = Psi2S
 
 
    // BLINDING 
@@ -497,7 +495,7 @@ public :
 #endif
 
 #ifdef B0toX3872K0s_base_cxx
-B0toX3872K0s_base::B0toX3872K0s_base(TTree *tree, const TString channel) : fChain(0) 
+B0toX3872K0s_base::B0toX3872K0s_base(TTree *tree) : fChain(0) 
 {
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
@@ -510,7 +508,6 @@ B0toX3872K0s_base::B0toX3872K0s_base(TTree *tree, const TString channel) : fChai
 
    }
    Init(tree);
-   channel_ = channel;
 }
 
 B0toX3872K0s_base::~B0toX3872K0s_base()

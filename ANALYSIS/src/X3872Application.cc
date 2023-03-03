@@ -19,17 +19,19 @@ using namespace std;
 int main(int argc, char* argv[]) {
 
 	// inputs from shell
-	char inputFileName[500];
-	//char outputFileName[500];
-	char dataset[500];
+	char inputFileName[1000];
+	char outputDir[1000];
+	char dataset[1000];
 	if ( argc < 2 ){
 		std::cout << " missing argument: insert the file and the dataset you want to use :-)" << std::endl; 
-		std::cout << " ./X3872Application inputFile [dataset]" << std::endl;
+		std::cout << " ./X3872Application inputFile [outpudir] [dataset-tag]" << std::endl;
 		return 1;
 	}
 	
 	strcpy(inputFileName,argv[1]);
-	strcpy(dataset, argv[2]);
+	strcpy(outputDir,argv[2]);
+    if (argc > 3) strcpy(dataset, argv[3]);
+    else strcpy(dataset, ""); 
 	
 	// -------------------------
 	// Loading the file from a .txt
@@ -56,20 +58,16 @@ int main(int argc, char* argv[]) {
                 int status = theChain->Add(TString(ChainPath));
                 if (status) Nfile++; 
             }
-
         }
     }
 
-
 	cout<<" Number of chained files : " << Nfile << std::endl; 
-
-
 
 	inputFile->close();
 	delete inputFile;
 
 	//cout<<" Number of events: " << theChain->GetEntries()<<std::endl; 
-    HLTapply HLTapp(theChain ,"prova", TString(dataset));
+    HLTapply HLTapp(theChain ,outputDir, TString(dataset));
 	HLTapp.Loop();
 
 

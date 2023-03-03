@@ -1,11 +1,13 @@
 #include "../include/HLTapply.h"
 
 
-HLTapply::HLTapply(TTree *tree, const TString channel, const TString tags) : B0toX3872K0s_base(tree, channel) {
+HLTapply::HLTapply(TTree *tree, const TString outdir, const TString tags) : B0toX3872K0s_base(tree) {
     tags_ = tags;
     TString blind_tag = "Blind";
     if(!isBlind_) blind_tag = "Open";
-    outFileTreePath_ = "outRoot/Data" + blind_tag + "_HLTemulation_" + channel_ + "_" + tags_ + ".root";
+    if(outdir == "") outFileTreePath_ =  "./outRoot/CharmoniumUL_" + tags_ + "_HLTemulation_" + blind_tag+ ".root";
+    else outFileTreePath_ =  outdir + ".root";
+    
     
     //std::cout << " .... analyzing " << tree->GetEntriesFast() << " events "<< std::endl;
 

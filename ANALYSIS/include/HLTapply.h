@@ -30,7 +30,7 @@ class HLTapply : public B0toX3872K0s_base{
 public :
 
 //CONSTRUCTOR - DECONSTRUCTOR
-    HLTapply(TTree *tree=0, const TString channel = "X3872", const TString tags = "dataset");
+    HLTapply(TTree *tree=0, const TString outdir = "./outRoot", const TString tags = "");
     virtual ~HLTapply(){
         delete outFileTree_; 
     }
