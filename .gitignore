@@ -4,8 +4,9 @@
 # TextFiles
 *.txt
 
-# Job reports
+# Job reports & outputs
 */JobReport/*
+cbasile.cc
 
 # Compiled Object files
 *.slo
@@ -33,6 +34,7 @@
 *.lib
 
 # Executables
+*/X3872Application
 *.exe
 *.out
 *.app
