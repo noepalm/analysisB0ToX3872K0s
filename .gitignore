@@ -4,6 +4,9 @@
 # TextFiles
 *.txt
 
+# Job reports
+*/JobReport/*
+
 # Compiled Object files
 *.slo
 *.lo
