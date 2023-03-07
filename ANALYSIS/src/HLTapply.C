@@ -3,9 +3,9 @@
 
 HLTapply::HLTapply(TTree *tree, const TString outdir, const TString tags) : B0toX3872K0s_base(tree) {
     tags_ = tags;
-    TString blind_tag = "Blind";
-    if(!isBlind_) blind_tag = "Open";
-    if(outdir == "") outFileTreePath_ =  "./outRoot/CharmoniumUL_" + tags_ + "_HLTemulation_" + blind_tag+ ".root";
+    TString blind_tag = "blind";
+    if(!isBlind_) blind_tag = "open";
+    if(outdir == "default") outFileTreePath_ =  "./outRoot/CharmoniumUL_" + tags_ + "_HLTemulation_" + blind_tag+ ".root";
     else outFileTreePath_ =  outdir + ".root";
     
     

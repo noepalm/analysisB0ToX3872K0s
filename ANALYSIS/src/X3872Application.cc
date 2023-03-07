@@ -22,16 +22,18 @@ int main(int argc, char* argv[]) {
 	char inputFileName[1000];
 	char outputDir[1000];
 	char dataset[1000];
+    int Nfiles = 1000;
 	if ( argc < 2 ){
 		std::cout << " missing argument: insert the file and the dataset you want to use :-)" << std::endl; 
-		std::cout << " ./X3872Application inputFile [outpudir] [dataset-tag]" << std::endl;
+		std::cout << " ./X3872Application inputFile [outpudir] [dataset-tag] [Nfiles]" << std::endl;
 		return 1;
 	}
 	
 	strcpy(inputFileName,argv[1]);
 	strcpy(outputDir,argv[2]);
     if (argc > 3) strcpy(dataset, argv[3]);
-    else strcpy(dataset, ""); 
+    else strcpy(dataset, "default"); 
+    if (argc > 4) Nfiles = std::stoi(argv[4]);
 	
 	// -------------------------
 	// Loading the file from a .txt
@@ -50,13 +52,16 @@ int main(int argc, char* argv[]) {
         {
             sscanf(Buffer,"%s",MyRootFile);
             std::cout << MyRootFile << std::endl;
-            for(int i = 1; i < 1000; i++){
+            for(int i = 0; i < Nfiles; i++){
                 ChainPath = TString(MyRootFile); 
-                if(ChainPath.EndsWith("_")) ChainPath.Append(Form("%d.root", i));
-                else ChainPath.Append(Form("%.3d.root", i));
+                if(ChainPath.EndsWith("_")){
+                    if(i==0) continue;
+                    ChainPath.Append(Form("%d.root", i));
+                }else ChainPath.Append(Form("%.3d.root", i));
                 
                 int status = theChain->Add(TString(ChainPath));
-                if (status) Nfile++; 
+                Nfile++;
+                //std::cout << " + chaining " << ChainPath << std::endl; 
             }
         }
     }
