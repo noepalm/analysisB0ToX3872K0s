@@ -63,22 +63,22 @@ def main():
     # --defaults
     executable = './X3872Application'
     now = datetime.datetime.now()
-    #defaultoutputdir='./JobReport/HLTemul_'+str(now.year)+str(now.month)+str(now.day)+"_"+str(now.hour)+str(now.minute)+str(now.second)
     defaultoutputdir='./JobReport/HLTemul_'+ now.strftime("%Y%m%d_%H%M%S")
 
 
-    parser.add_option('-q', '--queue',       action='store',     dest='queue',       help='run in batch in queue specified as option (default -q 8nh)', default='8nh')
-    parser.add_option('-n', '--nfileperjob', action='store',     dest='nfileperjob', help='split the jobs with n files read/batch job'                , default=1,   type='int')
-    parser.add_option('-p', '--prefix',      action='store',     dest='prefix',      help='the prefix to be added to the output'                      , default=defaultoutputdir)
-    parser.add_option('-a', '--application', action='store',     dest='application', help='the executable to be run'                                  , default=executable)
-    parser.add_option('-c', '--create',      action='store_true',dest='create',      help='create only the jobs, do not submit them'                  , default=False)
-    parser.add_option('-B', '--blind',      action='store_true',dest='isblind',      help='indicates if the analysis is blind'                  , default=True)
-    parser.add_option('-t', '--testnjobs',   action='store',     dest='testnjobs',   help='submit only the first n jobs'                              , default=1000000, type='int')
-    parser.add_option('-N', '--neventsjob', action='store',      dest='neventsjob',  help='split the jobs with n events  / batch job'                 , default=200,   type='int')
-    parser.add_option('-T', '--eventsperfile', action='store',   dest='eventsperfile',  help='number of events per input file'                        , default=-1,   type='int')
-    parser.add_option('-r', '--runtime',     action='store',     dest='runtime',     help='New runtime for condor resubmission in hours. default None: will take the original one.', default=4        , type=int);
-    parser.add_option('--eos',               action='store',     dest='eos',         help='copy the output in the specified EOS path'                 , default='')
-    parser.add_option('--scheduler',         action='store',     dest='scheduler',   help='select the batch scheduler (lsf,condor). Default=condor'   , default='condor')
+    parser.add_option('-q', '--queue',       action='store',     dest='queue',        help='run in batch in queue specified as option (default -q 8nh)', default='8nh')
+    parser.add_option('-n', '--nfileperjob', action='store',     dest='nfileperjob',  help='split the jobs with n files read/batch job'                , default=1,   type='int')
+    parser.add_option('-p', '--prefix',      action='store',     dest='prefix',       help='the prefix to be added to the output'                      , default=defaultoutputdir)
+    parser.add_option('-a', '--application', action='store',     dest='application',  help='the executable to be run'                                  , default=executable)
+    parser.add_option('-c', '--create',      action='store_true',dest='create',       help='create only the jobs, do not submit them'                  , default=False)
+    parser.add_option('-B', '--blind',       action='store_true',dest='isblind',      help='indicates if the analysis is blind'                  , default=True)
+    parser.add_option('-F', '--nfiles',      action='store',     dest='Nfiles',       help='number of files in a remote directory', default = 1000, type ='int')
+    parser.add_option('-t', '--testnjobs',   action='store',     dest='testnjobs',    help='submit only the first n jobs'                              , default=1000000, type='int')
+    parser.add_option('-N', '--neventsjob',  action='store',     dest='neventsjob',   help='split the jobs with n events  / batch job'                 , default=200,   type='int')
+    parser.add_option('-T', '--eventsperfile',action='store',    dest='eventsperfile',help='number of events per input file'                        , default=-1,   type='int')
+    parser.add_option('-r', '--runtime',     action='store',     dest='runtime',      help='New runtime for condor resubmission in hours. default None: will take the original one.', default=4        , type=int);
+    parser.add_option('--eos',               action='store',     dest='eos',          help='copy the output in the specified EOS path'                 , default='')
+    parser.add_option('--scheduler',         action='store',     dest='scheduler',    help='select the batch scheduler (lsf,condor). Default=condor'   , default='condor')
     (opt, args) = parser.parse_args()
     print args
     
@@ -147,7 +147,11 @@ def main():
         srcfile.write('cd '+pwd+'\n')
         srcfile.write('echo $PWD\n')
         #srcfile.write(opt.application+' '+icfgfilename+' \n')
-        srcfile.write(opt.application+' '+icfgfilename+' '+rootoutputfile+' \n')
+        Nf = 1000
+        if (opt.Nfiles > 1000) : opt.Nfiles = opt.Nfiles - 1000
+        else : Nf = opt.Nfiles 
+        print(Nf)
+        srcfile.write(opt.application+' '+icfgfilename+' '+rootoutputfile+' job_tag '+str(Nf)+' \n')
         if(opt.eos!=''):    
             outdireos = opt.eos + dataset+ str(ijob)+blind_tag 
             srcfile.write('cp '+rootoutputfile+'.root '+ outdireos +'.root\n')
