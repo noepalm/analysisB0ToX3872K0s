@@ -79,10 +79,10 @@ Color_t PtlColorMap(const TString& particle){
   PtlColor["PV"]   = kMagenta -7;
   PtlColor["BS"]   = kGreen -7;
 
-  PtlColor["16preVFP"] = kRed; 
+  PtlColor["16preVFP"] = kBlack; 
   PtlColor["16"] = kOrange; 
   PtlColor["17"] = kBlue; 
-  PtlColor["18"] = kBlack; 
+  PtlColor["18"] = kRed; 
 
   return PtlColor[particle];
 }
@@ -385,9 +385,9 @@ void makeROCcurve(std::vector<TString> SGNhistos, std::vector<TString> BKGhistos
 void compare_years(const TString& tree_name, const TString branch_name, const TString& selection, const int Nbins = 100, const float xlow = 0., const float xhigh = 100, TString x_name = " ", TString out_name = " "){
 
     //TFile* file_16preVFP = new TFile("outRoot/.root"); 
-    TFile* file_16       = new TFile("outRoot/DataBlind_HLTemulation_prova_2016G.root"); 
-    TFile* file_17       = new TFile("outRoot/DataBlind_HLTemulation_prova_2017B.root"); 
-    TFile* file_18       = new TFile("outRoot/DataBlind_HLTemulation_prova_2018A.root"); 
+    TFile* file_16       = new TFile("/eos/user/c/cbasile/B0toX3872K0s/data/CharmoniumUL_2016_blind.root");
+    TFile* file_17       = new TFile("/eos/user/c/cbasile/B0toX3872K0s/data/CharmoniumUL_2017_blind.root");
+    TFile* file_18       = new TFile("/eos/user/c/cbasile/B0toX3872K0s/data/CharmoniumUL_2018_blind.root");
 
     //TTree* h_16preVFP = (TTree*)file_16preVFP->Get(tree_name);
     TTree* t_16= (TTree*)file_16->Get(tree_name);
