@@ -7,6 +7,7 @@ RecoDecayPsi::RecoDecayPsi(TTree *tree, const TString & tags) : MCbase_B0toPsi2S
     RecoP4_K0s.SetM(mK0s);
 
     outFilePath_ = "./outRoot/RecoDecay_Psi2S_" + tags_ + ".root";
+    OutTree_setup();
 
 
 }//RecoDecayPsi()
@@ -14,6 +15,7 @@ RecoDecayPsi::RecoDecayPsi(TTree *tree, const TString & tags) : MCbase_B0toPsi2S
 RecoDecayPsi::~RecoDecayPsi(){
 
     delete outFile_;
+    delete outTree_;
 }
 
 void RecoDecayPsi::Loop(){
@@ -166,7 +168,7 @@ void RecoDecayPsi::Loop(){
                     if (Muon_trackQuality[B0_mu1_idx[b]] < 2) h_Mu_TrkQlty_MC.Fill(Muon_trackQuality[B0_mu1_idx[b]]);
                     else h_Mu_TrkQlty_MC.Fill(2);
 
-                    if (HLT_Dimuon25_Jpsi) h_Mu_dR_HLT_Dimuon25_Jpsi_MC.Fill(B0_MuMu_mu1_dr_Dimuon25_Jpsi[b]);
+                    //if (HLT_Dimuon25_Jpsi) h_Mu_dR_HLT_Dimuon25_Jpsi_MC.Fill(B0_MuMu_mu1_dr_Dimuon25_Jpsi[b]);
                     if (HLT_DoubleMu4_JpsiTrk_Displaced) h_Mu_dR_HLT_DoubleMu4_JpsiTrk_MC.Fill(B0_MuMu_mu1_dr_DoubleMu4_JpsiTrk_Displaced[b]);
                 }else{
                     h_Mu_SoftID_Fk.Fill(Muon_softId[B0_mu1_idx[b]]);
@@ -174,7 +176,7 @@ void RecoDecayPsi::Loop(){
                     if (Muon_trackQuality[B0_mu1_idx[b]] < 2) h_Mu_TrkQlty_Fk.Fill(Muon_trackQuality[B0_mu1_idx[b]]);
                     else h_Mu_TrkQlty_Fk.Fill(2);
 
-                    if (HLT_Dimuon25_Jpsi) h_Mu_dR_HLT_Dimuon25_Jpsi_Fk.Fill(B0_MuMu_mu1_dr_Dimuon25_Jpsi[b]);
+                    //if (HLT_Dimuon25_Jpsi) h_Mu_dR_HLT_Dimuon25_Jpsi_Fk.Fill(B0_MuMu_mu1_dr_Dimuon25_Jpsi[b]);
                     if (HLT_DoubleMu4_JpsiTrk_Displaced) h_Mu_dR_HLT_DoubleMu4_JpsiTrk_Fk.Fill(B0_MuMu_mu1_dr_DoubleMu4_JpsiTrk_Displaced[b]);
                 }
                 if (isMCmatched_Mu2){
@@ -183,7 +185,7 @@ void RecoDecayPsi::Loop(){
                     if (Muon_trackQuality[B0_mu1_idx[b]] < 2) h_Mu_TrkQlty_MC.Fill(Muon_trackQuality[B0_mu2_idx[b]]);
                     else  h_Mu_TrkQlty_MC.Fill(2);
 
-                    h_Mu_dR_HLT_Dimuon25_Jpsi_MC.Fill(B0_MuMu_mu2_dr_Dimuon25_Jpsi[b]);
+                    //h_Mu_dR_HLT_Dimuon25_Jpsi_MC.Fill(B0_MuMu_mu2_dr_Dimuon25_Jpsi[b]);
                     h_Mu_dR_HLT_DoubleMu4_JpsiTrk_MC.Fill(B0_MuMu_mu2_dr_DoubleMu4_JpsiTrk_Displaced[b]);
                 }else{
                     h_Mu_SoftID_Fk.Fill(Muon_softId[B0_mu2_idx[b]]);
@@ -191,7 +193,7 @@ void RecoDecayPsi::Loop(){
                     if (Muon_trackQuality[B0_mu1_idx[b]] < 2) h_Mu_TrkQlty_Fk.Fill(Muon_trackQuality[B0_mu2_idx[b]]);
                     else h_Mu_TrkQlty_Fk.Fill(2);
 
-                    h_Mu_dR_HLT_Dimuon25_Jpsi_Fk.Fill(B0_MuMu_mu2_dr_Dimuon25_Jpsi[b]);
+                    //h_Mu_dR_HLT_Dimuon25_Jpsi_Fk.Fill(B0_MuMu_mu2_dr_Dimuon25_Jpsi[b]);
                     h_Mu_dR_HLT_DoubleMu4_JpsiTrk_Fk.Fill(B0_MuMu_mu2_dr_DoubleMu4_JpsiTrk_Displaced[b]);
                 }
 
@@ -237,6 +239,21 @@ void RecoDecayPsi::Loop(){
 
         // *** B0 --> Psi(3872) K0s ***
         if (isMCmatched_B0){
+            
+            // ... masses ...
+            M_MuMu = B0_MuMu_fitted_mass[b];
+            M_PiPi = B0_finalFit_Rho_mass[b];
+            M_Psi2S= B0_finalFit_X_mass[b];
+            M_K0s = B0_K0s_nmcFitted_mass[b];
+            M_B0 = B0_finalFit_mass[b];
+            // ... pT ...
+            pT_Mu1 = RecoP4_Mu1.Pt(); 
+            pT_Mu2 = RecoP4_Mu2.Pt(); 
+            pT_Pi1 = RecoP4_Pi1.Pt(); 
+            pT_Pi2 = RecoP4_Pi2.Pt(); 
+            pT_K0s = RecoP4_K0s.Pt(); 
+            
+            outTree_->Fill();
 
             // Rho
             h_Pi1_pT_MC.Fill(RecoP4_Pi1.Pt()/RecoP4_B0.Pt());
@@ -366,6 +383,8 @@ void RecoDecayPsi::Loop(){
     h_B0_DistGenVtx_PV_MC.Write();
     h_B0_DistGenVtx_BS_MC.Write();
     h_B0_DistGenVtx_BSwithZ_MC.Write();
+
+    outTree_->Write();
 
     outFile_->Close();
     std::cout << "  ...[OUTPUT] output histograms written on file " << outFilePath_ << std::endl;
@@ -521,6 +540,33 @@ void RecoDecayPsi::MCtruthMatching(const bool verbose){
 	}
 
 }//MCtruthMatching()
+
+
+void RecoDecayPsi::OutTree_setup(){
+
+    TString TreeName = "RecoDecay_MCmatch";
+
+	
+	outTree_ = new TTree( TreeName, TreeName);
+	std::cout << " out tree setting up ... " << std::endl;
+
+	outTree_->Branch("run", &Run, "run/F");
+	outTree_->Branch("LumiBlock", &LumiBlock, "LumiBlock/F");
+	outTree_->Branch("event", &Event, "Event/F");
+	
+	outTree_->Branch("M_MuMu", &M_MuMu, "M_MuMu/F");
+	outTree_->Branch("M_PiPi", &M_PiPi, "M_PiPi/F");
+	outTree_->Branch("M_Psi2S", &M_Psi2S, "M_Psi2S/F");
+	outTree_->Branch("M_K0s", &M_K0s, "M_K0s/F");
+	outTree_->Branch("M_B0", &M_B0, "M_B0/F");
+
+    outTree_->Branch("pT_Mu1", &pT_Mu1, "pT_Mu1/F");
+    outTree_->Branch("pT_Mu2", &pT_Mu2, "pT_Mu2/F");
+    outTree_->Branch("pT_Pi1", &pT_Pi1, "pT_Pi1/F");
+    outTree_->Branch("pT_Pi2", &pT_Pi2, "pT_Pi2/F");
+    outTree_->Branch("pT_K0s", &pT_K0s, "pT_K0s/F");
+
+}//OutTree_setup()
 
 float RecoDecayPsi::DeltaPT(ROOT::Math::PtEtaPhiMVector& genV, ROOT::Math::PtEtaPhiMVector& recV){
 	return fabs(genV.Pt() - recV.Pt()) / genV.Pt();

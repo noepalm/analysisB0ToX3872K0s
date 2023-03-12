@@ -7,7 +7,7 @@ RecoDecayX::RecoDecayX(TTree *tree, const TString & tags) : MCbase_B0toX3872K0s 
     RecoP4_K0s.SetM(mK0s);
 
     outFilePath_ = "./outRoot/RecoDecay_X3872_" + tags_ + ".root";
-
+    OutTree_setup();
 
 }//RecoDecayX()
 
@@ -135,9 +135,11 @@ void RecoDecayX::Loop(){
         if (ientry < 0 || jentry == Nbreak) break;
         if ((jentry+1) % Nprint == 0) std::cout << "--> " << Form("%3.0f",(float)(jentry+1)/nentries* 100.) << " \%"<< std::endl;
         nb = fChain->GetEntry(jentry);   nbytes += nb;
+
         // ----- CHECK IF THE TRIGGER FIRED
         if(!HLT_DoubleMu4_JpsiTrk_Displaced) continue;
         N_FiredEvents++;
+
         // ----- GENERATOR
         GenPartFillP4();
         realB_idx = GenB0idx();
@@ -145,6 +147,10 @@ void RecoDecayX::Loop(){
         // ----- FIND THE MONTE CARLO TRUTH
         //std::cout << " --- EV " << jentry << " with #B0 candidates " << nB0 << std::endl;
         MCtruthMatching();
+
+        Run = run;
+        LumiBlock = luminosityBlock;
+        Event = event;
 
         n_PassedB0 = 0;
         for (Int_t b = 0; b  < nB0; b++){
@@ -257,8 +263,20 @@ void RecoDecayX::Loop(){
         if (isMCmatched_B0){
              
             // ... masses ...
+            M_MuMu = B0_MuMu_fitted_mass[b];
+            M_PiPi = B0_finalFit_Rho_mass[b];
+            M_X3872= B0_finalFit_X_mass[b];
+            M_K0s = B0_K0s_nmcFitted_mass[b];
             h_B0_M_MC.Fill(B0_finalFit_mass[b]);
+            M_B0 = B0_finalFit_mass[b];
+            // ... pT ...
+            pT_Mu1 = RecoP4_Mu1.Pt(); 
+            pT_Mu2 = RecoP4_Mu2.Pt(); 
+            pT_Pi1 = RecoP4_Pi1.Pt(); 
+            pT_Pi2 = RecoP4_Pi2.Pt(); 
+            pT_K0s = RecoP4_K0s.Pt(); 
             
+            outTree_->Fill();
 
             // Rho
             h_Pi1_pT_MC.Fill(RecoP4_Pi1.Pt()/RecoP4_B0.Pt());
@@ -403,6 +421,8 @@ void RecoDecayX::Loop(){
     h_K0s_M_Fk.Write();
     h_B0_M_MC.Write();
     h_B0_M_Fk.Write();
+
+    outTree_->Write();
 
     outFile_->Close();
     std::cout << "  ...[OUTPUT] output histograms written on file " << outFilePath_ << std::endl;
@@ -558,6 +578,33 @@ void RecoDecayX::MCtruthMatching(const bool verbose){
 	}
 
 }//MCtruthMatching()
+
+
+void RecoDecayX::OutTree_setup(){
+
+    TString TreeName = "RecoDecay_MCmatch";
+
+	
+	outTree_ = new TTree( TreeName, TreeName);
+	std::cout << " out tree setting up ... " << std::endl;
+
+	outTree_->Branch("run", &Run, "run/F");
+	outTree_->Branch("LumiBlock", &LumiBlock, "LumiBlock/F");
+	outTree_->Branch("event", &Event, "Event/F");
+	
+	outTree_->Branch("M_MuMu", &M_MuMu, "M_MuMu/F");
+	outTree_->Branch("M_PiPi", &M_PiPi, "M_PiPi/F");
+	outTree_->Branch("M_X3872", &M_X3872, "M_X3872/F");
+	outTree_->Branch("M_K0s", &M_K0s, "M_K0s/F");
+	outTree_->Branch("M_B0", &M_B0, "M_B0/F");
+
+    outTree_->Branch("pT_Mu1", &pT_Mu1, "pT_Mu1/F");
+    outTree_->Branch("pT_Mu2", &pT_Mu2, "pT_Mu2/F");
+    outTree_->Branch("pT_Pi1", &pT_Pi1, "pT_Pi1/F");
+    outTree_->Branch("pT_Pi2", &pT_Pi2, "pT_Pi2/F");
+    outTree_->Branch("pT_K0s", &pT_K0s, "pT_K0s/F");
+
+}//OutTree_setup()
 
 float RecoDecayX::DeltaPT(ROOT::Math::PtEtaPhiMVector& genV, ROOT::Math::PtEtaPhiMVector& recV){
 	return fabs(genV.Pt() - recV.Pt()) / genV.Pt();
