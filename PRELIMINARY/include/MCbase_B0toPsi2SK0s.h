@@ -84,12 +84,12 @@ public :
    Float_t         B0_MuMu_fitted_vtxZ[200];   //[nB0]
    Float_t         B0_MuMu_fitted_vtxZE[200];   //[nB0]
    Float_t         B0_MuMu_mu1_dr[200];   //[nB0]
-   Float_t         B0_MuMu_mu1_dr_Dimuon25_Jpsi[200];   //[nB0]
+   //Float_t         B0_MuMu_mu1_dr_Dimuon25_Jpsi[200];   //[nB0]
    Float_t         B0_MuMu_mu1_dr_DoubleMu4_JpsiTrk_Displaced[200];   //[nB0]
    Float_t         B0_MuMu_mu1_dxysign[200];   //[nB0]
    Float_t         B0_MuMu_mu1_dzsign[200];   //[nB0]
    Float_t         B0_MuMu_mu2_dr[200];   //[nB0]
-   Float_t         B0_MuMu_mu2_dr_Dimuon25_Jpsi[200];   //[nB0]
+   //Float_t         B0_MuMu_mu2_dr_Dimuon25_Jpsi[200];   //[nB0]
    Float_t         B0_MuMu_mu2_dr_DoubleMu4_JpsiTrk_Displaced[200];   //[nB0]
    Float_t         B0_MuMu_mu2_dxysign[200];   //[nB0]
    Float_t         B0_MuMu_mu2_dzsign[200];   //[nB0]
@@ -170,10 +170,10 @@ public :
    Float_t         B0_svprob[200];   //[nB0]
    Int_t           B0_K0s_matchTrack1_fired_DoubleMu4_JpsiTrk_Displaced[200];   //[nB0]
    Int_t           B0_K0s_matchTrack2_fired_DoubleMu4_JpsiTrk_Displaced[200];   //[nB0]
-   Int_t           B0_MuMu_mu1_fired_Dimuon25_Jpsi[200];   //[nB0]
+   //Int_t           B0_MuMu_mu1_fired_Dimuon25_Jpsi[200];   //[nB0]
    Int_t           B0_MuMu_mu1_fired_DoubleMu4_JpsiTrk_Displaced[200];   //[nB0]
    Int_t           B0_MuMu_mu1_trackQuality[200];   //[nB0]
-   Int_t           B0_MuMu_mu2_fired_Dimuon25_Jpsi[200];   //[nB0]
+   //Int_t           B0_MuMu_mu2_fired_Dimuon25_Jpsi[200];   //[nB0]
    Int_t           B0_MuMu_mu2_fired_DoubleMu4_JpsiTrk_Displaced[200];   //[nB0]
    Int_t           B0_MuMu_mu2_trackQuality[200];   //[nB0]
    Int_t           B0_PiPi_p1_fired_DoubleMu4_JpsiTrk_Displaced[200];   //[nB0]
@@ -332,12 +332,12 @@ public :
    TBranch        *b_B0_MuMu_fitted_vtxZ;   //!
    TBranch        *b_B0_MuMu_fitted_vtxZE;   //!
    TBranch        *b_B0_MuMu_mu1_dr;   //!
-   TBranch        *b_B0_MuMu_mu1_dr_Dimuon25_Jpsi;   //!
+   //TBranch        *b_B0_MuMu_mu1_dr_Dimuon25_Jpsi;   //!
    TBranch        *b_B0_MuMu_mu1_dr_DoubleMu4_JpsiTrk_Displaced;   //!
    TBranch        *b_B0_MuMu_mu1_dxysign;   //!
    TBranch        *b_B0_MuMu_mu1_dzsign;   //!
    TBranch        *b_B0_MuMu_mu2_dr;   //!
-   TBranch        *b_B0_MuMu_mu2_dr_Dimuon25_Jpsi;   //!
+   //TBranch        *b_B0_MuMu_mu2_dr_Dimuon25_Jpsi;   //!
    TBranch        *b_B0_MuMu_mu2_dr_DoubleMu4_JpsiTrk_Displaced;   //!
    TBranch        *b_B0_MuMu_mu2_dxysign;   //!
    TBranch        *b_B0_MuMu_mu2_dzsign;   //!
@@ -418,10 +418,10 @@ public :
    TBranch        *b_B0_svprob;   //!
    TBranch        *b_B0_K0s_matchTrack1_fired_DoubleMu4_JpsiTrk_Displaced;   //!
    TBranch        *b_B0_K0s_matchTrack2_fired_DoubleMu4_JpsiTrk_Displaced;   //!
-   TBranch        *b_B0_MuMu_mu1_fired_Dimuon25_Jpsi;   //!
+   //TBranch        *b_B0_MuMu_mu1_fired_Dimuon25_Jpsi;   //!
    TBranch        *b_B0_MuMu_mu1_fired_DoubleMu4_JpsiTrk_Displaced;   //!
    TBranch        *b_B0_MuMu_mu1_trackQuality;   //!
-   TBranch        *b_B0_MuMu_mu2_fired_Dimuon25_Jpsi;   //!
+   //TBranch        *b_B0_MuMu_mu2_fired_Dimuon25_Jpsi;   //!
    TBranch        *b_B0_MuMu_mu2_fired_DoubleMu4_JpsiTrk_Displaced;   //!
    TBranch        *b_B0_MuMu_mu2_trackQuality;   //!
    TBranch        *b_B0_PiPi_p1_fired_DoubleMu4_JpsiTrk_Displaced;   //!
@@ -670,12 +670,12 @@ void MCbase_B0toPsi2SK0s::Init(TTree *tree)
    fChain->SetBranchAddress("B0_MuMu_fitted_vtxZ", B0_MuMu_fitted_vtxZ, &b_B0_MuMu_fitted_vtxZ);
    fChain->SetBranchAddress("B0_MuMu_fitted_vtxZE", B0_MuMu_fitted_vtxZE, &b_B0_MuMu_fitted_vtxZE);
    fChain->SetBranchAddress("B0_MuMu_mu1_dr", B0_MuMu_mu1_dr, &b_B0_MuMu_mu1_dr);
-   fChain->SetBranchAddress("B0_MuMu_mu1_dr_Dimuon25_Jpsi", B0_MuMu_mu1_dr_Dimuon25_Jpsi, &b_B0_MuMu_mu1_dr_Dimuon25_Jpsi);
+//   fChain->SetBranchAddress("B0_MuMu_mu1_dr_Dimuon25_Jpsi", B0_MuMu_mu1_dr_Dimuon25_Jpsi, &b_B0_MuMu_mu1_dr_Dimuon25_Jpsi);
    fChain->SetBranchAddress("B0_MuMu_mu1_dr_DoubleMu4_JpsiTrk_Displaced", B0_MuMu_mu1_dr_DoubleMu4_JpsiTrk_Displaced, &b_B0_MuMu_mu1_dr_DoubleMu4_JpsiTrk_Displaced);
    fChain->SetBranchAddress("B0_MuMu_mu1_dxysign", B0_MuMu_mu1_dxysign, &b_B0_MuMu_mu1_dxysign);
    fChain->SetBranchAddress("B0_MuMu_mu1_dzsign", B0_MuMu_mu1_dzsign, &b_B0_MuMu_mu1_dzsign);
    fChain->SetBranchAddress("B0_MuMu_mu2_dr", B0_MuMu_mu2_dr, &b_B0_MuMu_mu2_dr);
-   fChain->SetBranchAddress("B0_MuMu_mu2_dr_Dimuon25_Jpsi", B0_MuMu_mu2_dr_Dimuon25_Jpsi, &b_B0_MuMu_mu2_dr_Dimuon25_Jpsi);
+//   fChain->SetBranchAddress("B0_MuMu_mu2_dr_Dimuon25_Jpsi", B0_MuMu_mu2_dr_Dimuon25_Jpsi, &b_B0_MuMu_mu2_dr_Dimuon25_Jpsi);
    fChain->SetBranchAddress("B0_MuMu_mu2_dr_DoubleMu4_JpsiTrk_Displaced", B0_MuMu_mu2_dr_DoubleMu4_JpsiTrk_Displaced, &b_B0_MuMu_mu2_dr_DoubleMu4_JpsiTrk_Displaced);
    fChain->SetBranchAddress("B0_MuMu_mu2_dxysign", B0_MuMu_mu2_dxysign, &b_B0_MuMu_mu2_dxysign);
    fChain->SetBranchAddress("B0_MuMu_mu2_dzsign", B0_MuMu_mu2_dzsign, &b_B0_MuMu_mu2_dzsign);
@@ -756,10 +756,10 @@ void MCbase_B0toPsi2SK0s::Init(TTree *tree)
    fChain->SetBranchAddress("B0_svprob", B0_svprob, &b_B0_svprob);
    fChain->SetBranchAddress("B0_K0s_matchTrack1_fired_DoubleMu4_JpsiTrk_Displaced", B0_K0s_matchTrack1_fired_DoubleMu4_JpsiTrk_Displaced, &b_B0_K0s_matchTrack1_fired_DoubleMu4_JpsiTrk_Displaced);
    fChain->SetBranchAddress("B0_K0s_matchTrack2_fired_DoubleMu4_JpsiTrk_Displaced", B0_K0s_matchTrack2_fired_DoubleMu4_JpsiTrk_Displaced, &b_B0_K0s_matchTrack2_fired_DoubleMu4_JpsiTrk_Displaced);
-   fChain->SetBranchAddress("B0_MuMu_mu1_fired_Dimuon25_Jpsi", B0_MuMu_mu1_fired_Dimuon25_Jpsi, &b_B0_MuMu_mu1_fired_Dimuon25_Jpsi);
+//   fChain->SetBranchAddress("B0_MuMu_mu1_fired_Dimuon25_Jpsi", B0_MuMu_mu1_fired_Dimuon25_Jpsi, &b_B0_MuMu_mu1_fired_Dimuon25_Jpsi);
    fChain->SetBranchAddress("B0_MuMu_mu1_fired_DoubleMu4_JpsiTrk_Displaced", B0_MuMu_mu1_fired_DoubleMu4_JpsiTrk_Displaced, &b_B0_MuMu_mu1_fired_DoubleMu4_JpsiTrk_Displaced);
    fChain->SetBranchAddress("B0_MuMu_mu1_trackQuality", B0_MuMu_mu1_trackQuality, &b_B0_MuMu_mu1_trackQuality);
-   fChain->SetBranchAddress("B0_MuMu_mu2_fired_Dimuon25_Jpsi", B0_MuMu_mu2_fired_Dimuon25_Jpsi, &b_B0_MuMu_mu2_fired_Dimuon25_Jpsi);
+//   fChain->SetBranchAddress("B0_MuMu_mu2_fired_Dimuon25_Jpsi", B0_MuMu_mu2_fired_Dimuon25_Jpsi, &b_B0_MuMu_mu2_fired_Dimuon25_Jpsi);
    fChain->SetBranchAddress("B0_MuMu_mu2_fired_DoubleMu4_JpsiTrk_Displaced", B0_MuMu_mu2_fired_DoubleMu4_JpsiTrk_Displaced, &b_B0_MuMu_mu2_fired_DoubleMu4_JpsiTrk_Displaced);
    fChain->SetBranchAddress("B0_MuMu_mu2_trackQuality", B0_MuMu_mu2_trackQuality, &b_B0_MuMu_mu2_trackQuality);
    fChain->SetBranchAddress("B0_PiPi_p1_fired_DoubleMu4_JpsiTrk_Displaced", B0_PiPi_p1_fired_DoubleMu4_JpsiTrk_Displaced, &b_B0_PiPi_p1_fired_DoubleMu4_JpsiTrk_Displaced);
