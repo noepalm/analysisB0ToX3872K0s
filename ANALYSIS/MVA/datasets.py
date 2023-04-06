@@ -1,0 +1,191 @@
+from glob import glob
+import os
+from pdb import set_trace
+#A single place where to bookkeep the dataset file locations
+#
+tag = ''
+posix = ''
+target_dataset = ''
+
+import socket
+path = 'HLTemulation'
+
+# datasets
+input_files = {
+'UL_2017_data':'/eos/user/c/cbasile/B0toX3872K0s/data/CharmoniumUL_2017_blind.root',
+'UL_2017_MC':'../PRELIMINARY/outRoot/RecoDecay_X3872_UL17.root'
+}
+
+if not os.path.isdir('/tmp/cbasile/plots/%s' % tag):
+   os.mkdir('/tmp/cbasile/plots/%s' % tag)
+
+#import concurrent.futures
+import multiprocessing
+import uproot
+import numpy as np
+
+def get_models_dir():
+   
+   mods = 'MVA/models/%s/' % (tag)
+   if not os.path.isdir(mods):
+      os.makedirs(mods)
+   return mods
+
+def get_data_sync(dataset, columns, nthreads=2*multiprocessing.cpu_count(), exclude={}, path='HLTemulation'):
+   if dataset not in input_files:
+      raise ValueError('The dataset %s does not exist, I have %s' % (dataset, ', '.join(input_files.keys())))
+   print 'getting files from "%s": ' % input_files[dataset]
+   #print ' \n'.join(input_files[dataset])
+   #infiles = [uproot.open(i) for i in input_files[dataset]]
+   infiles = uproot.open(input_files[dataset])
+   print 'available branches:\n',infiles[path].keys()
+   if columns == 'all':
+      columns = [i for i in infiles[path].keys() if i not in exclude]
+   try:
+      ret = infiles[path].arrays(columns)
+   except KeyError as ex:
+      print 'Exception! ', ex
+      set_trace()
+      raise RuntimeError('Failed to open %s properly' % infiles[0])
+   #for infile in infiles[1:]:
+   #   try:
+   #      arrays = infile[path].arrays(columns)
+   #   except:
+   #      raise RuntimeError('Failed to open %s properly' % infile)         
+   #   for column in columns:
+   #      ret[column] = np.concatenate((ret[column],arrays[column]))
+   return ret
+
+from sklearn.cluster import KMeans
+from sklearn.externals import joblib
+import json
+from pdb import set_trace
+
+#apply_weight = np.vectorize(lambda x, y: y.get(x), excluded={2})
+
+def kmeans_weighter(features, fname):
+   kmeans = joblib.load(fname)
+   cluster = kmeans.predict(features)
+   str_weights = json.load(open(fname.replace('.pkl', '.json')))   
+   weights = {}
+   for i in str_weights:
+      try:
+         weights[int(i)] = str_weights[i]
+      except:
+         pass
+   return apply_weight(cluster, weights)
+
+def training_selection(df,low=0.5,high=15.):
+   #'ensures there is a GSF Track and a KTF track within eta/pt boundaries'
+   return (df.gsf_mode_pt > low) & (np.abs(df.gsf_mode_eta) < 2.4) & ( (df.gen_dR<=0.03) | (df.gen_dR>=0.1) ) 
+
+import rootpy.plotting as rplt
+import root_numpy
+
+class HistWeighter(object):
+   def __init__(self, fname):
+      values = [[float(i) for i in j.split()] for j in open(fname)]
+      vals = np.array(values)
+      xs = sorted(list(set(vals[:,0])))
+      ys = sorted(list(set(vals[:,1])))
+      vals[:,0] += 0.0001
+      vals[:,1] += 0.0001
+      mask = (vals[:,2] == 0)
+      vals[:,2][mask] = 1 #turn zeros into ones
+      vals[:,2] = 1/vals[:,2]
+      self._hist = rplt.Hist2D(xs, ys)
+      root_numpy.fill_hist(self._hist, vals[:,[0,1]], vals[:, 2])
+
+   def _get_weight(self, x, y):
+      ix = self._hist.xaxis.FindFixBin(x)
+      iy = self._hist.yaxis.FindFixBin(y)
+      return self._hist.GetBinContent(ix, iy)
+
+   def get_weight(self, x, y):
+      cnt = lambda x, y: self._get_weight(x, y)
+      cnt = np.vectorize(cnt)
+      return cnt(x, y)
+
+import pandas as pd
+import numpy as np
+def pre_process_data(dataset, features, for_seeding=False, keep_nonmatch=False):  
+   selection_JpsiPiPi = '(M_X3872 < 3.66) or (M_X3872 > 3.71 and M_X3872 < 3.83) or (M_X3872 > 3.92)' 
+   selection_B0 = '(M_B0 > 5.09783 and M_B0 < 5.189) or (M_B0 > 5.371 and M_B0 < 5.463)'
+   mods = get_models_dir()
+   #features = list(set(features+['pTM_B0', 'LxySignBSz_B0', 'SVprob_B0', 'CosAlpha3DBSz_B0', 'LxySignSV_K0s', 'SVprob_PiPi', 'pT_PiPi', 'pT_Pi1', 'DR_B0Pi1', 'D0_Pi1']))
+   # get the background data 
+   bkg_dataset = dataset + '_data'
+   data_dict = get_data_sync(bkg_dataset, features) 
+   bkg_data = pd.DataFrame(data_dict)
+   bkg_data['is_signal'] = np.zeros(bkg_data.event.shape)
+   bkg_data['is_signal'] = bkg_data['is_signal'].astype(int)
+   bkg_data = bkg_data.query(selection_B0)
+   bkg_data = bkg_data.query(selection_JpsiPiPi)
+   # get the signal data 
+   sgn_dataset = dataset + '_MC'
+   data_dict = get_data_sync(sgn_dataset, features)
+   sgn_data = pd.DataFrame(data_dict)
+   sgn_data['is_signal'] = np.ones(sgn_data.event.shape)
+   sgn_data['is_signal'] = sgn_data['is_signal'].astype(int)
+
+   data = pd.concat([bkg_data, sgn_data])
+   # shuffle the DataFrame rows
+   data = data.sample(frac = 1, random_state = 1)
+   #print(data.head())
+
+   return data
+
+def train_test_split(data, div, thr):
+   mask = data.event % div
+   mask = mask < thr
+   return data[mask], data[np.invert(mask)]
+
+def reduce_mem_usage(df):
+    """ 
+    iterate through all the columns of a dataframe and 
+    modify the data type to reduce memory usage.        
+    """
+    start_mem = df.memory_usage().sum() / 1024**2
+    print(('Memory usage of dataframe is {:.2f}' 
+                     'MB').format(start_mem))
+
+    print 'before'
+    print df
+    
+    for col in df.columns:
+        col_type = df[col].dtype
+        
+        print col
+
+        if col_type != object:
+            c_min = df[col].min()
+            c_max = df[col].max()
+            if str(col_type)[:3] == 'int':
+                if c_min > np.iinfo(np.int8).min and c_max < np.iinfo(np.int8).max:
+                    df[col] = df[col].astype(np.int8)
+                elif c_min > np.iinfo(np.int16).min and c_max < np.iinfo(np.int16).max:
+                    df[col] = df[col].astype(np.int16)
+                elif c_min > np.iinfo(np.int32).min and c_max < np.iinfo(np.int32).max:
+                    df[col] = df[col].astype(np.int32)
+                elif c_min > np.iinfo(np.int64).min and c_max < np.iinfo(np.int64).max:
+                    df[col] = df[col].astype(np.int64)  
+            else:
+                if c_min > np.finfo(np.float16).min and c_max < np.finfo(np.float16).max:
+                    df[col] = df[col].astype(np.float16)
+                elif c_min > np.finfo(np.float32).min and c_max < np.finfo(np.float32).max:
+                    df[col] = df[col].astype(np.float32)
+                else:
+                    df[col] = df[col].astype(np.float64)
+        else:
+            df[col] = df[col].astype('category')    
+
+    end_mem = df.memory_usage().sum() / 1024**2
+    print(('Memory usage after optimization is: {:.2f}' 
+                              'MB').format(end_mem))
+    print('Decreased by {:.1f}%'.format(100 * (start_mem - end_mem) 
+                                             / start_mem))
+    
+    print 'after'
+    print df
+
+    return df
