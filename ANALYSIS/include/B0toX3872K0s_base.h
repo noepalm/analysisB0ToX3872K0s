@@ -472,8 +472,10 @@ public :
 
    // BLINDING 
    bool  isBlind_ = true;
-   float Blind_MB0_low  = 5.18;
-   float Blind_MB0_high = 5.38;
+   float Blind_MB0_low  = 5.20;
+   float Blind_MB0_high = 5.34;
+   float Blind_MX_low   = 3.85;
+   float Blind_MX_high  = 3.89;
 
    // RECONSTRUCTED PARTICLES
    int  RecoPartFillP4(const int Bidx);
