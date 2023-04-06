@@ -50,7 +50,7 @@ void HLTapply::Loop(){
             // blind the B0 mass region if specified
             M_B0 = B0_finalFit_mass[b];
             M_X3872 = B0_finalFit_X_mass[b];
-            if (isBlind_ && (M_B0 > Blind_MB0_low && M_B0 < Blind_MB0_high && M_X3872 > 3.75) ) continue;
+            if (isBlind_ && (M_B0 > Blind_MB0_low && M_B0 < Blind_MB0_high && M_X3872 > Blind_MX_low && M_X3872 < Blind_MX_high) ) continue;
 
             // save the reconstructed momenta for the particle and check te quality tracks
             if ( !RecoPartFillP4(b)) continue;
