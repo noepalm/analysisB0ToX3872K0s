@@ -58,8 +58,12 @@ class RecoDecayX : public MCbase_B0toX3872K0s {
         // TTree variables
         float Event, LumiBlock, Run;
         float M_MuMu, M_PiPi, M_X3872, M_K0s, M_B0;
-        float pT_Mu1, pT_Mu2, pT_Pi1, pT_Pi2, pT_K0s;
+        //float pT_Mu1, pT_Mu2, pT_Pi1, pT_Pi2, pT_K0s;
 
+        float LxySignBSz_B0, CosAlpha3DBSz_B0, pTM_B0, SVprob_B0;
+        float LxySignSV_K0s;
+        float SVprob_PiPi, pT_PiPi; 
+        float pT_Pi1, DR_B0Pi1, D0_Pi1;
 }; //RecoDecayX
 
 #endif

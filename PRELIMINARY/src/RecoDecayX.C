@@ -14,6 +14,7 @@ RecoDecayX::RecoDecayX(TTree *tree, const TString & tags) : MCbase_B0toX3872K0s 
 RecoDecayX::~RecoDecayX(){
 
     delete outFile_;
+    delete outTree_;
 }
 
 void RecoDecayX::Loop(){
@@ -266,15 +267,26 @@ void RecoDecayX::Loop(){
             M_MuMu = B0_MuMu_fitted_mass[b];
             M_PiPi = B0_finalFit_Rho_mass[b];
             M_X3872= B0_finalFit_X_mass[b];
-            M_K0s = B0_K0s_nmcFitted_mass[b];
+            M_K0s  = B0_K0s_nmcFitted_mass[b];
             h_B0_M_MC.Fill(B0_finalFit_mass[b]);
-            M_B0 = B0_finalFit_mass[b];
+            M_B0   = B0_finalFit_mass[b];
             // ... pT ...
-            pT_Mu1 = RecoP4_Mu1.Pt(); 
-            pT_Mu2 = RecoP4_Mu2.Pt(); 
-            pT_Pi1 = RecoP4_Pi1.Pt(); 
-            pT_Pi2 = RecoP4_Pi2.Pt(); 
-            pT_K0s = RecoP4_K0s.Pt(); 
+            //pT_Mu1 = RecoP4_Mu1.Pt(); 
+            //pT_Mu2 = RecoP4_Mu2.Pt(); 
+            //pT_Pi1 = RecoP4_Pi1.Pt(); 
+            //pT_Pi2 = RecoP4_Pi2.Pt(); 
+            //pT_K0s = RecoP4_K0s.Pt(); 
+            // ... MVA variables ...
+            LxySignBSz_B0       = B0_lxySign_BSwithZ[b];
+            SVprob_B0           = B0_svprob[b];
+            CosAlpha3DBSz_B0    = B0_cosAlpha2D_BSwithZ[b];
+            pTM_B0              = RecoP4_B0.Pt()/M_B0;
+            LxySignSV_K0s       = B0_K0_lxySign_wrtBvtx[b];
+            SVprob_PiPi         = B0_PiPi_sv_prob[b];
+            pT_PiPi             = (RecoP4_Pi1 + RecoP4_Pi2).Pt()/RecoP4_B0.Pt();
+            pT_Pi1              = RecoP4_Pi1.Pt()/RecoP4_B0.Pt();
+            DR_B0Pi1            = ROOT::Math::VectorUtil::DeltaR(RecoP4_Pi1, RecoP4_B0);
+            D0_Pi1              = B0_PiPi_pi1_d0sig[b];
             
             outTree_->Fill();
 
@@ -582,7 +594,7 @@ void RecoDecayX::MCtruthMatching(const bool verbose){
 
 void RecoDecayX::OutTree_setup(){
 
-    TString TreeName = "RecoDecay_MCmatch";
+    TString TreeName = "HLTemulation";
 
 	
 	outTree_ = new TTree( TreeName, TreeName);
@@ -598,11 +610,23 @@ void RecoDecayX::OutTree_setup(){
 	outTree_->Branch("M_K0s", &M_K0s, "M_K0s/F");
 	outTree_->Branch("M_B0", &M_B0, "M_B0/F");
 
-    outTree_->Branch("pT_Mu1", &pT_Mu1, "pT_Mu1/F");
-    outTree_->Branch("pT_Mu2", &pT_Mu2, "pT_Mu2/F");
-    outTree_->Branch("pT_Pi1", &pT_Pi1, "pT_Pi1/F");
-    outTree_->Branch("pT_Pi2", &pT_Pi2, "pT_Pi2/F");
-    outTree_->Branch("pT_K0s", &pT_K0s, "pT_K0s/F");
+//    outTree_->Branch("pT_Mu1", &pT_Mu1, "pT_Mu1/F");
+//    outTree_->Branch("pT_Mu2", &pT_Mu2, "pT_Mu2/F");
+//    outTree_->Branch("pT_Pi1", &pT_Pi1, "pT_Pi1/F");
+//    outTree_->Branch("pT_Pi2", &pT_Pi2, "pT_Pi2/F");
+//    outTree_->Branch("pT_K0s", &pT_K0s, "pT_K0s/F");
+
+	outTree_->Branch("pTM_B0", &pTM_B0, "pTM_B0/F");
+	outTree_->Branch("LxySignBSz_B0", &LxySignBSz_B0, "LxySignBSz_B0/F");
+	outTree_->Branch("SVprob_B0", &SVprob_B0, "SVprob_B0/F");
+	outTree_->Branch("CosAlpha3DBSz_B0", &CosAlpha3DBSz_B0, "CosAlpha3DBSz_B0/F");
+    outTree_->Branch("LxySignSV_K0s", &LxySignSV_K0s, "LxySignSV_K0s/F");
+    outTree_->Branch("SVprob_PiPi", &SVprob_PiPi, "SVprob_PiPi/F");
+	outTree_->Branch("pT_PiPi", &pT_PiPi, "pT_PiPi/F");
+	outTree_->Branch("pT_Pi1", &pT_Pi1, "pT_Pi1/F");
+	outTree_->Branch("DR_B0Pi1", &DR_B0Pi1, "DR_B0Pi1/F");
+	outTree_->Branch("D0_Pi1", &D0_Pi1, "D0_Pi1/F");
+
 
 }//OutTree_setup()
 
