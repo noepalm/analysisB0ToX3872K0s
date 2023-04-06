@@ -218,7 +218,7 @@ void SaveResults(RooWorkspace* ws, string dataset, float Mlow, float Mhigh){
 	float SIGMA_ERR   = X_sigma->getError();
     cout << " === sigma_tot = " << SIGMA << " +/- " << SIGMA_ERR << endl;
     
-    int SR_Ns= 3;
+    int SR_Ns= 8;
     float SGNeff = data->sumEntries(Form("M_Psi2S>%f&&M_Psi2S<%f", Xm - SR_Ns*SIGMA, Xm + SR_Ns*SIGMA))/ data_N->getVal();
     cout << " === signal-efficiency " << SGNeff << endl;
     

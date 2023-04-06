@@ -43,6 +43,7 @@ map<string, TString> MC_rootFile{
     {"2016_X", "../PRELIMINARY/outRoot/RecoDecay_X3872_UL16.root"},
     {"2017_X", "../PRELIMINARY/outRoot/RecoDecay_X3872_UL17.root"},
     {"2018_X", "../PRELIMINARY/outRoot/RecoDecay_X3872_UL18.root"},
+    {"run2_X", "../PRELIMINARY/outRoot/RecoDecay_X3872_Run2.root"}
 
 
 };
@@ -217,7 +218,7 @@ void SaveResults(RooWorkspace* ws, string dataset, float Mlow, float Mhigh){
 	float SIGMA_ERR   = X_sigma->getError();
     cout << " === sigma_tot = " << SIGMA << " +/- " << SIGMA_ERR << endl;
     
-    int SR_Ns= 3;
+    int SR_Ns= 8;
     float SGNeff = data->sumEntries(Form("M_X3872>%f&&M_X3872<%f", Xm - SR_Ns*SIGMA, Xm + SR_Ns*SIGMA))/ data_N->getVal();
     cout << " === signal-efficiency " << SGNeff << endl;
     

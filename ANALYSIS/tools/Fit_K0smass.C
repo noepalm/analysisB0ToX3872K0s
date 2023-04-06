@@ -43,6 +43,7 @@ map<string, TString> MC_rootFile{
     {"2016_X", "../PRELIMINARY/outRoot/RecoDecay_X3872_UL16.root"},
     {"2017_X", "../PRELIMINARY/outRoot/RecoDecay_X3872_UL17.root"},
     {"2018_X", "../PRELIMINARY/outRoot/RecoDecay_X3872_UL18.root"},
+    {"run2_X", "../PRELIMINARY/outRoot/RecoDecay_X3872_Run2.root"},
     {"2016preVFP_Psi", "../PRELIMINARY/outRoot/RecoDecay_Psi2S_UL16preVFP.root"},
     {"2016_Psi", "../PRELIMINARY/outRoot/RecoDecay_Psi2S_UL16.root"},
     {"2017_Psi", "../PRELIMINARY/outRoot/RecoDecay_Psi2S_UL17.root"},
@@ -94,7 +95,7 @@ void AddModel(RooWorkspace* ws, float low, float high){
     // Double Side-CrystalBall
     RooRealVar K0s_sigma("K0s_sigma", "", 0.005, 0.0005  , 0.01);
     RooRealVar alphaL("alphaL", "", 1., 0., 10);
-    RooRealVar nL("nL", "", 10, -10, 10);
+    RooRealVar nL("nL", "", 10, -10, 15);
     RooRealVar alphaR("alphaR", "", 1., 0., 10);
     RooRealVar nR("nR", "", 10, -10, 20);
     
