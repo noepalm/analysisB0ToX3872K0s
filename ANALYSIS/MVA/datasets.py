@@ -12,12 +12,10 @@ path = 'HLTemulation'
 
 # datasets
 input_files = {
-'UL_2017_data':'/eos/user/c/cbasile/B0toX3872K0s/data/CharmoniumUL_2017_blind.root',
-'UL_2017_MC':'../PRELIMINARY/outRoot/RecoDecay_X3872_UL17.root'
+   'UL_2017_data'  :'/eos/user/c/cbasile/B0toX3872K0s/data/CharmoniumUL_2017_blind.root',
+   'UL_2017_MC_X'  :'../PRELIMINARY/outRoot/RecoDecay_X3872_prova_merge.root',
+   'UL_2017_MC_Psi':'../PRELIMINARY/outRoot/RecoDecay_Psi2S_prova_merge.root'
 }
-
-if not os.path.isdir('/tmp/cbasile/plots/%s' % tag):
-   os.mkdir('/tmp/cbasile/plots/%s' % tag)
 
 #import concurrent.futures
 import multiprocessing
@@ -35,8 +33,6 @@ def get_data_sync(dataset, columns, nthreads=2*multiprocessing.cpu_count(), excl
    if dataset not in input_files:
       raise ValueError('The dataset %s does not exist, I have %s' % (dataset, ', '.join(input_files.keys())))
    print 'getting files from "%s": ' % input_files[dataset]
-   #print ' \n'.join(input_files[dataset])
-   #infiles = [uproot.open(i) for i in input_files[dataset]]
    infiles = uproot.open(input_files[dataset])
    print 'available branches:\n',infiles[path].keys()
    if columns == 'all':
@@ -46,15 +42,17 @@ def get_data_sync(dataset, columns, nthreads=2*multiprocessing.cpu_count(), excl
    except KeyError as ex:
       print 'Exception! ', ex
       set_trace()
-      raise RuntimeError('Failed to open %s properly' % infiles[0])
-   #for infile in infiles[1:]:
-   #   try:
-   #      arrays = infile[path].arrays(columns)
-   #   except:
-   #      raise RuntimeError('Failed to open %s properly' % infile)         
-   #   for column in columns:
-   #      ret[column] = np.concatenate((ret[column],arrays[column]))
+      raise RuntimeError("Failed to open %s properly" %(input_files[dataset]))
    return ret
+
+import ROOT
+def PDtoROOT_DataFrame(df, columns):
+   data = {key: df[key].values for key in columns}
+   print(data)
+   rdf = ROOT.RDF.FromNumpy(data) # NON funziona grr
+   
+   return rdf
+
 
 from sklearn.cluster import KMeans
 from sklearn.externals import joblib
@@ -108,37 +106,43 @@ class HistWeighter(object):
 
 import pandas as pd
 import numpy as np
-def pre_process_data(dataset, features, for_seeding=False, keep_nonmatch=False):  
-   selection_JpsiPiPi = '(M_X3872 < 3.66) or (M_X3872 > 3.71 and M_X3872 < 3.83) or (M_X3872 > 3.92)' 
+def pre_process_data(dataset, features, training = True, channel = 'X3872', keep_nonmatch=False):  
+   
+   selection_JpsiPiPi = '(M_X3872 < 3.65831) or (M_X3872 > 3.71493 and M_X3872 < 3.82562) or (M_X3872 > 3.91839)' 
    selection_B0 = '(M_B0 > 5.09783 and M_B0 < 5.189) or (M_B0 > 5.371 and M_B0 < 5.463)'
    mods = get_models_dir()
-   #features = list(set(features+['pTM_B0', 'LxySignBSz_B0', 'SVprob_B0', 'CosAlpha3DBSz_B0', 'LxySignSV_K0s', 'SVprob_PiPi', 'pT_PiPi', 'pT_Pi1', 'DR_B0Pi1', 'D0_Pi1']))
-   # get the background data 
+   
+   ## get the BACKGROUND data 
    bkg_dataset = dataset + '_data'
    data_dict = get_data_sync(bkg_dataset, features) 
    bkg_data = pd.DataFrame(data_dict)
-   bkg_data['is_signal'] = np.zeros(bkg_data.event.shape)
-   bkg_data['is_signal'] = bkg_data['is_signal'].astype(int)
-   bkg_data = bkg_data.query(selection_B0)
-   bkg_data = bkg_data.query(selection_JpsiPiPi)
-   # get the signal data 
-   sgn_dataset = dataset + '_MC'
+   bkg_data['is_signal'] = np.zeros(bkg_data.event.shape).astype(int)
+   # ... apply blind region cuts
+   if training :
+      bkg_data = bkg_data.query(selection_B0)
+      bkg_data = bkg_data.query(selection_JpsiPiPi)
+
+   ## get the SIGNAL data 
+   if (channel == "X3872"): sgn_dataset = dataset + '_MC_X'
+   if (channel == "Psi2S"): sgn_dataset = dataset + '_MC_Psi'
    data_dict = get_data_sync(sgn_dataset, features)
    sgn_data = pd.DataFrame(data_dict)
-   sgn_data['is_signal'] = np.ones(sgn_data.event.shape)
-   sgn_data['is_signal'] = sgn_data['is_signal'].astype(int)
+   sgn_data['is_signal'] = np.ones(sgn_data.event.shape).astype(int)
 
+   ## concatenate and shuffle the two sets
    data = pd.concat([bkg_data, sgn_data])
    # shuffle the DataFrame rows
-   data = data.sample(frac = 1, random_state = 1)
-   #print(data.head())
+   data = data.sample(frac = 1, random_state = 33).reset_index(drop=True)
+   # print(data.head())
+   # print(data.tail())
 
    return data
 
-def train_test_split(data, div, thr):
-   mask = data.event % div
-   mask = mask < thr
-   return data[mask], data[np.invert(mask)]
+def train_analysis_split(data, Ncv):
+   mask = data.index % Ncv
+   CVsplit = []
+   [CVsplit.append(data[mask == i]) for i in range(Ncv)]
+   return CVsplit
 
 def reduce_mem_usage(df):
     """ 
