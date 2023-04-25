@@ -30,12 +30,12 @@ void RecoDecayPsi::Loop(){
 
     // **** HISTOGRAMS **** //
     // muons tracks quality
-    TH1F h_Mu_SoftID_MC = TH1F("Mu_SoftID_MC", "", 2, -0.5, 1.5);
-    TH1F h_Mu_SoftID_Fk = TH1F("Mu_SoftID_Fk", "", 2, -0.5, 1.5);
+    TH1F h_Mu_SoftID_MC   = TH1F("Mu_SoftID_MC", "", 2, -0.5, 1.5);
+    TH1F h_Mu_SoftID_Fk   = TH1F("Mu_SoftID_Fk", "", 2, -0.5, 1.5);
     TH1F h_Mu_GlobalMu_MC = TH1F("Mu_GlobalMu_MC", "", 2, -0.5, 1.5);
     TH1F h_Mu_GlobalMu_Fk = TH1F("Mu_GlobalMu_Fk", "", 2, -0.5, 1.5);
-    TH1F h_Mu_TrkQlty_MC = TH1F("Mu_TrkQlty_MC", "", 3, -0.5, 2.5);
-    TH1F h_Mu_TrkQlty_Fk = TH1F("Mu_TrkQlty_Fk", "", 3, -0.5, 2.5);
+    TH1F h_Mu_TrkQlty_MC  = TH1F("Mu_TrkQlty_MC", "", 3, -0.5, 2.5);
+    TH1F h_Mu_TrkQlty_Fk  = TH1F("Mu_TrkQlty_Fk", "", 3, -0.5, 2.5);
     // pions track quality
     TH1F h_Pi_TrkQlty_MC = TH1F("Pi_TrkQlty_MC", "", 3, -0.5, 2.5);
     TH1F h_Pi_TrkQlty_Fk = TH1F("Pi_TrkQlty_Fk", "", 3, -0.5, 2.5);
