@@ -3,6 +3,7 @@
 
 # TextFiles
 *.txt
+*.csv
 
 # Job reports & outputs
 */JobReport/*
@@ -49,3 +50,4 @@ cbasile.cc
 *.swo
 *.swp
 *~
+*.pyc
