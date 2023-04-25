@@ -45,7 +45,7 @@ parser.add_argument(
    '--reg_alpha', default=0.0, type=float
 )
 parser.add_argument(
-   '--reg_lambda', default=2.112612055963768, type=float          # chiara: default 1, sempre usato nei miei test; mauro 9.99999999862; rob: 2.112612055963768
+   '--reg_lambda', default=1., type=float          # chiara: default 1, sempre usato nei miei test; mauro 9.99999999862; rob: 2.112612055963768
 )
 parser.add_argument(
    '--nthreads', default=8, type=int
