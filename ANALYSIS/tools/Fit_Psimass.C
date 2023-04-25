@@ -43,7 +43,7 @@ map<string, TString> MC_rootFile{
     {"2016_Psi", "../PRELIMINARY/outRoot/RecoDecay_Psi2S_UL16.root"},
     {"2017_Psi", "../PRELIMINARY/outRoot/RecoDecay_Psi2S_UL17.root"},
     {"2018_Psi", "../PRELIMINARY/outRoot/RecoDecay_Psi2S_UL18.root"},
-    {"run2_Psi", "../PRELIMINARY/outRoot/RecoDecay_Psi2S_ULrun2.root"}
+    {"run2_Psi", "../PRELIMINARY/outRoot/RecoDecay_Psi2S_Run2.root"}
 
 
 };

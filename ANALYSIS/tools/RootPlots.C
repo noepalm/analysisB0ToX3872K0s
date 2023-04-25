@@ -57,11 +57,11 @@ TCanvas* RatioPlot(TH1* h1, TH1* h2){
 
 	TH1F* h_ratio = (TH1F*)h1->Clone("h_ratio");
 	h_ratio->SetLineColor(kBlack);
-   	h_ratio->SetMinimum(0.);
-   	h_ratio->SetMaximum(3.);
    	h_ratio->Sumw2();
 	h_ratio->SetStats(0);
 	h_ratio->Divide(h2);
+   	h_ratio->SetMinimum(0.);
+   	h_ratio->SetMaximum(3);
 	// ratio plot style ...
 	h_ratio->SetMarkerStyle(20);
 	Yaxis = h_ratio->GetYaxis();
@@ -85,8 +85,5 @@ TCanvas* RatioPlot(TH1* h1, TH1* h2){
 	return c;
 
 }//RatioPlot()
-
-
-
 
 };

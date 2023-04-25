@@ -7,6 +7,7 @@
 
 #include "TCanvas.h"
 #include "TPad.h"
+#include "TTree.h"
 #include "TAxis.h"
 #include "TLegend.h"
 #include "TLatex.h"
@@ -15,7 +16,7 @@
 
 namespace myRootLib{
 
-void histoSetUp(TH1* histo, const TString& x_label, const TString& y_label, Color_t color, bool fill = true , bool norm = true);
-TCanvas* RatioPlot(TH1* h1, TH1* h2);
-
+    void histoSetUp(TH1* histo, const TString& x_label, const TString& y_label, Color_t color, bool fill = true , bool norm = true);
+    TCanvas* RatioPlot(TH1* h1, TH1* h2);
+    
 };
