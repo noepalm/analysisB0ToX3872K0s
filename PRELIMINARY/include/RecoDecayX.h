@@ -10,7 +10,7 @@ class RecoDecayX : public MCbase_B0toX3872K0s {
 
     public:
         // constructor and destructor
-        RecoDecayX(TTree *tree=0, const TString & tags = "UL_MC");
+        RecoDecayX(TTree *tree=0, const TString & dataset = "SGN", const TString & tags = "UL_MC");
         virtual ~RecoDecayX();
         void    OutTree_setup();
 
@@ -25,6 +25,9 @@ class RecoDecayX : public MCbase_B0toX3872K0s {
 
     private:
 
+        // channel SGN/NORM
+        TString dataset_;
+
         // [ OUTPUT ]
         TString outFilePath_;
         TFile*  outFile_;
@@ -34,8 +37,8 @@ class RecoDecayX : public MCbase_B0toX3872K0s {
         ROOT::Math::PtEtaPhiMVector RecoP4_Mu1, RecoP4_Mu2;
         ROOT::Math::PtEtaPhiMVector RecoP4_JPsi;
         ROOT::Math::PtEtaPhiMVector RecoP4_Pi1, RecoP4_Pi2;
-        ROOT::Math::PtEtaPhiMVector RecoP4_Rho;
-        ROOT::Math::PtEtaPhiMVector RecoP4_X3872;
+        ROOT::Math::PtEtaPhiMVector RecoP4_PiPi;
+        ROOT::Math::PtEtaPhiMVector RecoP4_JpsiPiPi;
         ROOT::Math::PtEtaPhiMVector RecoP4_K0s, RecoP4_K0sPi1, RecoP4_K0sPi2;
         ROOT::Math::PtEtaPhiMVector RecoP4_B0;
 

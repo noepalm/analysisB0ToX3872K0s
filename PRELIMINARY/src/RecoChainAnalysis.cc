@@ -77,16 +77,19 @@ int main (int argc, char* argv[]){
 	TString tag = argv[2];
 	std::string channel = argv[3];
 	TChain* chain = TChainLoader(DirPath);
+
+    RecoDecayX* RecoAnalyzer = new RecoDecayX(chain, channel, tag);
+	RecoAnalyzer->Loop();
 	
-	if (channel == "SGN"){
-		RecoDecayX* RecoAnalyzer = new RecoDecayX(chain, tag);
-		RecoAnalyzer->Loop();
-		delete RecoAnalyzer;
-	} else if (channel == "NORM"){
-		RecoDecayPsi* RecoAnalyzer = new RecoDecayPsi(chain, tag);
-		RecoAnalyzer->Loop();
-		delete RecoAnalyzer;
-	}
+	// if (channel == "SGN"){
+	// 	RecoDecayX* RecoAnalyzer = new RecoDecayX(chain, channel, tag);
+	// 	RecoAnalyzer->Loop();
+	// 	delete RecoAnalyzer;
+	// } else if (channel == "PROVA"){
+	// 	RecoDecayPsi* RecoAnalyzer = new RecoDecayPsi(chain, tag);
+	// 	RecoAnalyzer->Loop();
+	// 	delete RecoAnalyzer;
+	// }
 
 	delete chain;
 

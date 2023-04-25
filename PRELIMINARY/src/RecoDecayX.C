@@ -1,12 +1,17 @@
 #include "../include/RecoDecayX.h"
 
-RecoDecayX::RecoDecayX(TTree *tree, const TString & tags) : MCbase_B0toX3872K0s (tree, tags){
+RecoDecayX::RecoDecayX(TTree *tree, const TString & dataset, const TString & tags) : MCbase_B0toX3872K0s (tree, tags){
+
+    dataset_ = dataset;
 
     RecoP4_Mu1.SetM(mMuon); RecoP4_Mu2.SetM(mMuon);
     RecoP4_Pi1.SetM(mPion); RecoP4_Pi2.SetM(mPion);
     RecoP4_K0s.SetM(mK0s);
 
-    outFilePath_ = "./outRoot/RecoDecay_X3872_" + tags_ + ".root";
+    TString dset_tag("X3872");
+    if (dataset_ == "NORM") dset_tag = "Psi2S";
+
+    outFilePath_ = "./outRoot/RecoDecay_"+ dset_tag +"_" + tags_ + ".root";
     OutTree_setup();
 
 }//RecoDecayX()
@@ -142,7 +147,12 @@ void RecoDecayX::Loop(){
         N_FiredEvents++;
 
         // ----- GENERATOR
-        GenPartFillP4();
+        if (dataset_ == "SGN") GenPartFillP4_X();
+        else if (dataset_ == "NORM") GenPartFillP4_Psi();
+        else {
+            std::cout << " [ERROR] : bad indication of dataset name, use only  SGN/NORM" << std::endl;
+            exit(-1);
+        }
         realB_idx = GenB0idx();
 
         // ----- FIND THE MONTE CARLO TRUTH
@@ -291,11 +301,11 @@ void RecoDecayX::Loop(){
             outTree_->Fill();
 
             // Rho
-            h_Pi1_pT_MC.Fill(RecoP4_Pi1.Pt()/RecoP4_B0.Pt());
+            h_Pi1_pT_MC.Fill(RecoP4_Pi1.Pt());///RecoP4_B0.Pt());
             h_Pi1_D0_MC.Fill( B0_PiPi_pi1_d0sig[b] );
             h_Pi1_DRwrtB_MC.Fill(ROOT::Math::VectorUtil::DeltaR(RecoP4_Pi1, RecoP4_B0));
             h_PiPi_svProb_MC.Fill(B0_PiPi_sv_prob[b]);
-            h_PiPi_pT_MC.Fill( (RecoP4_Pi1 + RecoP4_Pi2).Pt()/RecoP4_B0.Pt() );
+            h_PiPi_pT_MC.Fill( (RecoP4_Pi1 + RecoP4_Pi2) );//.Pt()/RecoP4_B0.Pt() );
 
             //K0short
             h_K0s_LxySign_wrtBvtx_MC.Fill(B0_K0_lxySign_wrtBvtx[b]);
@@ -423,10 +433,6 @@ void RecoDecayX::Loop(){
     h_B0_DistGenVtx_BS_MC.Write();
     h_B0_DistGenVtx_BSwithZ_MC.Write();
 
-    h_MuMu_M_MC.Write();
-    h_MuMu_M_Fk.Write();
-    h_PiPi_M_MC.Write();
-    h_PiPi_M_Fk.Write();
     h_X3872_M_MC.Write();
     h_X3872_M_Fk.Write();
     h_K0s_M_MC.Write();
@@ -724,6 +730,6 @@ int RecoDecayX::TriggerSelection_Track(const int Bidx){
 
 	//if (isOK_trk_step0 && isOK_trk_step1) RETURN_VALUE = 1;	
 
-	return RETURN_VALUE;
+   return RETURN_VALUE;
 
 }//TriggerSelection_Tracks

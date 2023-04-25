@@ -532,21 +532,22 @@ public :
    virtual void     Show(Long64_t entry = -1);
 
 
-   virtual void     GenPartFillP4();
+   virtual void     GenPartFillP4_X();
+   virtual void     GenPartFillP4_Psi();
    virtual int      GenB0idx();
 
    // I/O
    TString tags_;
 
    // PDG particle id & mass
-	int isMum = 13, isPip = 211, isJPsi = 443, isRho = 113, isK0s = 310, isX3872 = 9920443, isB0 = 511;
+	int isMum = 13, isPip = 211, isJPsi = 443, isRho = 113, isK0s = 310, isX3872 = 9920443, isPsi2S = 100443, isB0 = 511;
 	const float mMuon = 0.105658, mPion = 0.1395704, mK0s = 0.497648; 
 	// generator ptls 4-vectors
 	ROOT::Math::PtEtaPhiMVector GenP4_Mum, GenP4_Mup;           // muons
 	ROOT::Math::PtEtaPhiMVector GenP4_JPsi;                     // JPsi
 	ROOT::Math::PtEtaPhiMVector GenP4_Pim, GenP4_Pip;           // pions
-	ROOT::Math::PtEtaPhiMVector GenP4_Rho;                      // Rho 
-	ROOT::Math::PtEtaPhiMVector GenP4_X3872;                    // X3872
+	ROOT::Math::PtEtaPhiMVector GenP4_PiPi;                      // Rho 
+	ROOT::Math::PtEtaPhiMVector GenP4_JpsiPiPi;                    // X3872
 	ROOT::Math::PtEtaPhiMVector GenP4_K0s;                      // K0s
    ROOT::Math::PtEtaPhiMVector GenP4_K0s_Pim, GenP4_K0s_Pip;   // traks from K0s
 	ROOT::Math::PtEtaPhiMVector GenP4_B0;                       // B0
