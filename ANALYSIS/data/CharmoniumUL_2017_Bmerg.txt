@@ -1,3 +1,3 @@
->xNANO_data_2023Mar03_
+>merged/xNANO_data_2023Mar03_merged
 root://xrootd-cms.infn.it///store/user/crovelli/Charmonium/naniX_data2017B_2023March6/230303_170901/000
 #root://xrootd-cms.infn.it///store/user/crovelli/Charmonium/naniX_data2017B_2023March6/230303_170901/0001/xNANO_data_2023Mar03_1

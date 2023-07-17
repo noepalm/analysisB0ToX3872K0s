@@ -1,0 +1,7 @@
+root://xrootd-cms.infn.it///store/user/crovelli/Charmonium/naniX_data2018D_2023Mar03/230303_171057/0000/xNANO_data_2023Mar03_
+root://xrootd-cms.infn.it///store/user/crovelli/Charmonium/naniX_data2018D_2023Mar03/230303_171057/0001/xNANO_data_2023Mar03_1
+root://xrootd-cms.infn.it///store/user/crovelli/Charmonium/naniX_data2018D_2023Mar03/230303_171057/0002/xNANO_data_2023Mar03_2
+root://xrootd-cms.infn.it///store/user/crovelli/Charmonium/naniX_data2018D_2023Mar03/230303_171057/0003/xNANO_data_2023Mar03_3
+root://xrootd-cms.infn.it///store/user/crovelli/Charmonium/naniX_data2018D_2023Mar03/230303_171057/0004/xNANO_data_2023Mar03_4
+root://xrootd-cms.infn.it///store/user/crovelli/Charmonium/naniX_data2018D_2023Mar03/230303_171057/0005/xNANO_data_2023Mar03_5
+root://xrootd-cms.infn.it///store/user/crovelli/Charmonium/naniX_data2018D_2023Mar03/230303_171057/0006/xNANO_data_2023Mar03_6

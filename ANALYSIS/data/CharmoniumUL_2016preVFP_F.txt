@@ -1,0 +1,1 @@
+root://xrootd-cms.infn.it///store/user/soffi/Charmonium/crab_data_Run2016FpreVPF/230303_130811/0000/xNANO_data_2023Mar03_

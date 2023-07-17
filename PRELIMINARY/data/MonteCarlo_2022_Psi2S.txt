@@ -1,0 +1,7 @@
+####
+# Monte Carlo for B0 -> Psi(2S) K0s channel
+# 
+# --- Run3 2022
+####
+
+/eos/cms/store/group/phys_bphys/crovelli/nanoaod_X/Xnani2022_2023Feb16/BPH_BToPsi2SKs_Psi2SToJPsiPiPi_JPsiToMuMu_McM_Run3/crab_BdToPsi2SKs2022/230216_122106/0000/

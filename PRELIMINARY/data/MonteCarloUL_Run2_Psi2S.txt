@@ -1,0 +1,10 @@
+#####
+# Monte Carlo for B0 -> Psi(2S) K0s channel
+#####
+
+/eos/cms/store/group/phys_bphys/crovelli/nanoaod_X/Xnani2016preVPF_2023Feb02/BuToPsi2SKs_Psi2SToJPsiPiPi_JPsiToMuMu_RhoToPiPi_TuneCP5_13TeV-pythia8-evtgen/crab_BdToPsi2SKs2016preVPF/230202_190735/0000/
+/eos/cms/store/group/phys_bphys/crovelli/nanoaod_X/Xnani2016_2023Feb02/BuToPsi2SKs_Psi2SToJPsiPiPi_JPsiToMuMu_RhoToPiPi_TuneCP5_13TeV-pythia8-evtgen/crab_BdToPsi2SKs2016/230202_190631/0000/
+/eos/cms/store/group/phys_bphys/crovelli/nanoaod_X/naniX2017_2023Jan24/BuToPsi2SKs_Psi2SToJPsiPiPi_JPsiToMuMu_RhoToPiPi_TuneCP5_13TeV-pythia8-evtgen/crab_BdToPsi2SKs2017/230124_223153/0000/
+/eos/cms/store/group/phys_bphys/crovelli/nanoaod_X/naniX2017_2023Jan24/BuToPsi2SKs_Psi2SToJPsiPiPi_JPsiToMuMu_RhoToPiPi_TuneCP5_13TeV-pythia8-evtgen/crab_BdToPsi2SKs2017ext/230124_223215/0000/
+/eos/cms/store/group/phys_bphys/crovelli/nanoaod_X/Xnani2018_2023Feb02/BuToPsi2SKs_Psi2SToJPsiPiPi_JPsiToMuMu_RhoToPiPi_TuneCP5_13TeV-pythia8-evtgen/crab_BdToPsi2SKs2018/230202_135123/0000/
+

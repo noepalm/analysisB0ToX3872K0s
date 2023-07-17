@@ -1,0 +1,3 @@
+root://xrootd-cms.infn.it///store/user/crovelli/Charmonium/naniX_data2017F_2023March6/230303_170916/0000/xNANO_data_2023Mar03_
+root://xrootd-cms.infn.it///store/user/crovelli/Charmonium/naniX_data2017F_2023March6/230303_170916/0001/xNANO_data_2023Mar03_1
+root://xrootd-cms.infn.it///store/user/crovelli/Charmonium/naniX_data2017F_2023March6/230303_170916/0002/xNANO_data_2023Mar03_2
