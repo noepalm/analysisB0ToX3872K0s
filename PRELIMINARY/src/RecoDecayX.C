@@ -56,6 +56,14 @@ void RecoDecayX::Loop(){
     TH1F h_Pi_dR_HLT_DoubleMu4_JpsiTrk_MC = TH1F("Pi_dR_HLT_DoubleMu4_JpsiTrk_MC", "", Nbins, xlow, xhigh);
     TH1F h_Pi_dR_HLT_DoubleMu4_JpsiTrk_Fk = TH1F("Pi_dR_HLT_DoubleMu4_JpsiTrk_Fk", "", Nbins, xlow, xhigh);
     
+    // Trigger Tracks
+    TH1F h_TrigTrk_pT("TrigTrk_pT", "", 50, 0.,10.);
+    TH1F h_TrigTrk_eta("TrigTrk_eta", "", 30, -3, 3);
+    TH1F h_TrigTrk_DCAs("TrigTrk_DCAs", "", 50, 0, 20);
+    TH1F h_TrigTrk_pT_post("TrigTrk_pT_post", "", 50, 0.,10.);
+    TH1F h_TrigTrk_eta_post("TrigTrk_eta_post", "", 30, -3, 3);
+    TH1F h_TrigTrk_DCAs_post("TrigTrk_DCAs_post", "", 50, 0, 20);
+
     // JPsi --> MuMu
     Nbins =35 , xlow = 2.9, xhigh = 3.25;
     TH1F h_MuMu_M_MC = TH1F("MuMu_M_MC", "", Nbins, xlow, xhigh);
@@ -130,7 +138,9 @@ void RecoDecayX::Loop(){
     bool isMCmatched_JPsi, isMCmatched_Rho, isMCmatched_X3872, isMCmatched_K0s, isMCmatched_B0;
    
     // toCount variables
-    int  N_FiredEvents = 0, N_PassedEvents = 0, n_PassedB0 = 0, N_PassedB0 = 0, N_B0matching = 0;
+    int  N_FiredEvents = 0, N_PassedEvents = 0;
+    int  n_FiredB0 = 0 ,N_FiredB0 = 0, n_PassedB0 = 0, N_PassedB0 = 0, N_B0matching = 0;
+    int  n_trgMuon = 0, NtrgMuon = 0, n_trgTrk = 0, NtrgTrk = 0; // B0 cand with a triggered dimuon /track
     bool toCountJPsi = true, toCountPiPi= true, toCountK0s = true;
     int  prevMu1_idx, prevMu2_idx, prevPi1_idx, prevPi2_idx;
 
@@ -163,7 +173,8 @@ void RecoDecayX::Loop(){
         LumiBlock = luminosityBlock;
         Event = event;
 
-        n_PassedB0 = 0;
+        n_FiredB0 = 0, n_trgMuon = 0, n_trgTrk = 0,n_PassedB0 = 0;
+        prevMu1_idx = -1, prevMu2_idx = -1, prevPi1_idx = -1, prevPi2_idx = -1;
         for (Int_t b = 0; b  < nB0; b++){
             
             if ( !RecoPartFillP4(b)) continue; 
@@ -182,10 +193,42 @@ void RecoDecayX::Loop(){
             // ----- TRIGGER SELECTION TO THE B0 CANDIDATE
             //std::cout << " - muon selection " << TriggerSelection_Muons(b) << std::endl;
             //std::cout << " - track selection " << TriggerSelection_Track(b) << std::endl;
+            // sclero per le efficienze di trigger
+            if ( B0_MuMu_mu1_fired_DoubleMu4_JpsiTrk_Displaced[b] && B0_MuMu_mu2_fired_DoubleMu4_JpsiTrk_Displaced[b] 
+                    && 
+                (B0_PiPi_p1_fired_DoubleMu4_JpsiTrk_Displaced[b] || B0_PiPi_p2_fired_DoubleMu4_JpsiTrk_Displaced[b] || 
+                 B0_K0s_matchTrack1_fired_DoubleMu4_JpsiTrk_Displaced[b] || B0_K0s_matchTrack2_fired_DoubleMu4_JpsiTrk_Displaced[b])) n_FiredB0++;
+            else continue;
+            float trk_pT, trk_eta, trk_DCAs;
+            if(B0_PiPi_p1_fired_DoubleMu4_JpsiTrk_Displaced[b]){
+                trk_pT = RecoP4_Pi1.Pt(); trk_eta = RecoP4_Pi1.Eta(); trk_DCAs = B0_PiPi_pi1_d0sig[b];
+            } else if (B0_PiPi_p2_fired_DoubleMu4_JpsiTrk_Displaced[b]){
+                trk_pT = RecoP4_Pi2.Pt(); trk_eta = RecoP4_Pi2.Eta(); trk_DCAs = B0_PiPi_pi2_d0sig[b];
+            } else if (B0_K0s_matchTrack1_fired_DoubleMu4_JpsiTrk_Displaced[b]){
+                trk_pT = B0_K0s_matchTrack1_pt[b]; trk_eta = B0_K0s_matchTrack1_eta[b]; trk_DCAs = B0_K0s_matchTrack1_D0sign[b];
+            }else if (B0_K0s_matchTrack2_fired_DoubleMu4_JpsiTrk_Displaced[b]){
+                trk_pT = B0_K0s_matchTrack2_pt[b]; trk_eta = B0_K0s_matchTrack2_eta[b]; trk_DCAs = B0_K0s_matchTrack2_D0sign[b];
+            }
+            h_TrigTrk_pT.Fill(trk_pT); h_TrigTrk_eta.Fill(trk_eta); h_TrigTrk_DCAs.Fill(trk_DCAs);
+
             if(!TriggerSelection_Muons(b)) continue;
+            n_trgMuon++;
             if(!TriggerSelection_Track(b)) continue;
+            n_trgTrk++;
             n_PassedB0++;
             //std::cout << " = passed B0 " << n_PassedB0 << std::endl;
+            //
+
+            if(B0_PiPi_p1_fired_DoubleMu4_JpsiTrk_Displaced[b]){
+                trk_pT = RecoP4_Pi1.Pt(); trk_eta = RecoP4_Pi1.Eta(); trk_DCAs = B0_PiPi_pi1_d0sig[b];
+            } else if (B0_PiPi_p2_fired_DoubleMu4_JpsiTrk_Displaced[b]){
+                trk_pT = RecoP4_Pi2.Pt(); trk_eta = RecoP4_Pi2.Eta(); trk_DCAs = B0_PiPi_pi2_d0sig[b];
+            } else if (B0_K0s_matchTrack1_fired_DoubleMu4_JpsiTrk_Displaced[b]){
+                trk_pT = B0_K0s_matchTrack1_pt[b]; trk_eta = B0_K0s_matchTrack1_eta[b]; trk_DCAs = B0_K0s_matchTrack1_D0sign[b];
+            }else if (B0_K0s_matchTrack2_fired_DoubleMu4_JpsiTrk_Displaced[b]){
+                trk_pT = B0_K0s_matchTrack2_pt[b]; trk_eta = B0_K0s_matchTrack2_eta[b]; trk_DCAs = B0_K0s_matchTrack2_D0sign[b];
+            }
+            h_TrigTrk_pT_post.Fill(trk_pT); h_TrigTrk_eta_post.Fill(trk_eta); h_TrigTrk_DCAs_post.Fill(trk_DCAs);
             
 
             // *** JPsi --> Mu+Mu-  ***
@@ -305,7 +348,7 @@ void RecoDecayX::Loop(){
             h_Pi1_D0_MC.Fill( B0_PiPi_pi1_d0sig[b] );
             h_Pi1_DRwrtB_MC.Fill(ROOT::Math::VectorUtil::DeltaR(RecoP4_Pi1, RecoP4_B0));
             h_PiPi_svProb_MC.Fill(B0_PiPi_sv_prob[b]);
-            h_PiPi_pT_MC.Fill( (RecoP4_Pi1 + RecoP4_Pi2) );//.Pt()/RecoP4_B0.Pt() );
+            h_PiPi_pT_MC.Fill( (RecoP4_Pi1 + RecoP4_Pi2).Pt()/RecoP4_B0.Pt() );
 
             //K0short
             h_K0s_LxySign_wrtBvtx_MC.Fill(B0_K0_lxySign_wrtBvtx[b]);
@@ -367,13 +410,19 @@ void RecoDecayX::Loop(){
             N_PassedB0 += n_PassedB0;
             N_PassedEvents++;
         } 
+        if(n_FiredB0 > 0) N_FiredB0++;
+        if(n_trgMuon> 0) NtrgMuon++;
+        if(n_trgTrk> 0) NtrgTrk++;
 
 
     }// loop on events
 
-    std::cout << " Events which fired the HLT "  << N_FiredEvents << std::endl;
-    std::cout << " Events which passed the HLT " << N_PassedEvents << std::endl;
-    std::cout << " B0 cand. which passed the HLT " << N_PassedB0 << std::endl;
+    std::cout << " Events which fired HLT "  << N_FiredEvents << std::endl;
+    std::cout << " Events which passed HLT " << N_PassedEvents << std::endl;
+    std::cout << " Events with >0 B0cand firing  HLT "  << N_FiredB0 << std::endl;
+    std::cout << " Events with >0 B0cand passing HLT-muon "  << NtrgMuon << std::endl;
+    std::cout << " Events with >0 B0cand passing HLT-trk "  << NtrgTrk << std::endl;
+    std::cout << " B0 cand. passing whole HLT " << N_PassedB0 << std::endl;
     std::cout << " B0 cand. MC matching " << N_B0matching << std::endl;
     
     outFile_ = new TFile(outFilePath_, "RECREATE");
@@ -439,6 +488,13 @@ void RecoDecayX::Loop(){
     h_K0s_M_Fk.Write();
     h_B0_M_MC.Write();
     h_B0_M_Fk.Write();
+
+    h_TrigTrk_pT.Write(); 
+    h_TrigTrk_eta.Write();
+    h_TrigTrk_DCAs.Write();
+    h_TrigTrk_pT_post.Write(); 
+    h_TrigTrk_eta_post.Write();
+    h_TrigTrk_DCAs_post.Write();
 
     outTree_->Write();
 
@@ -728,7 +784,7 @@ int RecoDecayX::TriggerSelection_Track(const int Bidx){
 		}
    }
 
-	//if (isOK_trk_step0 && isOK_trk_step1) RETURN_VALUE = 1;	
+	if (isOK_trk_step0 && isOK_trk_step1) RETURN_VALUE = 1;	
 
    return RETURN_VALUE;
 

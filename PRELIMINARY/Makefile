@@ -65,6 +65,7 @@ RecoLev:$(INCLUDEDIR)src/RecoChainAnalysis.cc\
 		$(CXX) $(CXXFLAGS) -ldl -o RecoChainAnalysis $(OUTLIB)/*.o $(GLIBS) $(LDFLAGS) $ $<
 
 clean:
+		@echo "cleaning..."
 		rm -f $(OUTLIB)*.o
 		rm -f GenLev
 		rm -f RecoLev
