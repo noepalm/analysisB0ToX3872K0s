@@ -60,7 +60,7 @@ void HLTapply::Loop(){
             //std::cout << " - muon selection " << TriggerSelection_Muons(b) << std::endl;
             //std::cout << " - track selection " << TriggerSelection_Track(b) << std::endl;
             if(!TriggerSelection_Muons(b)) continue;
-            if(!TriggerSelection_Track(b)) continue;
+            //if(!TriggerSelection_Track(b)) continue;
             n_PassedB0++;
 
             toCountJPsi = (B0_mu1_idx[b] != prevMu1_idx) || (B0_mu2_idx[b] != prevMu2_idx);
