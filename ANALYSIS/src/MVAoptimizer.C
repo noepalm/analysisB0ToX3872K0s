@@ -1,11 +1,13 @@
 #include "../include/MVAoptimizer.h"
+#include "../include/LumiConstants.h"
+using namespace LumiConstants; 
 
-MVAoptimizer::MVAoptimizer(const TString& input, const float& BDTcut,const float& Mcut,const int& year, const TString & channel){
+MVAoptimizer::MVAoptimizer(const TString& input, const float& BDTcut,const float& Mcut,const TString& year, const TString & channel){
 
     year_ = year;
-	LumiNorm_ = 0.025;
+	LumiNorm_ = McNormPerYear_Psi2S[year_]; 
     channel_ = channel;
-	std::cout<< Form(" Analyze %d dataset for " + channel_ + "channel -> LumiNorm %.4f", year_, LumiNorm_)<<std::endl;
+	std::cout<< Form(" Analyze "+ year_ +" dataset for " + channel_ + " channel -> LumiNorm %.4f", LumiNorm_)<<std::endl;
 
     BDToutCut_ = BDTcut;
     MpipiCut_  = Mcut;
@@ -14,14 +16,16 @@ MVAoptimizer::MVAoptimizer(const TString& input, const float& BDTcut,const float
     inPath_ = input;
     if(!gSystem->AccessPathName(inPath_)){
         inFile_ = TFile::Open(inPath_);
-        inTree_ = (TTree*)inFile_->Get("CVtrainig_UL_2017");
-        std::cout << " [+] loaded TTree from " << inPath_ << " with "<< inTree_->GetEntries() << " entries" << std::endl;
+        inTree_ = (TTree*)inFile_->Get("CVtrainig_UL_"+ year_);
+        std::cout << " [+] loaded TTree CVtrainig_UL_"+ year_ +"from " << inPath_ << " with "<< inTree_->GetEntries() << " entries" << std::endl;
     }else std::cout << " ERROR : cannot open input file " << inPath_ << std::endl;
 
     set_SBregions();
     set_selection();
 
-    outPath_ = Form("/eos/user/c/cbasile/www/B0toX3872K0s/MVA/CVtraining_UL_%d/", year_);
+    outPath_ = "/eos/user/c/cbasile/www/B0toX3872K0s/FitToData/"+year_+"/";
+    //outPath_ = Form("/eos/user/c/cbasile/www/B0toX3872K0s/HLTchecks/");
+
 
 }// MVAoptimizer()
 
@@ -34,7 +38,7 @@ MVAoptimizer::~MVAoptimizer(){
 void MVAoptimizer::set_SBregions(){
 
     // B0 sidebands limits
-    B0_lSB_low  = 5.09783;
+    B0_lSB_low  = 5.1; //5.09783;
     B0_lSB_high = 5.18903;
     B0_rSB_low  = 5.37143;
     B0_rSB_high = 5.46262;
@@ -57,7 +61,7 @@ void MVAoptimizer::set_SBregions(){
 
 
     // plot limits
-    MB_low = 5.05 , MB_high = 5.50;
+    MB_low = 5.0 , MB_high = 5.55;
     //MJpsiPiPi_low, MJpsiPiPi_high;
     //MK0s_low, MK0s_high;
     MPiPi_low = 0.3, MPiPi_high = 1.;
@@ -68,9 +72,8 @@ void MVAoptimizer::set_SBregions(){
 
 void MVAoptimizer::set_selection(){
     // selection on the K0s SR
-    selection_ = Form("M_K0s > %f && M_K0s < %f", K0s_SR_low, K0s_SR_high);
+    selection_ = Form("M_K0s > %f && M_K0s < %f && M_PiPi < 0.85 && M_X3872 < 4.0", K0s_SR_low, K0s_SR_high);
     // selection on the JpsiPiPi SR
-    selection_.Append(Form(" && M_X3872 > %f && M_X3872 < %f", JpsiPiPi_SR_low, JpsiPiPi_SR_high));
     SRselection = selection_;
     // selection on the MVA 
     selection_.Append(Form(" && BDTout > %f && M_PiPi > %f", BDToutCut_, MpipiCut_)); 
@@ -88,50 +91,58 @@ double MVAoptimizer::Nbkg_extraction(){
     
 	// ==== ROOFIT SET UP ==== //
 	// prepare B0 mass dataset
-	//double Mlow = 5.0, Mhigh = 5.6;	
 	RooRealVar M_B0   ("M_B0", " B0 mass in data", MB_low, MB_high, "GeV");
     RooRealVar M_X3872("M_X3872", " JpsiPiPi mass in data", 3.4, 4.9, "GeV");
     RooRealVar M_K0s  ("M_K0s", " K0short mass in data", 0.4, 0.6, "GeV");
     RooRealVar M_PiPi ("M_PiPi", "PiPi mass", MPiPi_low, MPiPi_high, "GeV");
     RooRealVar BDTout ("BDTout", " BDTout in data", BDTout_low, BDTout_high, "");
 	// define signal & sidebands region
-	M_B0.setRange(  "B0_lSB"      , MB_low , B0_lSB_high);
-	M_B0.setRange(  "B0_rSB"      , B0_rSB_low , MB_high);
+	M_B0.setRange(  "B0_lSB"      , B0_lSB_low , B0_lSB_high);
+	M_B0.setRange(  "B0_rSB"      , B0_rSB_low , B0_rSB_high);
 	M_B0.setRange("BLINDregion"   , B0_lSB_high, B0_rSB_low);
 	M_B0.setRange("FULLregion"    , MB_low,      MB_high);
 	M_B0.setRange("SGNregion"     , B0_SR_low  , B0_SR_high);
-	// cuts on the intermediate resonances
+
+    
+
 	TString selection;
-	//if (channel_ == "X3872") selection = "M_X3872 > 3.75 && M_PiPi < 0.9";
-	//else if (channel_ == "Psi2S") selection = "M_X3872 < 3.75";
-    RooDataSet tmp_data("data", "tmp_data", RooArgSet(M_B0, M_X3872, M_K0s, M_PiPi, BDTout), Import(*inTree_), Cut(selection));
+    RooDataSet tmp_data("data", "tmp_data", RooArgSet(M_B0, M_X3872, M_K0s, M_PiPi, BDTout), Import(*inTree_), Cut(selection_));
 	tmp_data.Print();
+	wsFit->import(tmp_data);
 
 	selection = selection_;
 	selection.Append(Form(" && (M_B0 < %f || M_B0 > %f)", B0_lSB_high, B0_rSB_low));
     RooDataSet* data = (RooDataSet *)tmp_data.reduce(M_B0, selection);
     data->Print();
-	wsFit->import(*data);
     
 	// define BACKGROUND MODEL
     // Fermi 
-	RooRealVar Slope("Slope", "", 10.0, 1.0 , 200.);
-	RooRealVar Flex("Flex", "", 4., 1. , 7.);
-	RooRealVar C("C", "", 0.5, 0. , 1.);
+	RooRealVar Slope("Slope", "", 10.0, 1.0 , 30.);
+	RooRealVar Flex("Flex", "", 5., 3. , 5.25);
+	RooRealVar C("C", "", 0.05, 0.0, 0.1);
 
     RooGenericPdf Fermi("Fermi", "", "1./(1. + exp(( @0 - @1)*@2)) + @3", RooArgList(M_B0, Flex, Slope, C));
     // Poisson
 	RooRealVar SlopeP("SlopeP", "", -15.0, -35.0 , -5.);
-	RooRealVar Th("Th", "", 4.75, 4.5 , 5.);
+	RooRealVar Th("Th", "", 4.75, 4.0 , 5.);
 	RooRealVar Exp("Exp", "", 4.);
 	
 	RooGenericPdf Pois("Pois", "", "pow((@0 - @1), @4) * exp(( @0 - @1)*@2) + @3", RooArgList(M_B0, Th,  SlopeP, C, Exp));
-	
-	
-	RooRealVar bkg_yield("nBKG", "", 3000, 100, 100000);
+
+    // Jpsi+X + combinatorial
+    // exponential comb
+    RooRealVar comb_coeff("comb_coeff","",-5,-15., -1);
+    RooExponential pdf_comb("pdf_comb","",M_B0,comb_coeff);
+    RooRealVar n_comb("n_comb","",80000,0.,1E6);
+    // Jpsi+X (conjugated error function)
+    RooRealVar jpsix_scale("jpsix_scale","",0.02,0.001,0.1);
+    RooRealVar jpsix_shift("jpsix_shift","",5.15,5.12,5.16);
+    RooGenericPdf pdf_jpsix("pdf_jpsix","","TMath::Erfc((@0-@1)/@2)",RooArgList(M_B0,jpsix_shift,jpsix_scale));
+    RooRealVar n_jpsix("n_jpsix","",20000,0.,1E5);
+
+    RooAddPdf BKGmodel("BKGmodel","",RooArgList(pdf_comb,pdf_jpsix),RooArgList(n_comb,n_jpsix));
     //RooAddPdf BKGmodel("BKGmodel", "B0 sidebans shape", Fermi, bkg_yield);
-	RooAddPdf BKGmodel("BKGmodel", "B0 sidebans shape", Pois, bkg_yield);
-    wsFit->import(BKGmodel);
+	//RooAddPdf BKGmodel("BKGmodel", "B0 sidebans shape", Pois, bkg_yield);
 
 
     // fit data
@@ -141,12 +152,15 @@ double MVAoptimizer::Nbkg_extraction(){
 	//ResBKGmodelSB1->Print();
 	RooFitResult *ResBKGmodel= BKGmodel.fitTo(*data, Range("B0_lSB,B0_rSB"), Save());
 	ResBKGmodel->Print("v");
+    wsFit->import(BKGmodel);
 	wsFit->import(*ResBKGmodel);
 
     // plot results
-    RooPlot* frame = M_B0.frame(Name("FitPlot"),Bins(45));
+    RooPlot* frame = M_B0.frame(Name("FitPlot"),Bins(55));
 	data->plotOn(frame);
 	BKGmodel.plotOn(frame, Range("FULLregion"), RooFit::NormRange("B0_lSB,B0_rSB"));
+	BKGmodel.plotOn(frame,  Components(pdf_jpsix), LineStyle(kDashed), LineColor(kRed), Range("FULLregion"), RooFit::NormRange("B0_lSB,B0_rSB"));
+	BKGmodel.plotOn(frame,  Components(pdf_comb), LineStyle(kDashed), LineColor(kGray), Range("FULLregion"), RooFit::NormRange("B0_lSB,B0_rSB"));
 	BKGmodel.paramOn(frame, Layout(0.60));
 	frame->SetTitle(Form("BDT out > %.2f Mpipi > %.3f", BDToutCut_, MpipiCut_));
 	wsFit->import(*frame);
@@ -168,11 +182,12 @@ double MVAoptimizer::Nbkg_extraction(){
 	double Ib = IntBreg->getVal();
 	std::cout << " - Integral in sidebands region " << Ib << std::endl;
 
-	Nbkg = data->sumEntries() * Is/Ib; 
+	//Nbkg = data->sumEntries() * Is/Ib; 
+	Nbkg = inTree_->GetEntries(selection + Form("&& M_B0 > %f && M_B0 < %f", B0_lSB_low, B0_rSB_high))*Is/Ib;
 	std::cout << " - Nbkg in signal region " << Nbkg << std::endl;
 
 	// ==== SAVE ON FILE ==== //
-	TString outFileName = Form("./outRoot/PunziOptimization/fit_results/FitResults_B0sidebands_%d_", year_);
+	TString outFileName = "./outRoot/PunziOptimization/fit_results/FitResults_B0sidebands_" + year_+"_";
 	if (BDToutCut_ < 0.) outFileName.Append(Form("m"));
 	outFileName.Append(Form("%.0f_Mpipi%.0f", fabs(BDToutCut_)*100., MpipiCut_*1000) + channel_ + ".root");
 
@@ -180,23 +195,19 @@ double MVAoptimizer::Nbkg_extraction(){
 	frame->Write("FitPlot");
 	ResBKGmodel->Write("FitResults");
 	h_Corr->Write();
-	//wsFit->writeToFile("prova_workspace.root");
+	wsFit->writeToFile("prova_workspace.root");
 
 	outFitFile->Close();
 	std::cout << " [OUT] written on " << outFileName << std::endl;
-	wsFit->Print();
+	//wsFit->Print();
     return Nbkg;
 
 }//Nbkg_extraction
 
 double MVAoptimizer::Nsgn_extraction(){
 
-	//TString selection = Form("is_signal && M_B0 > %f && M_B0 < %f && BDTout > %f && M_PiPi > %f", B0_SR_low, B0_SR_high, BDToutCut_, MpipiCut_ );
-	TString selection = SGNselection + Form(" && M_B0 > %f && M_B0 < %f", B0_SR_low, B0_SR_high); 
-    //if(channel_ == "X3872") selection.Append("&& M_X3872 >3.75");
-    //lse if(channel_ == "Psi2S") selection.Append("&& M_X3872 < 3.75");
-	double Nsgn = inTree_->Draw("M_B0", selection, "goff");
-	std::cout << " - Nsgn in signal region " <<  Nsgn << std::endl;
+	double Nsgn = inTree_->GetEntries(SGNselection);
+	//std::cout << " - Nsgn in signal region " <<  Nsgn << std::endl;
 
 	Nsgn *= LumiNorm_;
 	return Nsgn;
@@ -206,26 +217,23 @@ double MVAoptimizer::Nsgn_extraction(){
 double MVAoptimizer::EFFsgn_extraction(){
 
 	double Ns = Nsgn_extraction();
-	TString selection = Form("is_signal && M_B0 > %f && M_B0 < %f", B0_SR_low, B0_SR_high);
-    //if(channel_ == "X3872") selection.Append("&& M_X3872 >3.75");
-    //else if(channel_ == "Psi2S") selection.Append("&& M_X3872 < 3.75");
-	double Ntot = inTree_->Draw("M_B0", selection, "goff");
-	Ntot *= LumiNorm_;
+	double Ntot = inTree_->GetEntries( "is_signal && " + SRselection)*LumiNorm_;
 
 	return Ns/Ntot;
 
 }//EFFsgn_extraction()
 
-double MVAoptimizer::PunziSign(double* PSerr){
+double MVAoptimizer::PunziSign(double* PSerr, double * Nbkg , double * Esgn ){
 
 	double PunziS;
 	const double b = 5.0;    // #sigmas corresp. to 5sigma significance level
 	const double a = 2.0;    // #sigmas corresp. to CL (90%--> 1.2816) (95% --> 1.6448) (CMStwiki --> 2.)
 
 	double B          = Nbkg_extraction();
-
+    *Nbkg = B;
 	double S          = Nsgn_extraction();
 	double Seff       = EFFsgn_extraction();
+    *Esgn = Seff;
 	double Seff_error = 1./sqrt(S); // error square
 	
 	double Sign_denom        = b*b + 2.*a*sqrt(B) + b*sqrt(b*b + 4.*a*sqrt(B) + 4.*B );
@@ -241,7 +249,7 @@ double MVAoptimizer::PunziSign(double* PSerr){
 
 int MVAoptimizer::makeSGNvsBKGplot(){
 
-	int Nbins = 45;
+	int Nbins = 55;
 	double Mlow = MB_low, Mhigh = MB_high;
 	TH1F* h_Data_B0 = new TH1F("Data_B0", "", Nbins, Mlow, Mhigh);
 	TH1F* h_SGN_B0  = new TH1F("SGN_B0" , "", Nbins, Mlow, Mhigh); 
@@ -252,20 +260,26 @@ int MVAoptimizer::makeSGNvsBKGplot(){
 	TH2F* h_Data_B0vsX = new TH2F("Data_B0vsX", "", Nbins, Mlow, Mhigh, 15, Mlow_X, Mhigh_X );
 	TH2F* h_SGN_B0vsX  = new TH2F("SGN_B0vsX", "", Nbins, Mlow, Mhigh, 15, Mlow_X, Mhigh_X );
 
-	TString BKG_selection = DATAselection;//Form("!is_signal&& BDTout > %f && M_PiPi > %f",  BDToutCut_, MpipiCut_ );
+	TString BKG_selection = DATAselection;
 	if (is_blind_) BKG_selection.Append(Form("&& (M_B0 < %f || M_B0 > %f)",  B0_lSB_high, B0_rSB_low));
-	TString SGN_selection = SGNselection;//Form("is_signal && BDTout > %f && M_PiPi > %f",  BDToutCut_, MpipiCut_ );
+	TString SGN_selection = SGNselection;
+    // data
 	inTree_->Draw("M_B0>>Data_B0", BKG_selection);
 	inTree_->Draw("M_X3872>>Data_X", BKG_selection+ Form("&& M_B0 > %f && M_B0 < %f", B0_SR_low, B0_SR_high));
 	inTree_->Draw("M_X3872:M_B0>>Data_B0vsX", BKG_selection);
+    // MC
 	inTree_->Draw("M_B0>>SGN_B0", SGN_selection);
-    std::cout << " #sgn @ plot func " << h_SGN_B0->Integral() << std::endl;
 	h_SGN_B0->Scale(LumiNorm_);
 	inTree_->Draw("M_X3872>>SGN_X", SGN_selection);
 	h_SGN_X->Scale(LumiNorm_);
 	inTree_->Draw("M_X3872:M_B0>>SGN_B0vsX", SGN_selection);
 	h_SGN_B0vsX->Scale(LumiNorm_);
     h_SGN_B0vsX->Add(h_Data_B0vsX);
+
+    std::cout << " Jpsi PiPi under B0 peak >>> selection Data: " << BKG_selection+ Form("&& M_B0 > %f && M_B0 < %f", B0_SR_low, B0_SR_high) << std::endl;
+    std::cout << " Jpsi PiPi under B0 peak >>> DATA :" << h_Data_X->Integral() << std::endl;
+    std::cout << " Jpsi PiPi under B0 peak >>> selection MC : " << SGN_selection << std::endl;
+    std::cout << " Jpsi PiPi under B0 peak >>> MC :" << h_SGN_X->Integral() << std::endl;
 
 	h_SGN_B0->GetXaxis()->SetTitle("M(B_{0}) [GeV]");
 	h_SGN_B0->GetYaxis()->SetTitle(Form("Events/%.3f [GeV]", h_SGN_B0->GetXaxis()->GetBinWidth(1)));
@@ -315,7 +329,7 @@ int MVAoptimizer::makeSGNvsBKGplot(){
 	h_SGN_B0->GetYaxis()->SetRangeUser(0., 1.4 * std::max(h_SGN_B0->GetMaximum(), h_Data_B0->GetMaximum()));
 	h_SGN_B0->Draw("HIST");
 	legendB0->AddEntry(h_SGN_B0, "SIGNAL (MC)");
-	legendB0->AddEntry(h_Data_B0, Form("DATA %d", year_));
+	legendB0->AddEntry(h_Data_B0,"DATA " + year_);
 	FitCurve->Draw("SAME");
 	h_Data_B0->Draw("PE0 SAME");
 	legendB0->AddEntry(FitCurve, "SIDEBANDS-FIT");
@@ -411,7 +425,7 @@ void MVAoptimizer::Plot2D_BDToutMpipi(){
 	TCanvas* c1 = new TCanvas("c1","canvas", 1024, 1024);	
 	gStyle->SetOptStat(0);
 	legend->AddEntry(h_CorrS, Form("SIGNAL (MC) Corr = %.3f", h_CorrS->GetCorrelationFactor()));
-	legend->AddEntry(h_CorrD, Form("DATA %d Corr = %.3f", year_, h_CorrD->GetCorrelationFactor()));
+	legend->AddEntry(h_CorrD, Form("DATA " + year_+ " Corr = %.3f", h_CorrD->GetCorrelationFactor()));
 	h_CorrS->Draw("BOX ");
 	h_CorrD->Draw("BOX SAME");
 	h_CorrS->Draw("BOX SAME");
@@ -419,23 +433,114 @@ void MVAoptimizer::Plot2D_BDToutMpipi(){
 	legend->Draw();
     CMSxxx(c1);
 
-	c1->SaveAs(outPath_ + Form("BDToutVSMpipi_UL%d_", year_) + channel_+ ".png"); 
-	c1->SaveAs(outPath_ + Form("BDToutVSMpipi_UL%d_", year_) + channel_+ ".pdf"); 
+	c1->SaveAs(outPath_ + "BDToutVSMpipi_UL" +  year_+ "_" + channel_+ ".png"); 
+	c1->SaveAs(outPath_ + "BDToutVSMpipi_UL" +  year_+ "_" + channel_+ ".pdf"); 
 
 	h_Mpipi_B->Draw("HIST"); h_Mpipi_S->Draw("HIST SAME");
 	gPad->SetLeftMargin(0.15);
 	legend->Draw();
-	c1->SaveAs(outPath_ + Form("Mpipi_dataVSmc_UL%d_", year_) + channel_+ ".png"); 
-	c1->SaveAs(outPath_ + Form("Mpipi_dataVSmc_UL%d_", year_) + channel_+ ".pdf"); 
+	c1->SaveAs(outPath_ + "Mpipi_dataVSmc_UL" +  year_+ "_" + channel_+ ".png"); 
+	c1->SaveAs(outPath_ + "Mpipi_dataVSmc_UL" +  year_+ "_" + channel_+ ".pdf"); 
 
 	h_BDTx_B->Draw("HIST"); h_BDTx_S->Draw("HIST SAME");
 	gPad->SetLeftMargin(0.15);
 	legend->Draw();
-	c1->SaveAs(outPath_ + Form("BDTout_dataVSmc_UL%d_", year_) + channel_+ ".png"); 
-	c1->SaveAs(outPath_ + Form("BDTout_dataVSmc_UL%d_", year_) + channel_+ ".pdf"); 
-	
+	c1->SaveAs(outPath_ + "BDTout_dataVSmc_UL" +  year_+ "_" + channel_+ ".png"); 
+	c1->SaveAs(outPath_ + "BDTout_dataVSmc_UL" +  year_+ "_" + channel_+ ".pdf"); 
 
 }
+
+double MVAoptimizer::TotalFit_Psi2S(){
+
+	// ==== ROOFIT SET UP ==== //
+	RooRealVar* M_B0 = wsFit->var("M_B0");
+	TH1F hh("hh", "", 55, MB_low, MB_high); 
+    inTree_->Draw("M_B0>>hh", DATAselection);
+    RooDataHist h_data("h_data", "", *M_B0, Import(hh));
+
+    // take BKG model and  freeze Jpsi+X bkg
+    RooAbsPdf* BKGmodel = wsFit->pdf("BKGmodel"); 
+    RooRealVar* jpsix_scale = wsFit->var("jpsix_scale"); 
+    jpsix_scale->setConstant(true);
+    RooRealVar* jpsix_shift = wsFit->var("jpsix_shift"); 
+    jpsix_shift->setConstant(true);
+    RooRealVar* n_jpsix = wsFit->var("n_jpsix"); 
+    n_jpsix->setConstant(true);
+    
+
+    // fit variables 
+    // SIGNAL model CB + G 
+    // Crystal Ball
+    RooRealVar B0mass ("B0mass" , "", 5.279, 5.275, 5.285);
+    RooRealVar B0sigma_CB("B0sigma_CB", "", 0.01, 0.005, 0.1);
+    RooRealVar alpha("alpha", "", 1.5, 1.,  2.);
+    RooRealVar     N(    "N", "", 1., 1.,  10.);
+    
+    RooCBShape CBsignal("CBsignal", "", *M_B0, B0mass, B0sigma_CB, alpha, N);
+    RooProdPdf SGNpdfCB("SGNpdfCB", "SGNpdfCB", CBsignal ); 
+    // Gaussian
+    RooRealVar B0sigma_G("B0sigma_G", "", 0.06, 0.001  , 0.1);
+    
+    RooGaussian Gsignal("Gsignal", "", *M_B0, B0mass, B0sigma_G);
+    
+    RooRealVar f("f", "", 0., 1.);
+    RooAddPdf SGNmodel("SGNmodel", "SGNmodel", RooArgList(CBsignal, Gsignal), f);
+
+    // FULL model
+    RooRealVar sgn_yield("sgn_yield", "", 100, 50, 1E6);
+    RooRealVar bkg_yield("bkg_yield", "", 100, 80, 1E6);
+    RooAddPdf FULLmodel("FULLmodel", "FULLmodel", RooArgList(*BKGmodel, SGNmodel), RooArgList(bkg_yield,sgn_yield));
+
+    // FIT
+    RooFitResult *ResFULLmodel = FULLmodel.fitTo(h_data, Extended(kTRUE), Range("FULLregion"), Save());
+    ResFULLmodel->Print("v");
+    
+    // DRAW RESULTS
+    RooPlot* frame = M_B0->frame(Bins(55), Title(""));
+    h_data.plotOn(frame);
+    FULLmodel.plotOn(frame, Components(SGNmodel), LineColor(kGreen), LineStyle(kDashed), NormRange("FULLregion"));
+    FULLmodel.plotOn(frame, Components(*BKGmodel), LineColor(kRed), LineWidth(2), LineStyle(kDashed), NormRange("FULLregion"));
+    FULLmodel.plotOn(frame);
+    RooHist *hpull = frame->pullHist();
+    // chi-square
+    TText *TxtChi2= new TText(5.1, frame->GetMaximum()*0.85, Form("ChiSq = %.3f", frame->chiSquare(13)));
+    TxtChi2->SetTextSize(0.035);   TxtChi2->SetTextColor(kRed);
+    frame->addObject(TxtChi2);
+    std::cout << " ----> Chi2 SIGNAL FIT \t" << frame->chiSquare(13) << std::endl;
+    // plot pull
+    RooPlot* frame_pull = M_B0->frame(Bins(55), Title(""));
+    frame_pull->addPlotable(hpull, "P");
+
+    //SGN and BKG #events
+    double I_SGN_T  = SGNmodel.createIntegral(*M_B0, NormSet(*M_B0), Range("FULLregion"))->getVal(); //integrate sgn region
+    double I_SGN_Sr = SGNmodel.createIntegral(*M_B0, NormSet(*M_B0), Range("SGNregion"))->getVal(); //integrate sgn region
+    double nSGN = ((RooRealVar &)ResFULLmodel->floatParsFinal()[9]).getVal();
+    double numSignal_SR = nSGN*I_SGN_Sr/I_SGN_T;
+    std::cout << Form(" [RESULT] nSGN = %.2f \t sgn-integral (SR)/(FULL) = %.2f / %.2f  --->> Nsignal = %.2f ", nSGN, I_SGN_Sr, I_SGN_T, numSignal_SR) << std::endl;
+    double I_BKG_T  = BKGmodel->createIntegral(*M_B0, NormSet(*M_B0), Range("FULLregion"))->getVal(); //integrate sgn region
+    double I_BKG_Sr = BKGmodel->createIntegral(*M_B0, NormSet(*M_B0), Range("SGNregion"))->getVal(); //integrate sgn region
+    double nBKG = ((RooRealVar &)ResFULLmodel->floatParsFinal()[5]).getVal();
+    double numBackground_SR = nBKG*I_BKG_Sr/I_BKG_T;
+    std::cout << Form(" [RESULT] nBKG = %.2f \t bkg-integral (SR)/(FULL) = %.2f / %.2f  --->> Nbackground = %.2f ", nBKG, I_BKG_Sr, I_BKG_T, numBackground_SR) << std::endl;
+    TText *TxtNs = new TText(5.1, frame->GetMaximum()*0.8, Form("N SGN = %.2f ", numSignal_SR ));
+    TText *TxtNb = new TText(5.1, frame->GetMaximum()*0.75, Form("N BKG = %.2f ", numBackground_SR));
+    frame->addObject(TxtNs);
+    frame->addObject(TxtNb);
+
+    TCanvas* cf = new TCanvas("cf","data fit", 800, 1000);
+    cf->Divide(1,2);
+    cf->cd(1);
+    frame->Draw();
+    cf->cd(2);
+    frame_pull->Draw();
+    cf->SaveAs(outPath_ + "FullFit_" +Form("X%.0f_Mpipi%.0f_", fabs(BDToutCut_)*100., MpipiCut_*1000)+ year_ + "_" + channel_ +".png");
+    cf->SaveAs(outPath_ + "FullFit_" + Form("X%.0f_Mpipi%.0f_", fabs(BDToutCut_)*100., MpipiCut_*1000)+ year_ + "_" + channel_ +".pdf");
+    
+
+    return 0;
+
+	
+}//TotalFit_Psi2S()	
 
 void MVAoptimizer::CMSxxx(TCanvas* c){
 	c->cd();
@@ -449,6 +554,6 @@ void MVAoptimizer::CMSxxx(TCanvas* c){
 	RunDetails.DrawLatex(.20, .91, "Work in progress");
 	RunDetails.SetTextFont(42);
 	RunDetails.SetTextSize(0.030);
-	RunDetails.DrawLatex(.70, .91, "41 fb^{-1} (13 TeV)");
+	RunDetails.DrawLatex(.70, .91, Form("%.2f fb^{-1} (13 TeV)",LumiPerYear_Run2[year_]));
 
 }
