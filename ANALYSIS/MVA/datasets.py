@@ -12,9 +12,22 @@ path = 'HLTemulation'
 
 # datasets
 input_files = {
-   'UL_2017_data'  :'/eos/user/c/cbasile/B0toX3872K0s/data/CharmoniumUL_2017_blind.root',
-   'UL_2017_MC_X'  :'../PRELIMINARY/outRoot/RecoDecay_X3872_prova_merge.root',
-   'UL_2017_MC_Psi':'../PRELIMINARY/outRoot/RecoDecay_Psi2S_prova_merge.root'
+    # - 2016 preVFP-
+   'UL_2016preVFP_data'  :'/eos/user/c/cbasile/B0toX3872K0s/data/CharmoniumUL_2016preVFP_blind.root',
+   'UL_2016preVFP_MC_X'  :'../PRELIMINARY/outRoot/RecoDecay_X3872_UL16preVFP.root',
+   'UL_2016preVFP_MC_Psi':'../PRELIMINARY/outRoot/RecoDecay_Psi2S_UL16preVFP.root',
+    # - 2016 postVFP
+   'UL_2016postVFP_data'  :'/eos/user/c/cbasile/B0toX3872K0s/data/CharmoniumUL_2016postVFP_blind.root',
+   'UL_2016postVFP_MC_X'  :'../PRELIMINARY/outRoot/RecoDecay_X3872_UL16.root',
+   'UL_2016postVFP_MC_Psi':'../PRELIMINARY/outRoot/RecoDecay_Psi2S_UL16.root',
+    # - 2017 -
+   'UL_2017_data'  :'/eos/user/c/cbasile/B0toX3872K0s/data/CharmoniumUL_17_HLTemulation_blind.root',
+   'UL_2017_MC_X'  :'../PRELIMINARY/outRoot/RecoDecay_X3872_UL17.root',
+   'UL_2017_MC_Psi':'../PRELIMINARY/outRoot/RecoDecay_Psi2S_UL17.root',
+    # - 2018 -
+   'UL_2018_data'  :'/eos/user/c/cbasile/B0toX3872K0s/data/CharmoniumUL_2018_blind.root',
+   'UL_2018_MC_X'  :'../PRELIMINARY/outRoot/RecoDecay_X3872_UL18.root',
+   'UL_2018_MC_Psi':'../PRELIMINARY/outRoot/RecoDecay_Psi2S_UL18.root'
 }
 
 #import concurrent.futures
@@ -32,9 +45,9 @@ def get_models_dir():
 def get_data_sync(dataset, columns, nthreads=2*multiprocessing.cpu_count(), exclude={}, path='HLTemulation'):
    if dataset not in input_files:
       raise ValueError('The dataset %s does not exist, I have %s' % (dataset, ', '.join(input_files.keys())))
-   print 'getting files from "%s": ' % input_files[dataset]
+   print ' + getting files from "%s": ' % input_files[dataset]
    infiles = uproot.open(input_files[dataset])
-   print 'available branches:\n',infiles[path].keys()
+   print '  available branches:\n',infiles[path].keys()
    if columns == 'all':
       columns = [i for i in infiles[path].keys() if i not in exclude]
    try:
