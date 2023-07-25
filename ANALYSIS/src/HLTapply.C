@@ -5,7 +5,7 @@ HLTapply::HLTapply(TTree *tree, const TString outdir, const TString tags) : B0to
     tags_ = tags;
     TString blind_tag = "blind";
     if(!isBlind_) blind_tag = "open";
-    if(outdir == "default") outFileTreePath_ =  "./outRoot/CharmoniumUL_" + tags_ + "_HLTemulation_" + blind_tag+ ".root";
+    if(outdir == "default") outFileTreePath_ =  "./outRoot/Parking_" + tags_ + "_HLTemulation_" + blind_tag+ ".root";
     else outFileTreePath_ =  outdir + ".root";
     
     
@@ -19,6 +19,36 @@ void HLTapply::Loop(){
     Long64_t nbytes = 0, nb = 0;
     Long64_t Nbreak =  nentries + 10, Nprint = 1000;//(int)((double)nentries/20.); 
     long int TotalEvents = 0;
+    
+    // ----- HISTOGRAMS ----- //
+    int Nbins;
+    double xlow, xhigh;
+
+    // JPsi --> MuMu
+    Nbins =35 , xlow = 2.6, xhigh = 3.6;
+    TH1F h_MuMu_M_postfit  = TH1F("MuMu_M_postfit", "", Nbins, xlow, xhigh);
+    TH1F h_MuMu_M_prefit   = TH1F("MuMu_M_prefit", "", Nbins, xlow, xhigh);
+
+    // Rho --> PiPi
+    Nbins = 50 , xlow = 0., xhigh = 1.;
+    TH1F h_PiPi_M_postfit  = TH1F("PiPi_M_postfit", "", Nbins, xlow, xhigh);
+    TH1F h_PiPi_M_prefit   = TH1F("PiPi_M_prefit", "", Nbins, xlow, xhigh);
+    
+    // K0s --> PiPi
+    Nbins = 50 , xlow = .300, xhigh = .600;
+    TH1F h_K0s_M_postfit   = TH1F("K0s_M_postfit", "", Nbins, xlow, xhigh);
+    TH1F h_K0s_M_prefit    = TH1F("K0s_M_prefit", "", Nbins, xlow, xhigh);
+
+    // X3872 --> Jpsi PiPi
+    Nbins = 100, xlow = 3.2, xhigh = 4.2;
+    TH1F h_X3872_M_postfit = TH1F("X3872_M_postfit", "", Nbins, xlow, xhigh);
+    TH1F h_X3872_M_prefit  = TH1F("X3872_M_prefit", "", Nbins, xlow, xhigh);
+
+    // B0 --> X K0s
+    Nbins = 60 , xlow = 5., xhigh = 5.6;
+    TH1F h_B0_M_postfit    = TH1F("B0_M_postfit", "", Nbins, xlow, xhigh);
+    TH1F h_B0_M_prefit     = TH1F("B0_M_prefit", "", Nbins, xlow, xhigh);
+
 
 
     // ----- VARIABLES ----- //
@@ -42,7 +72,7 @@ void HLTapply::Loop(){
         nb = fChain->GetEntry(jentry);   nbytes += nb;
         
         // ----- CHECK IF THE TRIGGER FIRED
-        if(!HLT_DoubleMu4_JpsiTrk_Displaced) continue;
+        if(!HLT_DoubleMu4_3_LowMass) continue;
         N_FiredEvents++;
 
         for (Int_t b = 0; b  < nB0; b++){
@@ -59,8 +89,9 @@ void HLTapply::Loop(){
             // ----- TRIGGER SELECTION TO THE B0 CANDIDATE
             //std::cout << " - muon selection " << TriggerSelection_Muons(b) << std::endl;
             //std::cout << " - track selection " << TriggerSelection_Track(b) << std::endl;
+
             if(!TriggerSelection_Muons(b)) continue;
-            if(!TriggerSelection_Track(b)) continue;
+            // if(!TriggerSelection_Track(b)) continue;
             n_PassedB0++;
 
             toCountJPsi = (B0_mu1_idx[b] != prevMu1_idx) || (B0_mu2_idx[b] != prevMu2_idx);
@@ -88,8 +119,6 @@ void HLTapply::Loop(){
             M_K0sPi1 = RecoP4_K0sPi1.M();
             M_K0sPi2 = RecoP4_K0sPi2.M();
             M_K0s = B0_K0s_nmcFitted_mass[b];
-
-
             			
             LxySignBSz_B0       = B0_lxySign_BSwithZ[b];
             SVprob_B0           = B0_svprob[b];
@@ -101,10 +130,20 @@ void HLTapply::Loop(){
             pT_Pi1              = RecoP4_Pi1.Pt()/RecoP4_B0.Pt();
             DR_B0Pi1            = ROOT::Math::VectorUtil::DeltaR(RecoP4_Pi1, RecoP4_B0);
             D0_Pi1              = B0_PiPi_pi1_d0sig[b];
+
+            h_MuMu_M_prefit.Fill((RecoP4_Mu1_prefit + RecoP4_Mu2_prefit).M());
+            h_PiPi_M_prefit.Fill((RecoP4_Pi1_prefit + RecoP4_Pi2_prefit).M());
+            h_K0s_M_prefit.Fill(RecoP4_K0s_prefit.M());
+            h_X3872_M_prefit.Fill((RecoP4_Mu1_prefit + RecoP4_Mu2_prefit + RecoP4_Pi1_prefit + RecoP4_Pi2_prefit).M());
+            h_B0_M_prefit.Fill((RecoP4_Mu1_prefit + RecoP4_Mu2_prefit + RecoP4_Pi1_prefit + RecoP4_Pi2_prefit + RecoP4_K0s_prefit).M());
             
+            h_MuMu_M_postfit.Fill(B0_MuMu_fitted_mass[b]);
+            h_PiPi_M_postfit.Fill(B0_finalFit_Rho_mass[b]);
+            h_K0s_M_postfit.Fill(B0_K0s_nmcFitted_mass[b]);
+            h_X3872_M_postfit.Fill(B0_finalFit_X_mass[b]);
+            h_B0_M_postfit.Fill(B0_finalFit_mass[b]);  
+
             outTree_->Fill();
-            
-            
 
         } // loop on B0 candiadates
         
@@ -128,7 +167,19 @@ void HLTapply::Loop(){
 	else std::cout << " ... [OUTPUT]  " << outFileTreePath_ << std::endl;
 
 	outFileTree_->cd();
-	outTree_->Write();
+	
+    outTree_->Write();
+    h_MuMu_M_prefit.Write();
+    h_PiPi_M_prefit.Write();
+    h_K0s_M_prefit.Write();
+    h_X3872_M_prefit.Write();
+    h_B0_M_prefit.Write();
+    h_MuMu_M_postfit.Write();
+    h_PiPi_M_postfit.Write();
+    h_K0s_M_postfit.Write();
+    h_X3872_M_postfit.Write();
+    h_B0_M_postfit.Write();
+
 	outFileTree_->Close();
 
 }
@@ -170,9 +221,9 @@ void HLTapply::OutTree_setup(){
 
 int HLTapply::TriggerSelection_Muons(const int Bidx){
    // TRIGGER SETTINGS 
-    const float Min_Mu_pT = 4.,Max_Mu_eta = 2.5, Max_Mu_dr = 2.;
-    const float Min_MuMu_pT = 6.9, Low_MuMu_M = 3.0,  High_MuMu_M = 3.2, Max_MuMu_DCA = 0.5;
-    const float Min_MuMu_LxyS = 3, Min_MuMu_cosAlpha = 0.9, Min_MuMu_SVp = 0.1;
+    const float Min_Mu_pT_1 = 3., Min_Mu_pT_2 = 4., Max_Mu_eta = 2.5, Max_Mu_dr = 2.;
+    const float Min_MuMu_pT = 4.9, Low_MuMu_M = 0.2,  High_MuMu_M = 8.5, Max_MuMu_DCA = 0.5;
+    const float Min_MuMu_SVp = 0.005;
 
     int mu1_idx, mu2_idx;
     bool isFiredMu1, isFiredMu2;
@@ -184,14 +235,14 @@ int HLTapply::TriggerSelection_Muons(const int Bidx){
     mu2_idx = B0_mu2_idx[Bidx];
 
     // Fired Mu + muon tracks QUALITY CHECK
-    isFiredMu1 = (bool)B0_MuMu_mu1_fired_DoubleMu4_JpsiTrk_Displaced[Bidx];
-    isFiredMu2 = (bool)B0_MuMu_mu2_fired_DoubleMu4_JpsiTrk_Displaced[Bidx]; 
+    isFiredMu1 = (bool)B0_MuMu_mu1_fired_DoubleMu4_3_LowMass[Bidx];
+    isFiredMu2 = (bool)B0_MuMu_mu2_fired_DoubleMu4_3_LowMass[Bidx]; 
     if ( (isFiredMu1 && isFiredMu2) && ( Muon_softId[mu1_idx] && Muon_softId[mu2_idx] )){ 
             // STEP 0
             isOK_mu1_step0 = true;
-            if((RecoP4_Mu1.Pt() < Min_Mu_pT) || (fabs(RecoP4_Mu1.Eta()) > Max_Mu_eta)  || ( B0_MuMu_mu1_dr[Bidx]) > Max_Mu_dr ) isOK_mu1_step0 = false;
+            if((RecoP4_Mu1.Pt() < Min_Mu_pT_1) || (fabs(RecoP4_Mu1.Eta()) > Max_Mu_eta)  || ( B0_MuMu_mu1_dr[Bidx]) > Max_Mu_dr ) isOK_mu1_step0 = false;
             isOK_mu2_step0 = true;
-            if((RecoP4_Mu2.Pt() < Min_Mu_pT) || (fabs(RecoP4_Mu2.Eta()) > Max_Mu_eta)  || ( B0_MuMu_mu2_dr[Bidx]) > Max_Mu_dr ) isOK_mu2_step0 = false;
+            if((RecoP4_Mu2.Pt() < Min_Mu_pT_2) || (fabs(RecoP4_Mu2.Eta()) > Max_Mu_eta)  || ( B0_MuMu_mu2_dr[Bidx]) > Max_Mu_dr ) isOK_mu2_step0 = false;
 
             if (isOK_mu1_step0 && isOK_mu2_step0){ 
 
@@ -201,7 +252,7 @@ int HLTapply::TriggerSelection_Muons(const int Bidx){
                 if ( !MassCut || ((RecoP4_Mu1 + RecoP4_Mu2).Pt() < Min_MuMu_pT ) || ( B0_MuMu_DCA[Bidx] > Max_MuMu_DCA )  )	isOK_mumu_step1 = false;
                 // STEP 2	
                 isOK_mumu_step2 = true;
-                if((B0_MuMu_LxySign[Bidx] < Min_MuMu_LxyS) || (B0_MuMu_cosAlpha[Bidx] < Min_MuMu_cosAlpha ) || (B0_MuMu_sv_prob[Bidx] < Min_MuMu_SVp )) isOK_mumu_step2 = false;
+                if(B0_MuMu_sv_prob[Bidx] < Min_MuMu_SVp ) isOK_mumu_step2 = false;
             }
     }
 
@@ -211,6 +262,7 @@ int HLTapply::TriggerSelection_Muons(const int Bidx){
 
 }//TriggerSelection_Muons()
 
+
 int HLTapply::TriggerSelection_Track(const int Bidx){
    //TRIGGER SETTINGS
    const float Min_Trk_pT = 1.2, Max_Trk_eta = 2.5, Min_Trk_D0S = 2.;
@@ -218,13 +270,13 @@ int HLTapply::TriggerSelection_Track(const int Bidx){
 
    int RETURN_VALUE = 0;
 
-	bool isFired_RhoPi1 = (bool)B0_PiPi_p1_fired_DoubleMu4_JpsiTrk_Displaced[Bidx];
+	bool isFired_RhoPi1 = (bool)B0_PiPi_p1_fired_DoubleMu4_3_LowMass[Bidx];
 	bool isMatchedToMuon_Rho_Pi1	= ProbeTracks_isMatchedToMuon[B0_pi1_idx[Bidx]];
-	bool isFired_RhoPi2 = (bool)B0_PiPi_p2_fired_DoubleMu4_JpsiTrk_Displaced[Bidx];
+	bool isFired_RhoPi2 = (bool)B0_PiPi_p2_fired_DoubleMu4_3_LowMass[Bidx];
 	bool isMatchedToMuon_Rho_Pi2 = ProbeTracks_isMatchedToMuon[B0_pi2_idx[Bidx]];
 
-	bool isFired_K0sPi1 = (bool)B0_K0s_matchTrack1_fired_DoubleMu4_JpsiTrk_Displaced[Bidx];
-	bool isFired_K0sPi2 = (bool)B0_K0s_matchTrack2_fired_DoubleMu4_JpsiTrk_Displaced[Bidx];
+	bool isFired_K0sPi1 = (bool)B0_K0s_matchTrack1_fired_DoubleMu4_3_LowMass[Bidx];
+	bool isFired_K0sPi2 = (bool)B0_K0s_matchTrack2_fired_DoubleMu4_3_LowMass[Bidx];
 
 	//LEVEL 0 
 	isOK_trk_step0 =  (isFired_RhoPi1 || isFired_RhoPi2 || isFired_K0sPi1 || isFired_K0sPi2); // is fired at least 1
