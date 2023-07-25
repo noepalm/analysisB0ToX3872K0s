@@ -4,6 +4,17 @@ matplotlib.use('Agg')
 from argparse import ArgumentParser
 #from cmsjson import CMSJson
 from pdb import set_trace
+import ROOT
+import csv 
+ROOT.ROOT.EnableImplicitMT(5)
+
+#####
+# --> CV training di un modello
+#     usage : python MVA/BDT_CVtraining.py --dataset UL_2017 --what mytag --CV 3
+#
+# --> CV application del modello trainato
+#     usage : python MVA/BDT_CVtraining.py --dataset UL_2017 --channel X3872 --what anothertag --CV 3 --load_model
+####
 
 parser = ArgumentParser()
 parser.add_argument(
@@ -19,11 +30,11 @@ parser.add_argument(
    '--CV', default=3, type=int
 )
 parser.add_argument(
-   '--ntrees', default=700, type=int               # chiara: era 100. Io sempre usato 500; Rob 2000; Per modello finale 700
+   '--ntrees', default=300, type=int               # chiara: era 100. Io sempre usato 500; Rob 2000; Per modello finale 700
 )
 
 parser.add_argument(
-   '--depth', default=13, type=int                  # chiara: era 4; def = 6; Io ho sempre usato 10; Rob/Mauro: 15; Per modello finale 13
+   '--depth', default=3, type=int                  # chiara: era 4; def = 6; Io ho sempre usato 10; Rob/Mauro: 15; Per modello finale 13
 )
 parser.add_argument(
    '--lrate', default=0.1, type=float     
@@ -114,7 +125,7 @@ if not os.path.isdir(plots):
    os.makedirs(plots)
    print' + created directory ', plots 
 
-results = 'MVA/results'
+results = '/eos/user/c/cbasile/B0toX3872K0s/MVAresults'
 if not os.path.isdir(results):
    os.makedirs(results)
    print' + created directory ', results 
@@ -160,10 +171,10 @@ clf = xgb.XGBClassifier(
    booster='gbtree',                                # chiara: preso dalla versione di Rob, non nel master (ma e' il default)
    silent=False,
    # booster parameters
-   n_estimators=250,
-   learning_rate=0.075,
+   n_estimators=args.ntrees,
+   learning_rate=args.lrate,
    min_child_weight=args.min_child_weight,          #def=1 in xgboost, as here
-   max_depth=3,
+   max_depth=args.depth,
    gamma=args.gamma,                                #def=0 in xgboost, as here 
    max_delta_step=0,                                #def=0 in xgboost, as here 
    subsample=args.subsample,                        #def=1 in xgboost, as here     ===> tizio dice che e' tipico iniziare con 0.8
@@ -173,7 +184,8 @@ clf = xgb.XGBClassifier(
    reg_alpha=args.reg_alpha,                        #def=0 in xgboost, as here
    scale_pos_weight=1,                              #def=1 in xgboost, as here  
    # learning task parameters
-   objective='binary:logitraw',       ## chiara ##
+   #objective='binary:logistic',       ## norm [0,1] 
+   objective='binary:logitraw',        ## before log-regression
    random_state=5
 )
 
@@ -254,7 +266,6 @@ for i in range(Ncv):
       print('XGBoost model    AUC   score (test-set): {0:0.4f}'. format(aucTest[i]))
 
    else:
-
       full_model = '%s/%s_BDTtraining_CV%d-%d.pkl' % (mods, dataset, Ncv, i)
       clf = joblib.load(full_model)
       print 'Loaded pre-existing model %s' %(full_model)
@@ -262,7 +273,7 @@ for i in range(Ncv):
    ## predictions on ANALYSIS-SET
    BDTout.append(clf.predict_proba(to_apply[features].values)[:,1])
    data.loc[to_apply.index.values,'BDTout'] = clf.predict_proba(to_apply[features].values)[:,1]
-   to_apply['BDTout'] = clf.predict_proba(to_apply[features].values)[:,1]
+   to_apply.loc[:,'BDTout'] = clf.predict_proba(to_apply[features].values)[:,1]
    outAnaliysis_df.append(to_apply.copy())
    rocAnalysis.append(
       roc_curve(
@@ -273,18 +284,24 @@ for i in range(Ncv):
    print('XGBoost model    AUC   score (analysis-set): {0:0.4f}'. format(aucScore[i]))
 
 
-
-#print(data)
-import ROOT
+check_for_nan = data.isnull().values.any()
+print ("check for NaN " + str(check_for_nan))
+if (check_for_nan):
+    data = data.dropna()
+    check_for_nan = data.isnull().values.any()
+    print ("check again for NaN " + str(check_for_nan))
+    
 ## --> SAVE DATA FRAME IN A ROOT TREE
 outPath = '%s/%s_BDTtraining_CV%d_%s.csv' %(results, dataset, Ncv, args.channel)
 if args.load_model : outPath = '%s/%s_BDTapplication_CV%d_%s.csv' %(results, dataset, Ncv, args.channel) 
-data.to_csv(outPath)
+outPath_root = outPath.replace("csv", "root")
+data.to_csv(outPath, index = False)
 print(" [OUT] save pd.DataFrame in %s" %(outPath))
 rdf = ROOT.RDF.MakeCsvDataFrame(outPath)
-outPath = outPath.replace("csv", "root")
-rdf.Snapshot("CVtrainig_%s"%(dataset), outPath)
-print(" [OUT] save ROOT-DataFrame in %s" %(outPath))
+rdf.Snapshot("CVtrainig_%s"%(dataset), outPath_root)
+print(" [OUT] save ROOT-DataFrame in %s" %(outPath_root))
+os.system("rm %s"%(outPath)) # remove temporary .csv
+
 
 
 # # #     # # #
@@ -318,14 +335,14 @@ if not args.load_model:
    [ax.plot(rocTest[i][0][:-1], rocTest[i][1][:-1], 
                linestyle='solid', 
                #color='red', 
-               label='UL-2017 CV %d  AUC: %.3f'  %(i, aucTest[i]))
+               label='%s CV %d  AUC: %.3f'  %(dataset,i, aucTest[i]))
 
    for i in range(Ncv)]
    plt.legend()
    plt.grid()
-   try : plt.savefig('%s/%s_%s_%s_AUCtest.png' % (plots, dataset, args.jobtag, args.what))
+   try : plt.savefig('%s/%s_%s_%s_CV%d_AUCtest.png' % (plots, dataset, args.jobtag, args.what, Ncv))
    except : pass
-   try : plt.savefig('%s/%s_%s_%s_AUCtest.pdf' % (plots, dataset, args.jobtag, args.what))
+   try : plt.savefig('%s/%s_%s_%s_CV%d_AUCtest.pdf' % (plots, dataset, args.jobtag, args.what, Ncv))
    except : pass
 
    ## ROC curve for ANALYSIS-set ##
@@ -333,18 +350,18 @@ if not args.load_model:
    [ax.plot(rocAnalysis[i][0][:-1], rocAnalysis[i][1][:-1], 
                linestyle='solid', 
                #color='red', 
-               label='UL-2017 CV %d  AUC: %.3f'  %(i, aucScore[i]))
+               label='%s CV %d  AUC: %.3f'  %(dataset, i, aucScore[i]))
 
    for i in range(Ncv)]
    plt.legend()
    plt.grid()
-   try : plt.savefig('%s/%s_%s_%s_AUCanalysis.png' % (plots, dataset, args.jobtag, args.what))
+   try : plt.savefig('%s/%s_%s_%s_CV%d_AUCanalysis.png' % (plots, dataset, args.jobtag, args.what, Ncv))
    except : pass
-   try : plt.savefig('%s/%s_%s_%s_AUCanalysis.pdf' % (plots, dataset, args.jobtag, args.what))
+   try : plt.savefig('%s/%s_%s_%s_CV%d_AUCanalysis.png' % (plots, dataset, args.jobtag, args.what, Ncv))
    except : pass
 
    ## BDTout TRAINING vs ANALYSIS SET
-   nbins =24; xlow = -8; xhigh = 4 
+   nbins =16; xlow = -12; xhigh = 4
    bins = np.linspace(xlow, xhigh, nbins)
 
    fig, ax = plt.subplots(Nside_x, Nside_y, figsize = [6*Nside_x,6*Nside_y])
@@ -373,12 +390,13 @@ if not args.load_model:
                      yerr = np.sqrt(counts_MC/len(val_MC_out)), 
                      fmt = 'o', color = 'blue', label = 'validation MC 2017')
       ax[i,j].set_xlim(xlow,xhigh)
-      ax[0,0].legend(fontsize = 14)
       ax[i,j].set_xlabel('BDT output')
+      #ax[i,j].set_yscale('log')
       ax[i,j].grid()
-   try : plt.savefig('%s/%s_%s_%s_BDTout_trainVSanalysis.png' % (plots, dataset, args.jobtag, args.what))
+      ax[Nside_x-1,Nside_y-1].legend(fontsize = 14)
+   try : plt.savefig('%s/%s_%s_%s_CV%d_BDTout_trainVSanalysis.png' % (plots, dataset, args.jobtag, args.what, Ncv))
    except : pass
-   try : plt.savefig('%s/%s_%s_%s_BDTout_trainVSanalysis.pdf' % (plots, dataset, args.jobtag, args.what))
+   try : plt.savefig('%s/%s_%s_%s_CV%d_BDTout_trainVSanalysis.pdf' % (plots, dataset, args.jobtag, args.what, Ncv))
    except : pass
 
    ## BDT output vs Mpipi
@@ -403,7 +421,7 @@ if not args.load_model:
    ax.set_ylabel("M(#pi^+ #pi^-)")
    ax.legend(['BKG-data (validation set)', 'SGN-MC (validation set)'])
    plt.tight_layout()
-   try : plt.savefig('%s/%s_%s_%s_BDTvsMpipi.png' % (plots, dataset, args.jobtag, args.what))
+   try : plt.savefig('%s/%s_%s_%s_CV%d_BDTvsMpipi.png' % (plots, dataset, args.jobtag, args.what, Ncv))
    except : pass
-   try : plt.savefig('%s/%s_%s_%s_BDTvsMpipi.pdf' % (plots, dataset, args.jobtag, args.what))
+   try : plt.savefig('%s/%s_%s_%s_CV%d_BDTvsMpipi.pdf' % (plots, dataset, args.jobtag, args.what, Ncv))
    except : pass
