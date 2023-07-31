@@ -32,20 +32,30 @@ int B0toX3872K0s_base::RecoPartFillP4(const int Bidx){
    if(!Muon_softId[B0_mu1_idx[Bidx]] || !Muon_softId[B0_mu2_idx[Bidx]]) TrackQualityCheck = 0;
    RecoP4_Mu1.SetPt(B0_finalFit_mu1_pt[Bidx]); RecoP4_Mu1.SetEta(B0_finalFit_mu1_eta[Bidx]); RecoP4_Mu1.SetPhi(B0_finalFit_mu1_phi[Bidx]);
    RecoP4_Mu2.SetPt(B0_finalFit_mu2_pt[Bidx]); RecoP4_Mu2.SetEta(B0_finalFit_mu2_eta[Bidx]); RecoP4_Mu2.SetPhi(B0_finalFit_mu2_phi[Bidx]);
-   
+   RecoP4_Mu1_prefit.SetPt(B0_MuMu_prefit_mu1_pt[Bidx]); RecoP4_Mu1_prefit.SetEta(B0_MuMu_prefit_mu1_eta[Bidx]); RecoP4_Mu1_prefit.SetPhi(B0_MuMu_prefit_mu1_phi[Bidx]);
+   RecoP4_Mu2_prefit.SetPt(B0_MuMu_prefit_mu2_pt[Bidx]); RecoP4_Mu2_prefit.SetEta(B0_MuMu_prefit_mu2_eta[Bidx]); RecoP4_Mu2_prefit.SetPhi(B0_MuMu_prefit_mu2_phi[Bidx]);
+
    RecoP4_JPsi = RecoP4_Mu1 + RecoP4_Mu2;
    
    //... tracks P4
    if(ProbeTracks_isMatchedToMuon[B0_pi1_idx[Bidx]] || ProbeTracks_isMatchedToMuon[B0_pi2_idx[Bidx]])TrackQualityCheck = 0;
    RecoP4_Pi1.SetPt(B0_finalFit_pi1_pt[Bidx]); RecoP4_Pi1.SetEta(B0_finalFit_pi1_eta[Bidx]); RecoP4_Pi1.SetPhi(B0_finalFit_pi1_phi[Bidx]);
    RecoP4_Pi2.SetPt(B0_finalFit_pi2_pt[Bidx]); RecoP4_Pi2.SetEta(B0_finalFit_pi2_eta[Bidx]); RecoP4_Pi2.SetPhi(B0_finalFit_pi2_phi[Bidx]);
-   
+   RecoP4_Pi1_prefit.SetPt(B0_PiPi_prefit_pi1_pt[Bidx]); RecoP4_Pi1_prefit.SetEta(B0_PiPi_prefit_pi1_eta[Bidx]); RecoP4_Pi1_prefit.SetPhi(B0_PiPi_prefit_pi1_phi[Bidx]);
+   RecoP4_Pi2_prefit.SetPt(B0_PiPi_prefit_pi2_pt[Bidx]); RecoP4_Pi2_prefit.SetEta(B0_PiPi_prefit_pi2_eta[Bidx]); RecoP4_Pi2_prefit.SetPhi(B0_PiPi_prefit_pi2_phi[Bidx]);
+
    RecoP4_PiPi = RecoP4_Pi1 + RecoP4_Pi2;
    RecoP4_PiPi.SetM(B0_finalFit_Rho_mass[Bidx]);
    RecoP4_X3872 = RecoP4_JPsi + RecoP4_PiPi;
    RecoP4_X3872.SetM(B0_finalFit_Rho_mass[Bidx]);
    
    RecoP4_K0s.SetPt(B0_K0s_mcFitted_pt[Bidx]); RecoP4_K0s.SetEta(B0_K0s_mcFitted_eta[Bidx]); RecoP4_K0s.SetPhi(B0_K0s_mcFitted_phi[Bidx]);
+   
+   ROOT::Math::PtEtaPhiMVector k0s_pi1_prefit, k0s_pi2_prefit;
+   k0s_pi1_prefit.SetPt(B0_K0s_matchTrack1_pt[Bidx]); k0s_pi1_prefit.SetEta(B0_K0s_matchTrack1_eta[Bidx]); k0s_pi1_prefit.SetPhi(B0_K0s_matchTrack1_phi[Bidx]); k0s_pi1_prefit.SetM(mPion);
+   k0s_pi2_prefit.SetPt(B0_K0s_matchTrack2_pt[Bidx]); k0s_pi2_prefit.SetEta(B0_K0s_matchTrack2_eta[Bidx]); k0s_pi2_prefit.SetPhi(B0_K0s_matchTrack2_phi[Bidx]); k0s_pi2_prefit.SetM(mPion);
+   RecoP4_K0s_prefit = k0s_pi1_prefit + k0s_pi2_prefit;
+
 
    RecoP4_B0.SetPt(B0_finalFit_pt[Bidx]); RecoP4_B0.SetEta(B0_finalFit_eta[Bidx]); RecoP4_B0.SetPhi(B0_finalFit_phi[Bidx]); RecoP4_B0.SetM(B0_finalFit_mass[Bidx]);
 

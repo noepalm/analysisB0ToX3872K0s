@@ -25,7 +25,7 @@
 
 
 
-class HLTapply : public B0toX3872K0s_base{
+class HLTapply : public B0toX3872K0s_base {
 
 public :
 
@@ -60,12 +60,15 @@ public :
     // branches (aggiungere anche pT ed eta)
     float Event, LumiBlock, Run;
     float M_B0, M_PiPi, M_X3872, M_mumu, M_K0s, M_K0sPi1, M_K0sPi2;	
-
+    float M_B0_prefit, M_PiPi_prefit, M_X3872_prefit, M_mumu_prefit, M_K0s_prefit, M_K0sPi1_prefit, M_K0sPi2_prefit;
 
     float LxySignBSz_B0, CosAlpha3DBSz_B0, pTM_B0, SVprob_B0;
     float LxySignSV_K0s;
     float SVprob_PiPi, pT_PiPi; 
     float pT_Pi1, DR_B0Pi1, D0_Pi1;
+
+    // Trigger check bool
+    bool is_trigger_check = false;
 
 };
 

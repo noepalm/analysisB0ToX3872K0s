@@ -1,17 +1,17 @@
 #include "../include/RecoDecayX.h"
 
 RecoDecayX::RecoDecayX(TTree *tree, const TString & dataset, const TString & tags) : MCbase_B0toX3872K0s (tree, tags){
-
     dataset_ = dataset;
+    if(tags == "HLT_emulation_check") is_trigger_check = true;
 
     RecoP4_Mu1.SetM(mMuon); RecoP4_Mu2.SetM(mMuon);
     RecoP4_Pi1.SetM(mPion); RecoP4_Pi2.SetM(mPion);
-    RecoP4_K0s.SetM(mK0s);
+    RecoP4_K0s.SetM(mK0s); RecoP4_K0s_prefit.SetM(mK0s);
 
     TString dset_tag("X3872");
     if (dataset_ == "NORM") dset_tag = "Psi2S";
 
-    outFilePath_ = "./outRoot/RecoDecay_"+ dset_tag +"_" + tags_ + ".root";
+    outFilePath_ = "./outRoot/RecoDecay_"+ dset_tag + "_" + tags_ + ".root";
     OutTree_setup();
 
 }//RecoDecayX()
@@ -49,12 +49,12 @@ void RecoDecayX::Loop(){
     // DeltaR(trigger-Mu; reco-Mu)
     TH1F h_Mu_dR_HLT_Dimuon25_Jpsi_MC = TH1F("Mu_dR_HLT_Dimuon25_Jpsi_MC", "", Nbins, xlow, xhigh);
     TH1F h_Mu_dR_HLT_Dimuon25_Jpsi_Fk = TH1F("Mu_dR_HLT_Dimuon25_Jpsi_Fk", "", Nbins, xlow, xhigh);
-    TH1F h_Mu_dR_HLT_DoubleMu4_JpsiTrk_MC = TH1F("Mu_dR_HLT_DoubleMu4_JpsiTrk_MC", "", Nbins, xlow, xhigh);
-    TH1F h_Mu_dR_HLT_DoubleMu4_JpsiTrk_Fk = TH1F("Mu_dR_HLT_DoubleMu4_JpsiTrk_Fk", "", Nbins, xlow, xhigh);
+    TH1F h_Mu_dR_HLT_DoubleMu4_3_LowMass_MC = TH1F("Mu_dR_HLT_DoubleMu4_3_LowMass_MC", "", Nbins, xlow, xhigh);
+    TH1F h_Mu_dR_HLT_DoubleMu4_3_LowMass_Fk = TH1F("Mu_dR_HLT_DoubleMu4_3_LowMass_Fk", "", Nbins, xlow, xhigh);
     xlow = 0., xhigh = 0.03;
     // DeltaR(trigger-Pi; reco-Pi)
-    TH1F h_Pi_dR_HLT_DoubleMu4_JpsiTrk_MC = TH1F("Pi_dR_HLT_DoubleMu4_JpsiTrk_MC", "", Nbins, xlow, xhigh);
-    TH1F h_Pi_dR_HLT_DoubleMu4_JpsiTrk_Fk = TH1F("Pi_dR_HLT_DoubleMu4_JpsiTrk_Fk", "", Nbins, xlow, xhigh);
+    TH1F h_Pi_dR_HLT_DoubleMu4_3_LowMass_MC = TH1F("Pi_dR_HLT_DoubleMu4_3_LowMass_MC", "", Nbins, xlow, xhigh);
+    TH1F h_Pi_dR_HLT_DoubleMu4_3_LowMass_Fk = TH1F("Pi_dR_HLT_DoubleMu4_3_LowMass_Fk", "", Nbins, xlow, xhigh);
     
     // Trigger Tracks
     TH1F h_TrigTrk_pT("TrigTrk_pT", "", 50, 0.,10.);
@@ -65,14 +65,18 @@ void RecoDecayX::Loop(){
     TH1F h_TrigTrk_DCAs_post("TrigTrk_DCAs_post", "", 50, 0, 20);
 
     // JPsi --> MuMu
-    Nbins =35 , xlow = 2.9, xhigh = 3.25;
-    TH1F h_MuMu_M_MC = TH1F("MuMu_M_MC", "", Nbins, xlow, xhigh);
-    TH1F h_MuMu_M_Fk = TH1F("MuMu_M_Fk", "", Nbins, xlow, xhigh);
+    Nbins =35 , xlow = 2.6, xhigh = 3.6;
+    // Nbins =35 , xlow = 2.9, xhigh = 3.25;
+    TH1F h_MuMu_M_MC        = TH1F("MuMu_M_MC", "", Nbins, xlow, xhigh); //MC-matched, post-fit
+    TH1F h_MuMu_M_Fk        = TH1F("MuMu_M_Fk", "", Nbins, xlow, xhigh);
+    TH1F h_MuMu_M_prefit    = TH1F("MuMu_M_prefit", "", Nbins, xlow, xhigh); //MC-matched, pre-fit
 
     // Rho --> PiPi
     Nbins = 50 , xlow = 0., xhigh = 1.;
-    TH1F h_PiPi_M_MC        = TH1F("PiPi_M_MC", "", Nbins, xlow, xhigh);
+    TH1F h_PiPi_M_MC        = TH1F("PiPi_M_MC", "", Nbins, xlow, xhigh); //MC-matched, post-fit
     TH1F h_PiPi_M_Fk        = TH1F("PiPi_M_Fk", "", Nbins, xlow, xhigh);
+    TH1F h_PiPi_M_prefit    = TH1F("PiPi_M_prefit", "", Nbins, xlow, xhigh); //MC-matched, pre-fit
+
     Nbins = 30, xlow = 0., xhigh = .30; 
     TH1F h_Pi1_pT_MC        = TH1F("Pi1_pT_MC", "", Nbins, xlow, xhigh);
     TH1F h_Pi1_pT_Fk        = TH1F("Pi1_pT_Fk", "", Nbins, xlow, xhigh);
@@ -90,21 +94,28 @@ void RecoDecayX::Loop(){
     TH1F h_PiPi_pT_Fk       = TH1F("PiPi_pT_Fk", "", Nbins, xlow, xhigh);
 
     // X3872 --> Jpsi PiPi
-    Nbins = 50 , xlow = 3.75, xhigh = 4.0;
-    TH1F h_X3872_M_MC        = TH1F("X3872_M_MC", "", Nbins, xlow, xhigh);
+    Nbins = 100, xlow = 3.2, xhigh = 4.2;
+    // Nbins = 50 , xlow = 3.75, xhigh = 4.0;
+    TH1F h_X3872_M_MC        = TH1F("X3872_M_MC", "", Nbins, xlow, xhigh);      //MC-matched, post-fit
     TH1F h_X3872_M_Fk        = TH1F("X3872_M_Fk", "", Nbins, xlow, xhigh);
+    TH1F h_X3872_M_prefit    = TH1F("X3872_M_prefit", "", Nbins, xlow, xhigh);  //MC-matched, pre-fit
 
     // K0s --> PiPi
     Nbins = 50 , xlow = .300, xhigh = .600;
-    TH1F h_K0s_M_MC        = TH1F("K0s_M_MC", "", Nbins, xlow, xhigh);
+    TH1F h_K0s_M_MC        = TH1F("K0s_M_MC", "", Nbins, xlow, xhigh);       //MC-matched, pre-fit [!! others are different]
     TH1F h_K0s_M_Fk        = TH1F("K0s_M_Fk", "", Nbins, xlow, xhigh);
+    TH1F h_K0s_M_prefit   = TH1F("K0s_M_prefit", "", Nbins, xlow, xhigh);  //MC-matched, post-fit
+
     xlow = 0., xhigh = 100;
     TH1F h_K0s_LxySign_wrtBvtx_MC = TH1F("K0s_LxySign_wrtBvtx_MC", "", Nbins, xlow, xhigh);
     TH1F h_K0s_LxySign_wrtBvtx_Fk = TH1F("K0s_LxySign_wrtBvtx_Fk", "", Nbins, xlow, xhigh);
+    
     // B0 --> X K0s
     Nbins = 60 , xlow = 5., xhigh = 5.6;
-    TH1F h_B0_M_MC        = TH1F("B0_M_MC", "", Nbins, xlow, xhigh);
+    TH1F h_B0_M_MC        = TH1F("B0_M_MC", "", Nbins, xlow, xhigh);     //MC-matched, post-fit
     TH1F h_B0_M_Fk        = TH1F("B0_M_Fk", "", Nbins, xlow, xhigh);
+    TH1F h_B0_M_prefit    = TH1F("B0_M_prefit", "", Nbins, xlow, xhigh); //MC-matched, pre-fit
+
     xlow = 0.999, xhigh = 1.;
     TH1F h_B0_cosAlpha2DwrtBSwithZ_MC = TH1F("B0_cosAlpha2DwrtBSwithZ_MC", "", Nbins, xlow, xhigh);
     TH1F h_B0_cosAlpha2DwrtBSwithZ_Fk = TH1F("B0_cosAlpha2DwrtBSwithZ_Fk", "", Nbins, xlow, xhigh);
@@ -133,6 +144,10 @@ void RecoDecayX::Loop(){
     TH1F h_B0_pT_MC       = TH1F("B0_pT_MC", "", Nbins, xlow, xhigh);
     TH1F h_B0_pT_Fk       = TH1F("B0_pT_Fk", "", Nbins, xlow, xhigh);
 
+    // HLT emulation check
+    TH1F h_trigger_fired          = TH1F("trigger_fired", "", 2, -.5, 1.5);
+    TH1F h_trigger_fired_emulated = TH1F("trigger_fired_emulated", "", 2, -.5, 1.5);
+
     // MCmatching variables
     bool isMCmatched_Mu1, isMCmatched_Mu2, isMCmatched_Pi1, isMCmatched_Pi2;
     bool isMCmatched_JPsi, isMCmatched_Rho, isMCmatched_X3872, isMCmatched_K0s, isMCmatched_B0;
@@ -151,16 +166,20 @@ void RecoDecayX::Loop(){
         if (ientry < 0 || jentry == Nbreak) break;
         if ((jentry+1) % Nprint == 0) std::cout << "--> " << Form("%3.0f",(float)(jentry+1)/nentries* 100.) << " \%"<< std::endl;
         nb = fChain->GetEntry(jentry);   nbytes += nb;
+        
+
+        // Trigger check [pre-emulation]
+        h_trigger_fired.Fill(HLT_DoubleMu4_3_LowMass);
 
         // ----- CHECK IF THE TRIGGER FIRED
-        if(!HLT_DoubleMu4_JpsiTrk_Displaced) continue;
+        if(!HLT_DoubleMu4_3_LowMass && !is_trigger_check) continue; //skip HLT fired requirement if tag == "HLT_emulation_check"
         N_FiredEvents++;
 
         // ----- GENERATOR
         if (dataset_ == "SGN") GenPartFillP4_X();
         else if (dataset_ == "NORM") GenPartFillP4_Psi();
         else {
-            std::cout << " [ERROR] : bad indication of dataset name, use only  SGN/NORM" << std::endl;
+            std::cout << " [ERROR] : bad indication of dataset name, use only SGN/NORM" << std::endl;
             exit(-1);
         }
         realB_idx = GenB0idx();
@@ -194,38 +213,37 @@ void RecoDecayX::Loop(){
             //std::cout << " - muon selection " << TriggerSelection_Muons(b) << std::endl;
             //std::cout << " - track selection " << TriggerSelection_Track(b) << std::endl;
             // sclero per le efficienze di trigger
-            if ( B0_MuMu_mu1_fired_DoubleMu4_JpsiTrk_Displaced[b] && B0_MuMu_mu2_fired_DoubleMu4_JpsiTrk_Displaced[b] 
+            if ( B0_MuMu_mu1_fired_DoubleMu4_3_LowMass[b] && B0_MuMu_mu2_fired_DoubleMu4_3_LowMass[b] 
                     && 
-                (B0_PiPi_p1_fired_DoubleMu4_JpsiTrk_Displaced[b] || B0_PiPi_p2_fired_DoubleMu4_JpsiTrk_Displaced[b] || 
-                 B0_K0s_matchTrack1_fired_DoubleMu4_JpsiTrk_Displaced[b] || B0_K0s_matchTrack2_fired_DoubleMu4_JpsiTrk_Displaced[b])) n_FiredB0++;
+                (B0_PiPi_p1_fired_DoubleMu4_3_LowMass[b] || B0_PiPi_p2_fired_DoubleMu4_3_LowMass[b] || 
+                 B0_K0s_matchTrack1_fired_DoubleMu4_3_LowMass[b] || B0_K0s_matchTrack2_fired_DoubleMu4_3_LowMass[b])) n_FiredB0++;
             else continue;
             float trk_pT, trk_eta, trk_DCAs;
-            if(B0_PiPi_p1_fired_DoubleMu4_JpsiTrk_Displaced[b]){
+            if(B0_PiPi_p1_fired_DoubleMu4_3_LowMass[b]){
                 trk_pT = RecoP4_Pi1.Pt(); trk_eta = RecoP4_Pi1.Eta(); trk_DCAs = B0_PiPi_pi1_d0sig[b];
-            } else if (B0_PiPi_p2_fired_DoubleMu4_JpsiTrk_Displaced[b]){
+            } else if (B0_PiPi_p2_fired_DoubleMu4_3_LowMass[b]){
                 trk_pT = RecoP4_Pi2.Pt(); trk_eta = RecoP4_Pi2.Eta(); trk_DCAs = B0_PiPi_pi2_d0sig[b];
-            } else if (B0_K0s_matchTrack1_fired_DoubleMu4_JpsiTrk_Displaced[b]){
+            } else if (B0_K0s_matchTrack1_fired_DoubleMu4_3_LowMass[b]){
                 trk_pT = B0_K0s_matchTrack1_pt[b]; trk_eta = B0_K0s_matchTrack1_eta[b]; trk_DCAs = B0_K0s_matchTrack1_D0sign[b];
-            }else if (B0_K0s_matchTrack2_fired_DoubleMu4_JpsiTrk_Displaced[b]){
+            }else if (B0_K0s_matchTrack2_fired_DoubleMu4_3_LowMass[b]){
                 trk_pT = B0_K0s_matchTrack2_pt[b]; trk_eta = B0_K0s_matchTrack2_eta[b]; trk_DCAs = B0_K0s_matchTrack2_D0sign[b];
             }
             h_TrigTrk_pT.Fill(trk_pT); h_TrigTrk_eta.Fill(trk_eta); h_TrigTrk_DCAs.Fill(trk_DCAs);
-
+            
             if(!TriggerSelection_Muons(b)) continue;
+
             n_trgMuon++;
-            if(!TriggerSelection_Track(b)) continue;
-            n_trgTrk++;
             n_PassedB0++;
             //std::cout << " = passed B0 " << n_PassedB0 << std::endl;
             //
 
-            if(B0_PiPi_p1_fired_DoubleMu4_JpsiTrk_Displaced[b]){
+            if(B0_PiPi_p1_fired_DoubleMu4_3_LowMass[b]){
                 trk_pT = RecoP4_Pi1.Pt(); trk_eta = RecoP4_Pi1.Eta(); trk_DCAs = B0_PiPi_pi1_d0sig[b];
-            } else if (B0_PiPi_p2_fired_DoubleMu4_JpsiTrk_Displaced[b]){
+            } else if (B0_PiPi_p2_fired_DoubleMu4_3_LowMass[b]){
                 trk_pT = RecoP4_Pi2.Pt(); trk_eta = RecoP4_Pi2.Eta(); trk_DCAs = B0_PiPi_pi2_d0sig[b];
-            } else if (B0_K0s_matchTrack1_fired_DoubleMu4_JpsiTrk_Displaced[b]){
+            } else if (B0_K0s_matchTrack1_fired_DoubleMu4_3_LowMass[b]){
                 trk_pT = B0_K0s_matchTrack1_pt[b]; trk_eta = B0_K0s_matchTrack1_eta[b]; trk_DCAs = B0_K0s_matchTrack1_D0sign[b];
-            }else if (B0_K0s_matchTrack2_fired_DoubleMu4_JpsiTrk_Displaced[b]){
+            }else if (B0_K0s_matchTrack2_fired_DoubleMu4_3_LowMass[b]){
                 trk_pT = B0_K0s_matchTrack2_pt[b]; trk_eta = B0_K0s_matchTrack2_eta[b]; trk_DCAs = B0_K0s_matchTrack2_D0sign[b];
             }
             h_TrigTrk_pT_post.Fill(trk_pT); h_TrigTrk_eta_post.Fill(trk_eta); h_TrigTrk_DCAs_post.Fill(trk_DCAs);
@@ -244,7 +262,7 @@ void RecoDecayX::Loop(){
                     else h_Mu_TrkQlty_MC.Fill(2);
 
                     if (HLT_Dimuon25_Jpsi) h_Mu_dR_HLT_Dimuon25_Jpsi_MC.Fill(B0_MuMu_mu1_dr_Dimuon25_Jpsi[b]);
-                    if (HLT_DoubleMu4_JpsiTrk_Displaced) h_Mu_dR_HLT_DoubleMu4_JpsiTrk_MC.Fill(B0_MuMu_mu1_dr_DoubleMu4_JpsiTrk_Displaced[b]);
+                    if (HLT_DoubleMu4_3_LowMass) h_Mu_dR_HLT_DoubleMu4_3_LowMass_MC.Fill(B0_MuMu_mu1_dr_DoubleMu4_3_LowMass[b]);
                 }else{
                     h_Mu_SoftID_Fk.Fill(Muon_softId[B0_mu1_idx[b]]);
                     h_Mu_GlobalMu_Fk.Fill(Muon_isGlobal[B0_mu1_idx[b]]);
@@ -252,7 +270,7 @@ void RecoDecayX::Loop(){
                     else h_Mu_TrkQlty_Fk.Fill(2);
 
                     if (HLT_Dimuon25_Jpsi) h_Mu_dR_HLT_Dimuon25_Jpsi_Fk.Fill(B0_MuMu_mu1_dr_Dimuon25_Jpsi[b]);
-                    if (HLT_DoubleMu4_JpsiTrk_Displaced) h_Mu_dR_HLT_DoubleMu4_JpsiTrk_Fk.Fill(B0_MuMu_mu1_dr_DoubleMu4_JpsiTrk_Displaced[b]);
+                    if (HLT_DoubleMu4_3_LowMass) h_Mu_dR_HLT_DoubleMu4_3_LowMass_Fk.Fill(B0_MuMu_mu1_dr_DoubleMu4_3_LowMass[b]);
                 }
                 if (isMCmatched_Mu2){
                     h_Mu_SoftID_MC.Fill(Muon_softId[B0_mu2_idx[b]]);
@@ -261,7 +279,7 @@ void RecoDecayX::Loop(){
                     else  h_Mu_TrkQlty_MC.Fill(2);
 
                     h_Mu_dR_HLT_Dimuon25_Jpsi_MC.Fill(B0_MuMu_mu2_dr_Dimuon25_Jpsi[b]);
-                    h_Mu_dR_HLT_DoubleMu4_JpsiTrk_MC.Fill(B0_MuMu_mu2_dr_DoubleMu4_JpsiTrk_Displaced[b]);
+                    h_Mu_dR_HLT_DoubleMu4_3_LowMass_MC.Fill(B0_MuMu_mu2_dr_DoubleMu4_3_LowMass[b]);
                 }else{
                     h_Mu_SoftID_Fk.Fill(Muon_softId[B0_mu2_idx[b]]);
                     h_Mu_GlobalMu_Fk.Fill(Muon_isGlobal[B0_mu2_idx[b]]);
@@ -269,10 +287,13 @@ void RecoDecayX::Loop(){
                     else h_Mu_TrkQlty_Fk.Fill(2);
 
                     h_Mu_dR_HLT_Dimuon25_Jpsi_Fk.Fill(B0_MuMu_mu2_dr_Dimuon25_Jpsi[b]);
-                    h_Mu_dR_HLT_DoubleMu4_JpsiTrk_Fk.Fill(B0_MuMu_mu2_dr_DoubleMu4_JpsiTrk_Displaced[b]);
+                    h_Mu_dR_HLT_DoubleMu4_3_LowMass_Fk.Fill(B0_MuMu_mu2_dr_DoubleMu4_3_LowMass[b]);
                 }
                 
-                if(isMCmatched_Mu1&&isMCmatched_Mu2) h_MuMu_M_MC.Fill(B0_MuMu_fitted_mass[b]);
+                if(isMCmatched_Mu1&&isMCmatched_Mu2) {
+                    h_MuMu_M_MC.Fill(B0_MuMu_fitted_mass[b]);
+                    h_MuMu_M_prefit.Fill((RecoP4_Mu1 + RecoP4_Mu2).M());
+                }
                 else h_MuMu_M_Fk.Fill(B0_MuMu_fitted_mass[b]);
 
             }
@@ -284,27 +305,34 @@ void RecoDecayX::Loop(){
                 prevPi1_idx = B0_pi1_idx[b]; prevPi2_idx = B0_pi2_idx[b];
 
                 if(isMCmatched_Pi1){
-                    if (HLT_DoubleMu4_JpsiTrk_Displaced) h_Pi_dR_HLT_DoubleMu4_JpsiTrk_MC.Fill(B0_PiPi_p1_dr_DoubleMu4_JpsiTrk_Displaced[b]);
+                    if (HLT_DoubleMu4_3_LowMass) h_Pi_dR_HLT_DoubleMu4_3_LowMass_MC.Fill(B0_PiPi_p1_dr_DoubleMu4_3_LowMass[b]);
                 }else{
-                    if (HLT_DoubleMu4_JpsiTrk_Displaced) h_Pi_dR_HLT_DoubleMu4_JpsiTrk_Fk.Fill(B0_PiPi_p1_dr_DoubleMu4_JpsiTrk_Displaced[b]);
+                    if (HLT_DoubleMu4_3_LowMass) h_Pi_dR_HLT_DoubleMu4_3_LowMass_Fk.Fill(B0_PiPi_p1_dr_DoubleMu4_3_LowMass[b]);
                 }
                 if (isMCmatched_Pi2)
                 {
-                    if (HLT_DoubleMu4_JpsiTrk_Displaced) h_Pi_dR_HLT_DoubleMu4_JpsiTrk_MC.Fill(B0_PiPi_p2_dr_DoubleMu4_JpsiTrk_Displaced[b]);   
+                    if (HLT_DoubleMu4_3_LowMass) h_Pi_dR_HLT_DoubleMu4_3_LowMass_MC.Fill(B0_PiPi_p2_dr_DoubleMu4_3_LowMass[b]);   
                 }else{
-                    if (HLT_DoubleMu4_JpsiTrk_Displaced) h_Pi_dR_HLT_DoubleMu4_JpsiTrk_Fk.Fill(B0_PiPi_p2_dr_DoubleMu4_JpsiTrk_Displaced[b]);
+                    if (HLT_DoubleMu4_3_LowMass) h_Pi_dR_HLT_DoubleMu4_3_LowMass_Fk.Fill(B0_PiPi_p2_dr_DoubleMu4_3_LowMass[b]);
                 }
-                if(isMCmatched_Pi1&&isMCmatched_Pi2) h_PiPi_M_MC.Fill(B0_finalFit_Rho_mass[b]);
+                if(isMCmatched_Pi1&&isMCmatched_Pi2){
+                    h_PiPi_M_MC.Fill(B0_finalFit_Rho_mass[b]);
+                    h_PiPi_M_prefit.Fill((RecoP4_Pi1+RecoP4_Pi2).M());
+                }
                 else h_PiPi_M_Fk.Fill(B0_finalFit_Rho_mass[b]); 
             }
             
-            if (isMCmatched_Mu1&&isMCmatched_Mu2&&isMCmatched_Pi1&&isMCmatched_Pi2) h_X3872_M_MC.Fill(B0_finalFit_X_mass[b]);
+            if (isMCmatched_Mu1&&isMCmatched_Mu2&&isMCmatched_Pi1&&isMCmatched_Pi2){
+                h_X3872_M_MC.Fill(B0_finalFit_X_mass[b]);
+                h_X3872_M_prefit.Fill( (RecoP4_Mu1 + RecoP4_Mu2 + RecoP4_Pi1 + RecoP4_Pi2).M() );
+            }
             else h_X3872_M_Fk.Fill(B0_finalFit_X_mass[b]);
 
         // *** K0short ***
         if (isMCmatched_K0s){
             h_K0s_M_MC.Fill(B0_K0s_nmcFitted_mass[b]);
-        }else{
+            h_K0s_M_prefit.Fill(RecoP4_K0s_prefit.M());
+        } else {
             h_K0s_M_Fk.Fill(B0_K0s_nmcFitted_mass[b]);
         }
         
@@ -322,6 +350,7 @@ void RecoDecayX::Loop(){
             M_X3872= B0_finalFit_X_mass[b];
             M_K0s  = B0_K0s_nmcFitted_mass[b];
             h_B0_M_MC.Fill(B0_finalFit_mass[b]);
+            h_B0_M_prefit.Fill((RecoP4_Mu1 + RecoP4_Mu2 + RecoP4_Pi1 + RecoP4_Pi2 + RecoP4_K0s).M());
             M_B0   = B0_finalFit_mass[b];
             // ... pT ...
             //pT_Mu1 = RecoP4_Mu1.Pt(); 
@@ -368,7 +397,11 @@ void RecoDecayX::Loop(){
             h_B0_DistGenVtx_PV_MC.Fill(Dist_GenV_PV);
             h_B0_DistGenVtx_BS_MC.Fill(Dist_GenV_BS);
             h_B0_DistGenVtx_BSwithZ_MC.Fill(Dist_GenV_BSwithZ);
-        }else{
+
+            // TRIGGER CHECK - post emulation
+            h_trigger_fired_emulated.Fill(HLT_DoubleMu4_3_LowMass);
+
+        } else {
 
             // ... masses ...
             h_B0_M_Fk.Fill(B0_finalFit_mass[b]);
@@ -405,7 +438,7 @@ void RecoDecayX::Loop(){
 
         
         } // loop on B0 candidates
-       
+               
         if(n_PassedB0 > 0){
             N_PassedB0 += n_PassedB0;
             N_PassedEvents++;
@@ -436,16 +469,18 @@ void RecoDecayX::Loop(){
 
     h_Mu_dR_HLT_Dimuon25_Jpsi_MC.Write();
     h_Mu_dR_HLT_Dimuon25_Jpsi_Fk.Write();
-    h_Mu_dR_HLT_DoubleMu4_JpsiTrk_MC.Write();
-    h_Mu_dR_HLT_DoubleMu4_JpsiTrk_Fk.Write();
+    h_Mu_dR_HLT_DoubleMu4_3_LowMass_MC.Write();
+    h_Mu_dR_HLT_DoubleMu4_3_LowMass_Fk.Write();
 
     h_MuMu_M_MC.Write();
     h_MuMu_M_Fk.Write();
+    h_MuMu_M_prefit.Write();
     h_PiPi_M_MC.Write();
     h_PiPi_M_Fk.Write();
+    h_PiPi_M_prefit.Write();
 
-    h_Pi_dR_HLT_DoubleMu4_JpsiTrk_MC.Write();
-    h_Pi_dR_HLT_DoubleMu4_JpsiTrk_Fk.Write();
+    h_Pi_dR_HLT_DoubleMu4_3_LowMass_MC.Write();
+    h_Pi_dR_HLT_DoubleMu4_3_LowMass_Fk.Write();
     h_Pi1_pT_MC.Write();
     h_Pi1_pT_Fk.Write();
     h_Pi1_D0_MC.Write();
@@ -484,10 +519,13 @@ void RecoDecayX::Loop(){
 
     h_X3872_M_MC.Write();
     h_X3872_M_Fk.Write();
+    h_X3872_M_prefit.Write();
     h_K0s_M_MC.Write();
     h_K0s_M_Fk.Write();
+    h_K0s_M_prefit.Write();
     h_B0_M_MC.Write();
     h_B0_M_Fk.Write();
+    h_B0_M_prefit.Write();
 
     h_TrigTrk_pT.Write(); 
     h_TrigTrk_eta.Write();
@@ -495,6 +533,13 @@ void RecoDecayX::Loop(){
     h_TrigTrk_pT_post.Write(); 
     h_TrigTrk_eta_post.Write();
     h_TrigTrk_DCAs_post.Write();
+
+    // trigger_fired_emulated only makes sense if is_trigger_check == true
+    // [otherwise, HLT trigger bit == 1 is enforced and emulation has no effect]
+    if(is_trigger_check){
+        h_trigger_fired.Write();
+        h_trigger_fired_emulated.Write();
+    }
 
     outTree_->Write();
 
@@ -517,6 +562,11 @@ int RecoDecayX::RecoPartFillP4(const int Bidx){
     RecoP4_Pi1.SetPt(B0_PiPi_prefit_pi1_pt[Bidx]); RecoP4_Pi1.SetEta(B0_PiPi_prefit_pi1_eta[Bidx]); RecoP4_Pi1.SetPhi(B0_PiPi_prefit_pi1_phi[Bidx]);
     RecoP4_Pi2.SetPt(B0_PiPi_prefit_pi2_pt[Bidx]); RecoP4_Pi2.SetEta(B0_PiPi_prefit_pi2_eta[Bidx]); RecoP4_Pi2.SetPhi(B0_PiPi_prefit_pi2_phi[Bidx]);
     RecoP4_K0s.SetPt(B0_K0s_mcFitted_pt[Bidx]); RecoP4_K0s.SetEta(B0_K0s_mcFitted_eta[Bidx]); RecoP4_K0s.SetPhi(B0_K0s_mcFitted_phi[Bidx]);
+
+    ROOT::Math::PtEtaPhiMVector k0s_pi1_prefit, k0s_pi2_prefit;
+    k0s_pi1_prefit.SetPt(B0_K0s_matchTrack1_pt[Bidx]); k0s_pi1_prefit.SetEta(B0_K0s_matchTrack1_eta[Bidx]); k0s_pi1_prefit.SetPhi(B0_K0s_matchTrack1_phi[Bidx]); k0s_pi1_prefit.SetM(mPion);
+    k0s_pi2_prefit.SetPt(B0_K0s_matchTrack2_pt[Bidx]); k0s_pi2_prefit.SetEta(B0_K0s_matchTrack2_eta[Bidx]); k0s_pi2_prefit.SetPhi(B0_K0s_matchTrack2_phi[Bidx]); k0s_pi2_prefit.SetM(mPion);
+    RecoP4_K0s_prefit = k0s_pi1_prefit + k0s_pi2_prefit;
 
     RecoP4_B0.SetPt(B0_finalFit_pt[Bidx]); RecoP4_B0.SetEta(B0_finalFit_eta[Bidx]); RecoP4_B0.SetPhi(B0_finalFit_phi[Bidx]); RecoP4_B0.SetM(B0_finalFit_mass[Bidx]);
  
@@ -632,9 +682,19 @@ void RecoDecayX::MCtruthMatching(const bool verbose){
 	MCmatch_Mup_DRmin = DRminMup; MCmatch_Mup_DpT = DRminMup_DpT; 
 
     // ... pions
-	if( (DRminPim > DRmin_threshold) || (DRminPim_DpT > DpT_threshold)) MCmatch_Pim_Idx = -1;
+	if( (DRminPim > DRmin_threshold) || (DRminPim_DpT > DpT_threshold)) {
+        std::cout << "NO PI- MATCH" << std::endl;
+        std::cout << "  dR_min_pi- = " << DRminPim << std::endl;
+        std::cout << "  dpT_min_pi- = " << DRminPim_DpT << std::endl;
+        MCmatch_Pim_Idx = -1;
+    }
 	MCmatch_Pim_DRmin = DRminPim; MCmatch_Pim_DpT = DRminPim_DpT;
-	if( (DRminPip > DRmin_threshold) || (DRminPip_DpT > DpT_threshold)) MCmatch_Pip_Idx = -1;
+	if( (DRminPip > DRmin_threshold) || (DRminPip_DpT > DpT_threshold)) {
+        MCmatch_Pip_Idx = -1;
+        std::cout << "NO PI+ MATCH" << std::endl;
+        std::cout << "  dR_min_pi+ = " << DRminPip << std::endl;
+        std::cout << "  dpT_min_pi+ = " << DRminPip_DpT << std::endl;
+    }
 	MCmatch_Pip_DRmin = DRminPip; MCmatch_Pip_DpT = DRminPip_DpT; 
 
     // ... K0 short
@@ -698,9 +758,9 @@ float RecoDecayX::DeltaPT(ROOT::Math::PtEtaPhiMVector& genV, ROOT::Math::PtEtaPh
 
 int RecoDecayX::TriggerSelection_Muons(const int Bidx){
    // TRIGGER SETTINGS 
-    const float Min_Mu_pT = 4.,Max_Mu_eta = 2.5, Max_Mu_dr = 2.;
-    const float Min_MuMu_pT = 6.9, Low_MuMu_M = 3.0,  High_MuMu_M = 3.2, Max_MuMu_DCA = 0.5;
-    const float Min_MuMu_LxyS = 3, Min_MuMu_cosAlpha = 0.9, Min_MuMu_SVp = 0.1;
+    const float Min_Mu_pT_1 = 3., Min_Mu_pT_2 = 4., Max_Mu_eta = 2.5, Max_Mu_dr = 2.;
+    const float Min_MuMu_pT = 4.9, Low_MuMu_M = 0.2,  High_MuMu_M = 8.5, Max_MuMu_DCA = 0.5;
+    const float Min_MuMu_SVp = 0.005;
 
     int mu1_idx, mu2_idx;
     bool isFiredMu1, isFiredMu2;
@@ -712,14 +772,14 @@ int RecoDecayX::TriggerSelection_Muons(const int Bidx){
     mu2_idx = B0_mu2_idx[Bidx];
 
     // Fired Mu + muon tracks QUALITY CHECK
-    isFiredMu1 = (bool)B0_MuMu_mu1_fired_DoubleMu4_JpsiTrk_Displaced[Bidx];
-    isFiredMu2 = (bool)B0_MuMu_mu2_fired_DoubleMu4_JpsiTrk_Displaced[Bidx]; 
+    isFiredMu1 = (bool)B0_MuMu_mu1_fired_DoubleMu4_3_LowMass[Bidx];
+    isFiredMu2 = (bool)B0_MuMu_mu2_fired_DoubleMu4_3_LowMass[Bidx]; 
     if ( (isFiredMu1 && isFiredMu2) && ( Muon_softId[mu1_idx] && Muon_softId[mu2_idx] )){ 
             // STEP 0
             isOK_mu1_step0 = true;
-            if((RecoP4_Mu1.Pt() < Min_Mu_pT) || (fabs(RecoP4_Mu1.Eta()) > Max_Mu_eta)  || ( B0_MuMu_mu1_dr[Bidx]) > Max_Mu_dr ) isOK_mu1_step0 = false;
+            if((RecoP4_Mu1.Pt() < Min_Mu_pT_1) || (fabs(RecoP4_Mu1.Eta()) > Max_Mu_eta)  || ( B0_MuMu_mu1_dr[Bidx]) > Max_Mu_dr ) isOK_mu1_step0 = false;
             isOK_mu2_step0 = true;
-            if((RecoP4_Mu2.Pt() < Min_Mu_pT) || (fabs(RecoP4_Mu2.Eta()) > Max_Mu_eta)  || ( B0_MuMu_mu2_dr[Bidx]) > Max_Mu_dr ) isOK_mu2_step0 = false;
+            if((RecoP4_Mu2.Pt() < Min_Mu_pT_1) || (fabs(RecoP4_Mu2.Eta()) > Max_Mu_eta)  || ( B0_MuMu_mu2_dr[Bidx]) > Max_Mu_dr ) isOK_mu2_step0 = false;
 
             if (isOK_mu1_step0 && isOK_mu2_step0){ 
 
@@ -729,7 +789,7 @@ int RecoDecayX::TriggerSelection_Muons(const int Bidx){
                 if ( !MassCut || ((RecoP4_Mu1 + RecoP4_Mu2).Pt() < Min_MuMu_pT ) || ( B0_MuMu_DCA[Bidx] > Max_MuMu_DCA )  )	isOK_mumu_step1 = false;
                 // STEP 2	
                 isOK_mumu_step2 = true;
-                if((B0_MuMu_LxySign[Bidx] < Min_MuMu_LxyS) || (B0_MuMu_cosAlpha[Bidx] < Min_MuMu_cosAlpha ) || (B0_MuMu_sv_prob[Bidx] < Min_MuMu_SVp )) isOK_mumu_step2 = false;
+                if(B0_MuMu_sv_prob[Bidx] < Min_MuMu_SVp ) isOK_mumu_step2 = false;
             }
     }
 
@@ -746,13 +806,13 @@ int RecoDecayX::TriggerSelection_Track(const int Bidx){
 
    int RETURN_VALUE = 0;
 
-	bool isFired_RhoPi1 = (bool)B0_PiPi_p1_fired_DoubleMu4_JpsiTrk_Displaced[Bidx];
+	bool isFired_RhoPi1 = (bool)B0_PiPi_p1_fired_DoubleMu4_3_LowMass[Bidx];
 	bool isMatchedToMuon_Rho_Pi1	= ProbeTracks_isMatchedToMuon[B0_pi1_idx[Bidx]];
-	bool isFired_RhoPi2 = (bool)B0_PiPi_p2_fired_DoubleMu4_JpsiTrk_Displaced[Bidx];
+	bool isFired_RhoPi2 = (bool)B0_PiPi_p2_fired_DoubleMu4_3_LowMass[Bidx];
 	bool isMatchedToMuon_Rho_Pi2 = ProbeTracks_isMatchedToMuon[B0_pi2_idx[Bidx]];
 
-	bool isFired_K0sPi1 = (bool)B0_K0s_matchTrack1_fired_DoubleMu4_JpsiTrk_Displaced[Bidx];
-	bool isFired_K0sPi2 = (bool)B0_K0s_matchTrack2_fired_DoubleMu4_JpsiTrk_Displaced[Bidx];
+	bool isFired_K0sPi1 = (bool)B0_K0s_matchTrack1_fired_DoubleMu4_3_LowMass[Bidx];
+	bool isFired_K0sPi2 = (bool)B0_K0s_matchTrack2_fired_DoubleMu4_3_LowMass[Bidx];
 
 	//LEVEL 0 
 	isOK_trk_step0 =  (isFired_RhoPi1 || isFired_RhoPi2 || isFired_K0sPi1 || isFired_K0sPi2); // is fired at least 1

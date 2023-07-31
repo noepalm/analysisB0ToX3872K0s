@@ -6,8 +6,11 @@
 *.csv
 
 # Job reports & outputs
-*/JobReport/*
+ANALYSIS/scripts/JobReport/
 cbasile.cc
+
+# Trained models
+ANALYSIS/MVA/MVA/models/
 
 # Compiled Object files
 *.slo
@@ -35,7 +38,10 @@ cbasile.cc
 *.lib
 
 # Executables
+*/analysisGenLevel
+*/RecoChainAnalysis
 */X3872Application
+*/MVAcutter
 *.exe
 *.out
 *.app

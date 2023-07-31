@@ -13,9 +13,10 @@
 # this is to write 1 job per file in the dataset (-N = run on all the events in a file; -n = 1job/file)
 #
 # THIS ONE I USE --> to copy the output on EOS: python submit_batch.py -c -N -1 -n 1 -p testtnp --eos=ok myfiles.txt
-#
-#
 # myfiles.txt   contains the paths to the root files I need (./data/CharmoniumUL_Run2017B.txt ecc..)
+#
+# [NOEMI] python submit_batch.py -c --nfiles 1 --eos=$MYEOS/Analysis/data/ Run3_2022D.txt
+# [NOEMI] using CMSSW 12.6.0 
 
 
 import os
@@ -45,7 +46,7 @@ getenv      = True
 environment = "LS_SUBCWD={here}"
 request_memory = 1000
 +MaxRuntime = {rt}\n
-'''.format(de=os.path.abspath(dummy_exec.name), jd=os.path.abspath(jobdir), rt=int(options.runtime*3600), here=os.environ['PWD'] ) )
+'''.format(de=os.path.abspath(dummy_exec.name), jd=os.path.abspath(jobdir), rt=int(options.runtime*3600), here=os.environ['PWD'] + "/.." ) )
 
     for sf in srcFiles:
         condor_file.write('arguments = {sf} \nqueue 1 \n\n'.format(sf=os.path.abspath(sf)))
@@ -61,7 +62,7 @@ def main():
     parser = optparse.OptionParser(usage=usage)
 
     # --defaults
-    executable = './X3872Application'
+    executable = './X3872Application' #we're in /scripts folder
     now = datetime.datetime.now()
     defaultoutputdir='./JobReport/HLTemul_'+ now.strftime("%Y%m%d_%H%M%S")
 
@@ -94,7 +95,8 @@ def main():
     inputListfile=open(inputlist)
     
     # --> set-up the report directory
-    jobdir = opt.prefix+"/"+dataset
+    # jobdir = opt.prefix+"/"+dataset
+    jobdir = './JobReport/' + dataset + "_" + now.strftime("%Y%m%d_%H%M%S")
     os.system("mkdir -p "+jobdir)
     os.system("mkdir -p "+jobdir+"/log/")
     os.system("mkdir -p "+jobdir+"/out/")
@@ -124,12 +126,12 @@ def main():
 
         # prepare the txt with root files
         #icfgfilename = pwd+"/"+opt.prefix+"/"+dataset+"/cfg/tnp_"+str(ijob)+".txt"
-        icfgfilename = jobdir +"/cfg/tnp_"+str(ijob)+".txt"
-        icfgfile = open(icfgfilename,'w')
-        #icfgfile.write(ntpfile)
-        [icfgfile.write(lfile) for lfile in L]
+        # icfgfilename = jobdir +"/cfg/tnp_"+str(ijob)+".txt"
+        # icfgfile = open(icfgfilename,'w')
+        # #icfgfile.write(ntpfile)
+        # [icfgfile.write(lfile) for lfile in L]
 
-        icfgfile.close()
+        # icfgfile.close()
 
         # prepare the script to run
         #rootoutputfile = dataset+'_'+str(ijob)+'.root'
@@ -144,14 +146,14 @@ def main():
         srcfilename = jobdir+"/src/submit_"+str(ijob)+".src"
         srcfile = open(srcfilename,'w')
         srcfile.write('#!/bin/bash\n')
-        srcfile.write('cd '+pwd+'\n')
+        srcfile.write('cd ' + pwd + "/.." + '\n')
         srcfile.write('echo $PWD\n')
         #srcfile.write(opt.application+' '+icfgfilename+' \n')
         Nf = 1000
         if (opt.Nfiles > 1000) : opt.Nfiles = opt.Nfiles - 1000
         else : Nf = opt.Nfiles 
         print(Nf)
-        srcfile.write(opt.application+' '+icfgfilename+' '+rootoutputfile+' job_tag '+str(Nf)+' \n')
+        srcfile.write(opt.application+' '+ L[0].rstrip('\n') +' '+rootoutputfile+' job_tag '+str(Nf)+' \n')
         if(opt.eos!=''):    
             outdireos = opt.eos + dataset+ str(ijob)+blind_tag 
             srcfile.write('cp '+rootoutputfile+'.root '+ outdireos +'.root\n')

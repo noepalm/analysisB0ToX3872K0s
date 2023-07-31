@@ -126,7 +126,7 @@ void RecoDecayPsi::Loop(){
         if ((jentry+1) % Nprint == 0) std::cout << "--> " << Form("%3.0f",(float)(jentry+1)/nentries* 100.) << " \%"<< std::endl;
         nb = fChain->GetEntry(jentry);   nbytes += nb;
         // ----- CHECK IF THE TRIGGER FIRED
-        if(!HLT_DoubleMu4_JpsiTrk_Displaced) continue;
+        if(!HLT_DoubleMu4_3_LowMass) continue;
         N_FiredEvents++;
         // ----- GENERATOR
         GenPartFillP4();
@@ -169,7 +169,7 @@ void RecoDecayPsi::Loop(){
                     else h_Mu_TrkQlty_MC.Fill(2);
 
                     //if (HLT_Dimuon25_Jpsi) h_Mu_dR_HLT_Dimuon25_Jpsi_MC.Fill(B0_MuMu_mu1_dr_Dimuon25_Jpsi[b]);
-                    if (HLT_DoubleMu4_JpsiTrk_Displaced) h_Mu_dR_HLT_DoubleMu4_JpsiTrk_MC.Fill(B0_MuMu_mu1_dr_DoubleMu4_JpsiTrk_Displaced[b]);
+                    if (HLT_DoubleMu4_3_LowMass) h_Mu_dR_HLT_DoubleMu4_JpsiTrk_MC.Fill(B0_MuMu_mu1_dr_DoubleMu4_JpsiTrk_Displaced[b]);
                 }else{
                     h_Mu_SoftID_Fk.Fill(Muon_softId[B0_mu1_idx[b]]);
                     h_Mu_GlobalMu_Fk.Fill(Muon_isGlobal[B0_mu1_idx[b]]);
@@ -177,7 +177,7 @@ void RecoDecayPsi::Loop(){
                     else h_Mu_TrkQlty_Fk.Fill(2);
 
                     //if (HLT_Dimuon25_Jpsi) h_Mu_dR_HLT_Dimuon25_Jpsi_Fk.Fill(B0_MuMu_mu1_dr_Dimuon25_Jpsi[b]);
-                    if (HLT_DoubleMu4_JpsiTrk_Displaced) h_Mu_dR_HLT_DoubleMu4_JpsiTrk_Fk.Fill(B0_MuMu_mu1_dr_DoubleMu4_JpsiTrk_Displaced[b]);
+                    if (HLT_DoubleMu4_3_LowMass) h_Mu_dR_HLT_DoubleMu4_JpsiTrk_Fk.Fill(B0_MuMu_mu1_dr_DoubleMu4_JpsiTrk_Displaced[b]);
                 }
                 if (isMCmatched_Mu2){
                     h_Mu_SoftID_MC.Fill(Muon_softId[B0_mu2_idx[b]]);
@@ -209,15 +209,15 @@ void RecoDecayPsi::Loop(){
                 prevPi1_idx = B0_pi1_idx[b]; prevPi2_idx = B0_pi2_idx[b];
 
                 if(isMCmatched_Pi1){
-                    if (HLT_DoubleMu4_JpsiTrk_Displaced) h_Pi_dR_HLT_DoubleMu4_JpsiTrk_MC.Fill(B0_PiPi_p1_dr_DoubleMu4_JpsiTrk_Displaced[b]);
+                    if (HLT_DoubleMu4_3_LowMass) h_Pi_dR_HLT_DoubleMu4_JpsiTrk_MC.Fill(B0_PiPi_p1_dr_DoubleMu4_JpsiTrk_Displaced[b]);
                 }else{
-                    if (HLT_DoubleMu4_JpsiTrk_Displaced) h_Pi_dR_HLT_DoubleMu4_JpsiTrk_Fk.Fill(B0_PiPi_p1_dr_DoubleMu4_JpsiTrk_Displaced[b]);
+                    if (HLT_DoubleMu4_3_LowMass) h_Pi_dR_HLT_DoubleMu4_JpsiTrk_Fk.Fill(B0_PiPi_p1_dr_DoubleMu4_JpsiTrk_Displaced[b]);
                 }
                 if (isMCmatched_Pi2)
                 {
-                    if (HLT_DoubleMu4_JpsiTrk_Displaced) h_Pi_dR_HLT_DoubleMu4_JpsiTrk_MC.Fill(B0_PiPi_p2_dr_DoubleMu4_JpsiTrk_Displaced[b]);   
+                    if (HLT_DoubleMu4_3_LowMass) h_Pi_dR_HLT_DoubleMu4_JpsiTrk_MC.Fill(B0_PiPi_p2_dr_DoubleMu4_JpsiTrk_Displaced[b]);   
                 }else{
-                    if (HLT_DoubleMu4_JpsiTrk_Displaced) h_Pi_dR_HLT_DoubleMu4_JpsiTrk_Fk.Fill(B0_PiPi_p2_dr_DoubleMu4_JpsiTrk_Displaced[b]);
+                    if (HLT_DoubleMu4_3_LowMass) h_Pi_dR_HLT_DoubleMu4_JpsiTrk_Fk.Fill(B0_PiPi_p2_dr_DoubleMu4_JpsiTrk_Displaced[b]);
                 }
                 if (isMCmatched_PiPi) h_PiPi_M_MC.Fill( (RecoP4_Pi1+ RecoP4_Pi2).M() ); 
                 else h_PiPi_M_Fk.Fill( (RecoP4_Pi1+ RecoP4_Pi2).M() );

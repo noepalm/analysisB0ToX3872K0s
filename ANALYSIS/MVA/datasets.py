@@ -27,7 +27,14 @@ input_files = {
     # - 2018 -
    'UL_2018_data'  :'/eos/user/c/cbasile/B0toX3872K0s/data/CharmoniumUL_2018_blind.root',
    'UL_2018_MC_X'  :'../PRELIMINARY/outRoot/RecoDecay_X3872_UL18.root',
-   'UL_2018_MC_Psi':'../PRELIMINARY/outRoot/RecoDecay_Psi2S_UL18.root'
+   'UL_2018_MC_Psi':'../PRELIMINARY/outRoot/RecoDecay_Psi2S_UL18.root',
+   # - 2022 -
+   '2022D_data' : '/eos/home-n/npalmeri/B0toX3872K0s/data/Run3_2022D_blind.root',   
+   '2022E_data' : '/eos/home-n/npalmeri/B0toX3872K0s/data/Run3_2022E_blind.root',   
+   '2022F_data' : '/eos/home-n/npalmeri/B0toX3872K0s/data/Run3_2022F_blind.root',
+   '2022G_data' : '/eos/home-n/npalmeri/B0toX3872K0s/data/Run3_2022G_blind.root',
+   '2022_MC_X' : '../../PRELIMINARY/outRoot/RecoDecay_X3872_Run3.root',
+   '2022_MC_Psi' : '../../PRELIMINARY/outRoot/RecoDecay_Psi2S_Run3.root'
 }
 
 #import concurrent.futures
@@ -119,14 +126,14 @@ class HistWeighter(object):
 
 import pandas as pd
 import numpy as np
-def pre_process_data(dataset, features, training = True, channel = 'X3872', keep_nonmatch=False):  
+def pre_process_data(dataset, features, training = True, channel = 'X3872', era = 'D', keep_nonmatch=False):  
    
    selection_JpsiPiPi = '(M_X3872 < 3.65831) or (M_X3872 > 3.71493 and M_X3872 < 3.82562) or (M_X3872 > 3.91839)' 
    selection_B0 = '(M_B0 > 5.09783 and M_B0 < 5.189) or (M_B0 > 5.371 and M_B0 < 5.463)'
    mods = get_models_dir()
    
    ## get the BACKGROUND data 
-   bkg_dataset = dataset + '_data'
+   bkg_dataset = dataset + era + '_data'
    data_dict = get_data_sync(bkg_dataset, features) 
    bkg_data = pd.DataFrame(data_dict)
    bkg_data['is_signal'] = np.zeros(bkg_data.event.shape).astype(int)

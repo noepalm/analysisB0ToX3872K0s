@@ -236,7 +236,7 @@ public :
    Bool_t          ProbeTracks_isMatchedToMuon[2000];   //[nProbeTracks]
    Bool_t          ProbeTracks_isMatchedToSoftMuon[2000];   //[nProbeTracks]
    Int_t           HLT_Dimuon25_Jpsi;
-   Int_t           HLT_DoubleMu4_JpsiTrk_Displaced;
+   Int_t           HLT_DoubleMu4_3_LowMass;
    UInt_t          nTrigObj;
    Float_t         TrigObj_pt[10];   //[nTrigObj]
    Float_t         TrigObj_eta[10];   //[nTrigObj]
@@ -484,7 +484,7 @@ public :
    TBranch        *b_ProbeTracks_isMatchedToMuon;   //!
    TBranch        *b_ProbeTracks_isMatchedToSoftMuon;   //!
    TBranch        *b_HLT_Dimuon25_Jpsi;   //!
-   TBranch        *b_HLT_DoubleMu4_JpsiTrk_Displaced;   //!
+   TBranch        *b_HLT_DoubleMu4_3_LowMass;   //!
    TBranch        *b_nTrigObj;   //!
    TBranch        *b_TrigObj_pt;   //!
    TBranch        *b_TrigObj_eta;   //!
@@ -822,7 +822,7 @@ void MCbase_B0toPsi2SK0s::Init(TTree *tree)
    fChain->SetBranchAddress("ProbeTracks_isMatchedToMuon", ProbeTracks_isMatchedToMuon, &b_ProbeTracks_isMatchedToMuon);
    fChain->SetBranchAddress("ProbeTracks_isMatchedToSoftMuon", ProbeTracks_isMatchedToSoftMuon, &b_ProbeTracks_isMatchedToSoftMuon);
    fChain->SetBranchAddress("HLT_Dimuon25_Jpsi", &HLT_Dimuon25_Jpsi, &b_HLT_Dimuon25_Jpsi);
-   fChain->SetBranchAddress("HLT_DoubleMu4_JpsiTrk_Displaced", &HLT_DoubleMu4_JpsiTrk_Displaced, &b_HLT_DoubleMu4_JpsiTrk_Displaced);
+   fChain->SetBranchAddress("HLT_DoubleMu4_3_LowMass", &HLT_DoubleMu4_3_LowMass, &b_HLT_DoubleMu4_3_LowMass);
    fChain->SetBranchAddress("nTrigObj", &nTrigObj, &b_nTrigObj);
    fChain->SetBranchAddress("TrigObj_pt", TrigObj_pt, &b_TrigObj_pt);
    fChain->SetBranchAddress("TrigObj_eta", TrigObj_eta, &b_TrigObj_eta);

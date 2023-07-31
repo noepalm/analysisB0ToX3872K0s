@@ -8,12 +8,21 @@ import ROOT
 import csv 
 ROOT.ROOT.EnableImplicitMT(5)
 
+import logging
+mpl_logger = logging.getLogger("matplotlib")
+mpl_logger.setLevel(logging.WARNING)
+
+
 #####
 # --> CV training di un modello
 #     usage : python MVA/BDT_CVtraining.py --dataset UL_2017 --what mytag --CV 3
 #
+#             python BDT_CVtraining.py --dataset 2022 --CV 3 --what D --lrate 0.075 --depth 3 --ntrees 350
+#
 # --> CV application del modello trainato
 #     usage : python MVA/BDT_CVtraining.py --dataset UL_2017 --channel X3872 --what anothertag --CV 3 --load_model
+#
+#             python BDT_CVtraining.py --dataset 2022 --CV 3 --what D --channel X3872 --load_model
 ####
 
 parser = ArgumentParser()
@@ -74,6 +83,9 @@ parser.add_argument(
    '--dataset'
 )
 parser.add_argument(
+   '--era'
+)
+parser.add_argument(
    '--channel', default = 'X3872', type = str
 )
 parser.add_argument(
@@ -115,17 +127,30 @@ import os
 if args.dataset:
    dataset = args.dataset
 
-mods = '%s/BDTxgb_%s' % (get_models_dir(), dataset)
+if args.era:
+    # era must be a single, uppercase letter
+    if len(args.era) == 1 and args.era.isupper():
+        era = args.era
+    else:
+        raise ValueError("ERROR: era must be a single, uppercase letter")
+else:
+    print("ERROR: no era specified")
+    exit()
+
+mods = '%s/BDTxgb_%s%s' % (get_models_dir(), dataset, era)
 if not os.path.isdir(mods):
    os.makedirs(mods)
    print' + created directory ', mods
 
-plots = '/eos/user/c/cbasile/www/B0toX3872K0s/MVA/CVtraining_%s/%s/' % (dataset, tag)
+# plots = '/eos/user/c/cbasile/www/B0toX3872K0s/MVA/CVtraining_%s/%s/' % (dataset, tag)
+plots = '/eos/home-n/npalmeri/www/Analysis/MVA/CVtraining_%s%s/' % (dataset, era)
+# plots = 'plots/CVtraining_%s%s/%s/' % (dataset, era, tag)
 if not os.path.isdir(plots):
    os.makedirs(plots)
    print' + created directory ', plots 
 
-results = '/eos/user/c/cbasile/B0toX3872K0s/MVAresults'
+results = '/eos/home-n/npalmeri/B0toX3872K0s/MVAresults'
+# results = 'MVAresults'
 if not os.path.isdir(results):
    os.makedirs(results)
    print' + created directory ', results 
@@ -141,7 +166,7 @@ print(fields)
 training_cuts = not args.load_model
 if training_cuts: print(" [TRAINING CUTS on data]")
 else: print(" [NO CUTS on data]")
-data = pre_process_data(dataset, fields, training_cuts, args.channel) 
+data = pre_process_data(dataset, fields, training_cuts, args.channel, era) 
 print(type(data))
    
 orig = data.copy()                    
@@ -214,6 +239,7 @@ for i in range(Ncv):
    to_apply = tmp.pop(i)
    print(" - element in data %d"%(len(tmp)))
    train_test = pd.concat(tmp)
+   # train, test = train_test_split(train_test, test_size = 0.25, random_state = 4)
    train, test = train_test_split(train_test, test_size = 0.25, random_state = 4)
    print 'train/test-set ',train_test.shape
    print 'train-set ',train.shape
@@ -242,7 +268,7 @@ for i in range(Ncv):
       )
 
       ## save model
-      full_model = '%s/%s_BDTtraining_CV%d-%d.pkl' % (mods, dataset, Ncv, i)
+      full_model = '%s/%s%s_BDTtraining_CV%d-%d.pkl' % (mods, dataset, era, Ncv, i)
       joblib.dump(clf, full_model, compress=True)
 
       print 'Training done!'
@@ -266,7 +292,7 @@ for i in range(Ncv):
       print('XGBoost model    AUC   score (test-set): {0:0.4f}'. format(aucTest[i]))
 
    else:
-      full_model = '%s/%s_BDTtraining_CV%d-%d.pkl' % (mods, dataset, Ncv, i)
+      full_model = '%s/%s%s_BDTtraining_CV%d-%d.pkl' % (mods, dataset, era, Ncv, i)
       clf = joblib.load(full_model)
       print 'Loaded pre-existing model %s' %(full_model)
 
@@ -292,13 +318,13 @@ if (check_for_nan):
     print ("check again for NaN " + str(check_for_nan))
     
 ## --> SAVE DATA FRAME IN A ROOT TREE
-outPath = '%s/%s_BDTtraining_CV%d_%s.csv' %(results, dataset, Ncv, args.channel)
-if args.load_model : outPath = '%s/%s_BDTapplication_CV%d_%s.csv' %(results, dataset, Ncv, args.channel) 
+outPath = '%s/%s%s_BDTtraining_CV%d_%s.csv' %(results, dataset, era, Ncv, args.channel)
+if args.load_model : outPath = '%s/%s%s_BDTapplication_CV%d_%s.csv' %(results, dataset, era, Ncv, args.channel) 
 outPath_root = outPath.replace("csv", "root")
 data.to_csv(outPath, index = False)
 print(" [OUT] save pd.DataFrame in %s" %(outPath))
 rdf = ROOT.RDF.MakeCsvDataFrame(outPath)
-rdf.Snapshot("CVtrainig_%s"%(dataset), outPath_root)
+rdf.Snapshot("CVtraining_%s%s" % (dataset, era), outPath_root)
 print(" [OUT] save ROOT-DataFrame in %s" %(outPath_root))
 os.system("rm %s"%(outPath)) # remove temporary .csv
 
@@ -325,24 +351,24 @@ if not args.load_model:
       axs[i,j].set_xlabel('score')
       axs[i,j].set_ylabel('features')
       axs[i,j].grid()
-   try : plt.savefig('%s/%s_%s_%s_features.png' % (plots, dataset, args.jobtag, args.what))
+   try : plt.savefig('%s/%s%s_%s_%s_features.png' % (plots, dataset, era, args.jobtag, args.what))
    except : pass
-   try : plt.savefig('%s/%s_%s_%s_features.pdf' % (plots, dataset, args.jobtag, args.what))
+   try : plt.savefig('%s/%s%s_%s_%s_features.pdf' % (plots, dataset, era, args.jobtag, args.what))
    except : pass
 
    ## ROC curve for TEST-set ##
    fig, ax = plt.subplots(figsize = [6,6])
    [ax.plot(rocTest[i][0][:-1], rocTest[i][1][:-1], 
-               linestyle='solid', 
-               #color='red', 
-               label='%s CV %d  AUC: %.3f'  %(dataset,i, aucTest[i]))
+               linestyle = 'solid', 
+               #color = 'red', 
+               label = '%s%s CV %d  AUC: %.3f' % (dataset, era, i, aucTest[i]))
 
    for i in range(Ncv)]
    plt.legend()
    plt.grid()
-   try : plt.savefig('%s/%s_%s_%s_CV%d_AUCtest.png' % (plots, dataset, args.jobtag, args.what, Ncv))
+   try : plt.savefig('%s/%s%s_%s_%s_CV%d_AUCtest.png' % (plots, dataset, era, args.jobtag, args.what, Ncv))
    except : pass
-   try : plt.savefig('%s/%s_%s_%s_CV%d_AUCtest.pdf' % (plots, dataset, args.jobtag, args.what, Ncv))
+   try : plt.savefig('%s/%s%s_%s_%s_CV%d_AUCtest.pdf' % (plots, dataset, era, args.jobtag, args.what, Ncv))
    except : pass
 
    ## ROC curve for ANALYSIS-set ##
@@ -350,18 +376,18 @@ if not args.load_model:
    [ax.plot(rocAnalysis[i][0][:-1], rocAnalysis[i][1][:-1], 
                linestyle='solid', 
                #color='red', 
-               label='%s CV %d  AUC: %.3f'  %(dataset, i, aucScore[i]))
+               label='%s%s CV %d  AUC: %.3f'  %(dataset, era, i, aucScore[i]))
 
    for i in range(Ncv)]
    plt.legend()
    plt.grid()
-   try : plt.savefig('%s/%s_%s_%s_CV%d_AUCanalysis.png' % (plots, dataset, args.jobtag, args.what, Ncv))
+   try : plt.savefig('%s/%s%s_%s_%s_CV%d_AUCanalysis.png' % (plots, dataset, era, args.jobtag, args.what, Ncv))
    except : pass
-   try : plt.savefig('%s/%s_%s_%s_CV%d_AUCanalysis.png' % (plots, dataset, args.jobtag, args.what, Ncv))
+   try : plt.savefig('%s/%s%s_%s_%s_CV%d_AUCanalysis.png' % (plots, dataset, era, args.jobtag, args.what, Ncv))
    except : pass
 
    ## BDTout TRAINING vs ANALYSIS SET
-   nbins =16; xlow = -12; xhigh = 4
+   nbins =16; xlow = -10; xhigh = 6 #-12, 4
    bins = np.linspace(xlow, xhigh, nbins)
 
    fig, ax = plt.subplots(Nside_x, Nside_y, figsize = [6*Nside_x,6*Nside_y])
@@ -394,9 +420,9 @@ if not args.load_model:
       #ax[i,j].set_yscale('log')
       ax[i,j].grid()
       ax[Nside_x-1,Nside_y-1].legend(fontsize = 14)
-   try : plt.savefig('%s/%s_%s_%s_CV%d_BDTout_trainVSanalysis.png' % (plots, dataset, args.jobtag, args.what, Ncv))
+   try : plt.savefig('%s/%s%s_%s_%s_CV%d_BDTout_trainVSanalysis.png' % (plots, dataset, era, args.jobtag, args.what, Ncv))
    except : pass
-   try : plt.savefig('%s/%s_%s_%s_CV%d_BDTout_trainVSanalysis.pdf' % (plots, dataset, args.jobtag, args.what, Ncv))
+   try : plt.savefig('%s/%s%s_%s_%s_CV%d_BDTout_trainVSanalysis.pdf' % (plots, dataset, era, args.jobtag, args.what, Ncv))
    except : pass
 
    ## BDT output vs Mpipi
@@ -421,7 +447,7 @@ if not args.load_model:
    ax.set_ylabel("M(#pi^+ #pi^-)")
    ax.legend(['BKG-data (validation set)', 'SGN-MC (validation set)'])
    plt.tight_layout()
-   try : plt.savefig('%s/%s_%s_%s_CV%d_BDTvsMpipi.png' % (plots, dataset, args.jobtag, args.what, Ncv))
+   try : plt.savefig('%s/%s%s_%s_%s_CV%d_BDTvsMpipi.png' % (plots, dataset, era, args.jobtag, args.what, Ncv))
    except : pass
-   try : plt.savefig('%s/%s_%s_%s_CV%d_BDTvsMpipi.pdf' % (plots, dataset, args.jobtag, args.what, Ncv))
+   try : plt.savefig('%s/%s%s_%s_%s_CV%d_BDTvsMpipi.pdf' % (plots, dataset, era, args.jobtag, args.what, Ncv))
    except : pass

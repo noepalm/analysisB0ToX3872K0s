@@ -39,7 +39,7 @@ class RecoDecayX : public MCbase_B0toX3872K0s {
         ROOT::Math::PtEtaPhiMVector RecoP4_Pi1, RecoP4_Pi2;
         ROOT::Math::PtEtaPhiMVector RecoP4_PiPi;
         ROOT::Math::PtEtaPhiMVector RecoP4_JpsiPiPi;
-        ROOT::Math::PtEtaPhiMVector RecoP4_K0s, RecoP4_K0sPi1, RecoP4_K0sPi2;
+        ROOT::Math::PtEtaPhiMVector RecoP4_K0s, RecoP4_K0sPi1, RecoP4_K0sPi2, RecoP4_K0s_prefit;
         ROOT::Math::PtEtaPhiMVector RecoP4_B0;
 
         // MC truth matching ptl-idx
@@ -67,6 +67,10 @@ class RecoDecayX : public MCbase_B0toX3872K0s {
         float LxySignSV_K0s;
         float SVprob_PiPi, pT_PiPi; 
         float pT_Pi1, DR_B0Pi1, D0_Pi1;
+
+        // Trigger check bool
+        bool is_trigger_check = false;
+
 }; //RecoDecayX
 
 #endif

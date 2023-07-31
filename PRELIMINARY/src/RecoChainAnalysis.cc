@@ -76,7 +76,11 @@ int main (int argc, char* argv[]){
 	std::string DirPath = argv[1];
 	TString tag = argv[2];
 	std::string channel = argv[3];
-	TChain* chain = TChainLoader(DirPath);
+	// TChain* chain = TChainLoader(DirPath);
+	TChain* chain = new TChain("Events");
+    if(channel == "NORM")        chain->Add("root://xrootd-cms.infn.it///store/user/crovelli/Run32022__BuToPsi2SKs_Psi2SToJPsiPiPi_JPsiToMuMu_RhoToPiPi_TuneCP5_13p6TeV_pythia8-evtgen/BuToPsi2SKs_Psi2SToJPsiPiPi_JPsiToMuMu_RhoToPiPi.root");
+    else if (channel == "SGN") chain->Add("root://xrootd-cms.infn.it///store/user/crovelli/Run32022__BuToX3872Ks_X3872ToJPsiRho_JPsiToMuMu_RhoToPiPi_TuneCP5_13TeV_pythia8-evtgen/BuToX3872Ks_X3872ToJPsiRho_JPsiToMuMu_RhoToPiPi.root");
+	std::cout << chain->GetEntries() << std::endl; //For Psi2S, DOES NOT save events without this (???)
 
     RecoDecayX* RecoAnalyzer = new RecoDecayX(chain, channel, tag);
 	RecoAnalyzer->Loop();

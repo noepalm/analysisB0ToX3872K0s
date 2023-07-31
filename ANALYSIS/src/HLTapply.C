@@ -3,14 +3,13 @@
 
 HLTapply::HLTapply(TTree *tree, const TString outdir, const TString tags) : B0toX3872K0s_base(tree) {
     tags_ = tags;
+    if(tags == "HLT_emulation_check") is_trigger_check = true;    
     TString blind_tag = "blind";
     if(!isBlind_) blind_tag = "open";
     if(outdir == "default") outFileTreePath_ =  "./outRoot/Parking_" + tags_ + "_HLTemulation_" + blind_tag+ ".root";
     else outFileTreePath_ =  outdir + ".root";
     
-    
     //std::cout << " .... analyzing " << tree->GetEntriesFast() << " events "<< std::endl;
-
 }
 
 void HLTapply::Loop(){
@@ -49,6 +48,9 @@ void HLTapply::Loop(){
     TH1F h_B0_M_postfit    = TH1F("B0_M_postfit", "", Nbins, xlow, xhigh);
     TH1F h_B0_M_prefit     = TH1F("B0_M_prefit", "", Nbins, xlow, xhigh);
 
+    // HLT emulation check
+    TH1F h_trigger_fired          = TH1F("trigger_fired", "", 2, -.5, 1.5);
+    TH1F h_trigger_fired_emulated = TH1F("trigger_fired_emulated", "", 2, -.5, 1.5);
 
 
     // ----- VARIABLES ----- //
@@ -72,7 +74,9 @@ void HLTapply::Loop(){
         nb = fChain->GetEntry(jentry);   nbytes += nb;
         
         // ----- CHECK IF THE TRIGGER FIRED
-        if(!HLT_DoubleMu4_3_LowMass) continue;
+        h_trigger_fired.Fill(HLT_DoubleMu4_3_LowMass);
+        
+        if(!HLT_DoubleMu4_3_LowMass && !is_trigger_check) continue; //skip HLT fired requirement if tag == "HLT_emulation_check"
         N_FiredEvents++;
 
         for (Int_t b = 0; b  < nB0; b++){
@@ -92,6 +96,9 @@ void HLTapply::Loop(){
 
             if(!TriggerSelection_Muons(b)) continue;
             // if(!TriggerSelection_Track(b)) continue;
+
+            h_trigger_fired_emulated.Fill(HLT_DoubleMu4_3_LowMass);
+
             n_PassedB0++;
 
             toCountJPsi = (B0_mu1_idx[b] != prevMu1_idx) || (B0_mu2_idx[b] != prevMu2_idx);
@@ -161,7 +168,22 @@ void HLTapply::Loop(){
     std::cout << " Events which passed the HLT " << N_PassedEvents << std::endl;
     std::cout << " B0 cand. which passed the HLT " << N_PassedB0 << std::endl;
 
+    // Save some check histograms
+    gROOT->SetBatch(kTRUE);
+    fChain->Draw("nB0 >> hnB0");
+    fChain->Draw("nK0s >> hnK0s");
+    fChain->Draw("nMuon >> hnMuon");
+    fChain->Draw("npipi >> hnpipi");
+    fChain->Draw("nJPsiToMuMu >> hnJPsiToMuMu");
+    fChain->Draw("nSV >> hnSV");
+    TH1I* hnB0 = (TH1I*)gDirectory->Get("hnB0");
+    TH1I* hnK0s = (TH1I*)gDirectory->Get("hnK0s");
+    TH1I* hnMuon = (TH1I*)gDirectory->Get("hnMuon");
+    TH1I* hnpipi = (TH1I*)gDirectory->Get("hnpipi");
+    TH1I* hnJPsiToMuMu = (TH1I*)gDirectory->Get("hnJPsiToMuMu");
+    TH1I* hnSV = (TH1I*)gDirectory->Get("hnSV");
 
+    // ----- SAVING STUFF ----- //
     outFileTree_ = new TFile( outFileTreePath_, "RECREATE");	
 	if (!outFileTree_->IsOpen()) std::cout << "	ERROR: cannot open Histo out-file " << outFileTreePath_ << std::endl;
 	else std::cout << " ... [OUTPUT]  " << outFileTreePath_ << std::endl;
@@ -174,11 +196,24 @@ void HLTapply::Loop(){
     h_K0s_M_prefit.Write();
     h_X3872_M_prefit.Write();
     h_B0_M_prefit.Write();
+    
     h_MuMu_M_postfit.Write();
     h_PiPi_M_postfit.Write();
     h_K0s_M_postfit.Write();
     h_X3872_M_postfit.Write();
     h_B0_M_postfit.Write();
+    
+    hnB0->Write();
+    hnK0s->Write();
+    hnMuon->Write();
+    hnpipi->Write();
+    hnJPsiToMuMu->Write();
+    hnSV->Write();
+
+    if(is_trigger_check){
+        h_trigger_fired.Write();
+        h_trigger_fired_emulated.Write();
+    }
 
 	outFileTree_->Close();
 
@@ -219,6 +254,7 @@ void HLTapply::OutTree_setup(){
 
 }//OutTree_setup()
 
+// HLT emulation for muons
 int HLTapply::TriggerSelection_Muons(const int Bidx){
    // TRIGGER SETTINGS 
     const float Min_Mu_pT_1 = 3., Min_Mu_pT_2 = 4., Max_Mu_eta = 2.5, Max_Mu_dr = 2.;

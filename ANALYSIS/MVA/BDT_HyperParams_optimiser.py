@@ -14,19 +14,26 @@ rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
 rc('text', usetex=True)
 from datasets import tag, pre_process_data, target_dataset, get_models_dir 
 import os
+import logging
+mpl_logger = logging.getLogger("matplotlib")
+mpl_logger.setLevel(logging.WARNING)
 
 #######
 # -> optimisation of the BDT hyperparameters by random/grid search
 #    random-search usage : python BDT_HyperParams_optimiser.py --dataset UL_2017 
 #    grid-search usage : python BDT_HyperParams_optimiser.py --dataset UL_2017 --grid_search
 #
+#    NOEMI: python BDT_HyperParams_optimiser.py --dataset 2022 --era D
+#    NOEMI: python BDT_HyperParams_optimiser.py --dataset 2022 --era E
+#    NOEMI: python BDT_HyperParams_optimiser.py --dataset 2022 --era F
+#    NOEMI: python BDT_HyperParams_optimiser.py --dataset 2022 --era G
 #######
 
 parser = ArgumentParser()
 #parser.add_argument(
 #    '--what'
 #)
-
+""
 parser.add_argument(
    '--jobtag', default='', type=str
 )
@@ -36,12 +43,21 @@ parser.add_argument(
 )
 
 parser.add_argument(
+   '--era' 
+)
+
+parser.add_argument(
    '--selection' 
 )
 
 parser.add_argument(
    '--grid_search', action='store_true', default = False
 )
+
+parser.add_argument(
+   '--from_file', action='store_true', default = False
+)
+
 
 #parser.add_argument(
 #   '--test', action='store_true'
@@ -63,28 +79,39 @@ args = parser.parse_args()
 if args.dataset:
    dataset = args.dataset
 
+# + Load and check era
+if args.era:
+    # era must be a single, uppercase letter
+    if len(args.era) == 1 and args.era.isupper():
+        era = args.era
+    else:
+        raise ValueError("ERROR: era must be a single, uppercase letter")
+else:
+    print("ERROR: no era specified")
+    exit()
+
 # + Set job tag
 if args.grid_search:
     mode = 'grid' 
 else :
     mode = 'random'
 
-mods = '%s/BDT_optimisation_%s_%s' % (get_models_dir(), mode, dataset)
+mods = '%s/BDT_optimisation_%s_%s%s' % (get_models_dir(), mode, dataset, era)
 if not os.path.isdir(mods):
    os.makedirs(mods)
    print( " + created directory " + mods)
 
-plots = '/eos/user/c/cbasile/www/B0toX3872K0s/MVA/BDToptimisation/'
+plots = './plots/'
 if not os.path.isdir(plots):
    os.makedirs(plots)
-   print(' + created plot directory ', plots) 
+   print(' + created plot directory ', plots)
 
 additional = ['event','M_X3872', 'M_B0']
 features   = ['pTM_B0', 'LxySignBSz_B0', 'SVprob_B0', 'CosAlpha3DBSz_B0', 'LxySignSV_K0s', 'SVprob_PiPi', 'pT_PiPi', 'pT_Pi1', 'DR_B0Pi1', 'D0_Pi1'] 
 
 fields = additional + features
 
-data = pre_process_data(dataset, fields) 
+data = pre_process_data(dataset, fields, era = era)
 orig = data.copy() 
 print(" orig.shape",orig.shape)
 
@@ -97,7 +124,7 @@ h = ax.hist2d(background.M_B0.values, background.M_X3872.values, bins = (70,50),
 fig.colorbar(h[3], ax=ax)
 ax.set_xlabel("M(B0)(GeV)")
 ax.set_ylabel("M(JpsiPiPi) (GeV)")
-fig_name = 'MB0vsMJpsiPiPi_%s_%s' %(mode, dataset)
+fig_name = 'MB0vsMJpsiPiPi_%s_%s%s' %(mode, dataset, era)
 plt.savefig('%s/%s.png'%(plots, fig_name))
 plt.savefig('%s/%s.pdf'%(plots, fig_name))
 #exit()
@@ -108,7 +135,7 @@ if args.selection:
 
 
 from sklearn.model_selection import train_test_split
-train_test, validation = train_test_split(data, test_size=0.2) 
+train_test, validation = train_test_split(data, test_size=0.2)
 train, test = train_test_split(train_test, test_size = 0.4)
 print (' train/test-set ',train_test.shape)
 print (' train-set ',train.shape)
@@ -130,14 +157,17 @@ if not (args.grid_search):
         'n_estimators' : range(50,500,50),
     }
 else :
-    hyperparameter_space = {
-        'max_depth': [3,4], 
-        'learning_rate': [0.1, 0.125, 0.175], 
-        'n_estimators' : range(100,300,50),
-    }
+    if (args.from_file):
+        hyperparameter_space = json.load(open('MVA/models/BDT_optimisation_grid_2022%s/BDT_grid_to_search_2022%s.json' % (era, era)))
+    else :
+        hyperparameter_space = {
+            'max_depth': [3,4], 
+            'learning_rate': [0.1, 0.125, 0.175], 
+            'n_estimators' : range(100,300,50),
+        }
     
 print(" ### OPTIMIZATION ### ")
-print hyperparameter_space
+print(hyperparameter_space)
 seed = 43
 Niter = 50
 
@@ -163,7 +193,7 @@ optimizer.fit(train_test[features].values, train_test.is_signal.values.astype(in
 
 print("... hyper parameters search is over")
 print(" = best model is ", optimizer.best_params_)
-outfile_name = '%s/BestBDT_%s_%s.json'%(mods, mode, dataset)
+outfile_name = '%s/BestBDT_%s_%s%s.json'%(mods, mode, dataset, era)
 with open(outfile_name, 'w') as outfile:
     json.dump(optimizer.best_params_, outfile)
 print(" = validation AUC score of the best model is %.3f"%optimizer.best_estimator_.score(validation[features].values, validation.is_signal.values.astype(int)))
@@ -179,7 +209,15 @@ plt.xlabel('Iteration')
 plt.ylabel('AUC')
 plt.grid(True)
 plt.legend()
-fig_name = 'AUCscore_%s_%s_%s' %(mode, dataset,lab)
+fig_name = 'AUCscore_%s_%s%s_%s' %(mode, dataset, era, lab)
 plt.savefig('%s/%s.png'%(plots, fig_name))
 plt.savefig('%s/%s.pdf'%(plots, fig_name))
 
+# -------------------------------------------------------------
+# ... hyper parameters search is over
+# (' = best model is ', {'n_estimators': 100, 'learning_rate': 0.07500000000000001, 'max_depth': 3})
+#  = validation AUC score of the best model is 0.929
+
+# ... hyper parameters search is over
+# (' = best model is ', {'n_estimators': 350, 'learning_rate': 0.07500000000000001, 'max_depth': 3})
+#  = validation AUC score of the best model is 0.917

@@ -15,6 +15,7 @@
 
 using namespace std;
 
+// For Run 3 analysis: run on CMSSW 12.6.0
 
 int main(int argc, char* argv[]) {
 
@@ -44,34 +45,35 @@ int main(int argc, char* argv[]) {
 	TString ChainPath("");
 	std::cout << " [INPUT] : " << inputFileName << std::endl;
 	ifstream *inputFile = new ifstream(inputFileName);
-    int Nfile = 0;
-
-    while( !(inputFile->eof()) ){
-        inputFile->getline(Buffer,500);
+	int Nfile = 0;
+    
+    while(!(inputFile->eof())){
+        inputFile->getline(Buffer, 500);
         if (!strstr(Buffer,"#") && !(strspn(Buffer," ") == strlen(Buffer)))
         {
             sscanf(Buffer,"%s",MyRootFile);
             std::cout << MyRootFile << std::endl;
             for(int i = 0; i < Nfiles; i++){
                 ChainPath = TString(MyRootFile); 
-                if(ChainPath.EndsWith("_")){
+                if (ChainPath.EndsWith("_")) {
                     if(i==0) continue;
                     ChainPath.Append(Form("%d.root", i));
-                }else ChainPath.Append(Form("%.3d.root", i));
-                
+                } else if (!ChainPath.EndsWith(".root")){
+					ChainPath.Append(Form("%.3d.root", i));
+				}                
                 int status = theChain->Add(TString(ChainPath));
                 Nfile++;
-                //std::cout << " + chaining " << ChainPath << std::endl; 
+                // std::cout << " + chaining " << ChainPath << std::endl; 
             }
         }
     }
 
-	cout<<" Number of chained files : " << Nfile << std::endl; 
+	cout << " Number of chained files : " << Nfile << std::endl; 
 
 	inputFile->close();
 	delete inputFile;
 
-	//cout<<" Number of events: " << theChain->GetEntries()<<std::endl; 
+	// cout << " Number of events: " << theChain->GetEntries() << std::endl; 
     HLTapply HLTapp(theChain ,outputDir, TString(dataset));
 	HLTapp.Loop();
 
