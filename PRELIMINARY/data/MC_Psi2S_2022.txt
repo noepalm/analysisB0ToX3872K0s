@@ -1,0 +1,1 @@
+root://xrootd-cms.infn.it///store/user/crovelli/Run32022__BuToPsi2SKs_Psi2SToJPsiPiPi_JPsiToMuMu_RhoToPiPi_TuneCP5_13p6TeV_pythia8-evtgen/BuToPsi2SKs_Psi2SToJPsiPiPi_JPsiToMuMu_RhoToPiPi.root
