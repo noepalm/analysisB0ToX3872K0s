@@ -212,12 +212,3 @@ plt.legend()
 fig_name = 'AUCscore_%s_%s%s_%s' %(mode, dataset, era, lab)
 plt.savefig('%s/%s.png'%(plots, fig_name))
 plt.savefig('%s/%s.pdf'%(plots, fig_name))
-
-# -------------------------------------------------------------
-# ... hyper parameters search is over
-# (' = best model is ', {'n_estimators': 100, 'learning_rate': 0.07500000000000001, 'max_depth': 3})
-#  = validation AUC score of the best model is 0.929
-
-# ... hyper parameters search is over
-# (' = best model is ', {'n_estimators': 350, 'learning_rate': 0.07500000000000001, 'max_depth': 3})
-#  = validation AUC score of the best model is 0.917

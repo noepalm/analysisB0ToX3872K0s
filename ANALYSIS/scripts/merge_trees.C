@@ -10,11 +10,14 @@ void merge_trees(TString era){
 
     // check if era argument is a single, uppercase letter
     // if not, print error and exit
-    if (era.Length() != 1 || !era.IsAlpha()) {
+    if ((era.Length() != 1 && era != "all") || !era.IsAlpha()) {
         cout << "ERROR: era argument must be a single, uppercase letter" << endl;
         return;
     }
 
+    // Check if user wants to merge all eras
+    Bool_t merge_all_eras = era == "all";
+    if(merge_all_eras) era = "[A-Z]"; // if merging all eras, make era a regexp matching any letter
 
     // Create TChain
     TChain *chain = new TChain("HLTemulation");
@@ -49,6 +52,7 @@ void merge_trees(TString era){
     }
 
     // If files were found, merge trees and save to file
+    if(merge_all_eras) era = ""; 
     chain->Merge(folder + "Run3_2022" + era + "_blind.root");
     cout << "Saving merged tree as " << + "Run3_2022" + era + "_blind.root" << " to " << folder << endl;
 

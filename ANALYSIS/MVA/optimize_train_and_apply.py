@@ -87,12 +87,19 @@ for era in ['D', 'E', 'F', 'G']:
     print("### TRAINING AND APPLYING BDT ON ERA %s ###" % era)
 
     # Train BDT
+    # # check if model was already trained
+    # if os.path.exists('/eos/home-n/npalmeri/B0toX3872K0s/MVAresults/2022%s_BDTtraining_CV3_X3872.root' % era):
+    #     print("   BDT already trained. Moving to application...")
+    # else:
+    #     print("   TRAINING BDT")
+    #     os.system("python BDT_CVtraining.py --dataset 2022 --era %s --what %s --CV 3 --lrate %f --ntrees %d --depth %d" % (era, era, params['learning_rate'], params['n_estimators'], params['max_depth']))
+
     # check if model was already trained
-    if os.path.exists('/eos/home-n/npalmeri/B0toX3872K0s/MVAresults/2022%s_BDTtraining_CV3_X3872.root' % era):
+    if os.path.exists('/eos/home-n/npalmeri/B0toX3872K0s/MVAresults/2022_BDTtraining_CV3_X3872.root'):
         print("   BDT already trained. Moving to application...")
     else:
         print("   TRAINING BDT")
-        os.system("python BDT_CVtraining.py --dataset 2022 --era %s --what %s --CV 3 --lrate %f --ntrees %d --depth %d" % (era, era, params['learning_rate'], params['n_estimators'], params['max_depth']))
+        os.system("python BDT_CVtraining.py --dataset 2022 --era all --what %s --CV 3 --lrate %f --ntrees %d --depth %d" % ("all", params['learning_rate'], params['n_estimators'], params['max_depth']))
 
     # Apply BDT
     ## X3872

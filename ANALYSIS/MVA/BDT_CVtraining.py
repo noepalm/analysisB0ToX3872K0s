@@ -12,17 +12,18 @@ import logging
 mpl_logger = logging.getLogger("matplotlib")
 mpl_logger.setLevel(logging.WARNING)
 
+# matplotlib.rcParams['text.usetex'] = True
 
 #####
 # --> CV training di un modello
 #     usage : python MVA/BDT_CVtraining.py --dataset UL_2017 --what mytag --CV 3
 #
-#             python BDT_CVtraining.py --dataset 2022 --CV 3 --what D --lrate 0.075 --depth 3 --ntrees 350
+#             python BDT_CVtraining.py --dataset 2022 --era D --CV 3 --what D --lrate 0.075 --depth 3 --ntrees 350
 #
 # --> CV application del modello trainato
 #     usage : python MVA/BDT_CVtraining.py --dataset UL_2017 --channel X3872 --what anothertag --CV 3 --load_model
 #
-#             python BDT_CVtraining.py --dataset 2022 --CV 3 --what D --channel X3872 --load_model
+#             python BDT_CVtraining.py --dataset 2022 --era D --CV 3 --what D --channel X3872 --load_model
 ####
 
 parser = ArgumentParser()
@@ -129,7 +130,7 @@ if args.dataset:
 
 if args.era:
     # era must be a single, uppercase letter
-    if len(args.era) == 1 and args.era.isupper():
+    if (len(args.era) == 1 and args.era.isupper()) or args.era == "all":
         era = args.era
     else:
         raise ValueError("ERROR: era must be a single, uppercase letter")
@@ -137,7 +138,8 @@ else:
     print("ERROR: no era specified")
     exit()
 
-mods = '%s/BDTxgb_%s%s' % (get_models_dir(), dataset, era)
+# mods = '%s/BDTxgb_%s%s' % (get_models_dir(), dataset, era)
+mods = '%s/BDTxgb_%s' % (get_models_dir(), dataset)
 if not os.path.isdir(mods):
    os.makedirs(mods)
    print' + created directory ', mods
@@ -166,7 +168,11 @@ print(fields)
 training_cuts = not args.load_model
 if training_cuts: print(" [TRAINING CUTS on data]")
 else: print(" [NO CUTS on data]")
-data = pre_process_data(dataset, fields, training_cuts, args.channel, era) 
+data = pre_process_data(dataset, fields, training_cuts, args.channel, era)
+
+# once data has been processed, change era to "" for output file names
+if era == "all": 
+      era = ""
 print(type(data))
    
 orig = data.copy()                    
@@ -292,7 +298,8 @@ for i in range(Ncv):
       print('XGBoost model    AUC   score (test-set): {0:0.4f}'. format(aucTest[i]))
 
    else:
-      full_model = '%s/%s%s_BDTtraining_CV%d-%d.pkl' % (mods, dataset, era, Ncv, i)
+      # full_model = '%s/%s%s_BDTtraining_CV%d-%d.pkl' % (mods, dataset, era, Ncv, i)
+      full_model = '%s/%s_BDTtraining_CV%d-%d.pkl' % (mods, dataset, Ncv, i)
       clf = joblib.load(full_model)
       print 'Loaded pre-existing model %s' %(full_model)
 
@@ -444,10 +451,78 @@ if not args.load_model:
                      cmin=1, 
                      label = 'SGN-MC (validation set)')
    ax.set_xlabel("BDT output")
-   ax.set_ylabel("M(#pi^+ #pi^-)")
+   ax.set_ylabel(r"M(\pi^+\pi^-) [GeV]")
    ax.legend(['BKG-data (validation set)', 'SGN-MC (validation set)'])
    plt.tight_layout()
    try : plt.savefig('%s/%s%s_%s_%s_CV%d_BDTvsMpipi.png' % (plots, dataset, era, args.jobtag, args.what, Ncv))
    except : pass
    try : plt.savefig('%s/%s%s_%s_%s_CV%d_BDTvsMpipi.pdf' % (plots, dataset, era, args.jobtag, args.what, Ncv))
    except : pass
+else:
+   plt.figure(figsize = [8,8])
+   ax = plt.subplot(111)
+   ax.set_yscale('log')
+   for idx, split in enumerate(dataCV):
+      ax.hist(split.loc[:, 'CosAlpha3DBSz_B0'].values,
+               range = [-1, 1],
+               bins = 50,
+               alpha = 0.5,
+               label = "Split {idx}".format(idx = idx))
+      ax.legend()
+
+   # save figure
+   plt.savefig(plots + 'CosAlpha3DBSz_B0.png')
+
+   plt.figure(figsize = [8,8])
+   ax = plt.subplot(111)
+   ax.set_yscale('log')
+   for idx, split in enumerate(dataCV):
+      ax.hist(split.loc[:, 'LxySignBSz_B0'].values,
+               bins = 100,
+               range = [0, 200],
+               alpha = 0.5,
+               label = "Split {idx}".format(idx = idx))
+      ax.legend()
+
+   # save figure
+   plt.savefig(plots + 'LxySignBSz_B0.png')
+
+   # make 2x1 figure plotting cosAlpha3D for BDTout < -6 and > -6
+   fig, axs = plt.subplots(2, 3, figsize = [4*3, 4*2])
+
+   for i in range(3):
+      axs[0,i].hist(data.loc[(data['BDTout'] < -6) & (data.index % 3 == i), 'CosAlpha3DBSz_B0'].values,
+                     range = [-1, 1],
+                     bins = 50,
+                     alpha = 0.5,
+                     density = True,
+                     label = "BDTout < -6")
+      axs[0,i].hist(data.loc[(data['BDTout'] > -6) & (data.index % 3 == i), 'CosAlpha3DBSz_B0'].values,
+                     range = [-1, 1],
+                     bins = 50,
+                     alpha = 0.5,
+                     density = True,
+                     label = "BDTout > -6")
+      axs[0,i].set_title("Split %d" % i)
+      axs[0,i].set_xlabel(r"\cos{\alpha_{B^0}}")
+
+      axs[0,i].legend()
+      axs[0,i].set_yscale('log')
+
+      # same thing on subplot 2 for LxySignBSz_B0
+      axs[1,i].hist(data.loc[(data['BDTout'] < -6) & (data.index % 3 == i), 'LxySignBSz_B0'].values,
+                     range = [0, 20],
+                     bins = 100,
+                     alpha = 0.5,
+                     density = True,
+                     label = "BDTout < -6")
+      axs[1,i].hist(data.loc[(data['BDTout'] > -6) & (data.index % 3 == i), 'LxySignBSz_B0'].values,
+                     range = [0, 20],
+                     bins = 100,
+                     alpha = 0.5,
+                     density = True,
+                     label = "BDTout > -6")
+
+      axs[1,i].legend()
+
+   fig.savefig(plots + 'CosAlpha3DBSz_B0_BDTout.png')

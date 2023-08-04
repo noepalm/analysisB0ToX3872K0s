@@ -223,7 +223,7 @@ void draw_preliminary_chiara(){
     Double_t Red_bdt[6] = {0, 1., 1., 61./255., 0.7, 0.5};
     Double_t Green_bdt[6] = {162./255., 0.455, 240./255., 1., 0.6, 0.6};
     Double_t Blue_bdt[6] = {1., 0., 33./255., 109./255., 0.6, 0.6};  
-    TColor::CreateGradientColorTable(Number_bdt, Stops_bdt, Red_bdt, Green_bdt, Blue_bdt, 255, 0.5);
+    TColor::CreateGradientColorTable(Number_bdt, Stops_bdt, Red_bdt, Green_bdt, Blue_bdt, 255, 0.3);
 
 
     TCanvas* c5 = new TCanvas("c5", "", 1000, 400);
@@ -258,7 +258,7 @@ void draw_preliminary_chiara(){
 
             legs[i]->AddEntry((era + "_" + features[i] + "_hist").c_str(), ("Era " + era).c_str(), "f");
 
-            if(i == 3) gPad->SetLogy();
+            if(i == 1 || i == 3) gPad->SetLogy(); //set logy for LxySignBSz_B0 and CosAlpha3DBSz_B0
         }
     }
 
