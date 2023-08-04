@@ -10,7 +10,7 @@ ROOT.ROOT.EnableImplicitMT(5)
 
 #####
 # --> CV training di un modello
-#     usage : python MVA/BDT_CVtraining.py --dataset UL_2017 --what mytag --CV 3
+#     usage : python MVA/BDT_CVtraining.py --dataset UL_2017 --what mytag --CV 3 --depth 3 --lrate 0.75 --ntrees 100
 #
 # --> CV application del modello trainato
 #     usage : python MVA/BDT_CVtraining.py --dataset UL_2017 --channel X3872 --what anothertag --CV 3 --load_model
