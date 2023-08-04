@@ -31,6 +31,7 @@
 #include "RooChebychev.h"
 #include "RooFitResult.h"
 #include "RooPlot.h"
+#include "RooHist.h"
 #include "RooCurve.h"
 #include "RooWorkspace.h"
 using namespace RooFit;
@@ -66,7 +67,7 @@ class MVAoptimizer{
 public:
 
     // constructor & destructor
-    MVAoptimizer(const TString& input, const float& BDTcut,const float& Mcut,const int& year, const TString & channel = "X_3872");
+    MVAoptimizer(const TString& input, const float& BDTcut,const float& Mcut,const TString& year, const TString & channel = "X_3872");
     ~MVAoptimizer();
 
     //getters
@@ -77,15 +78,18 @@ public:
     void set_SBregions();
     void set_Blind(const bool& blindness){is_blind_ = blindness;}
     void set_LumiNorm(const float &factor){LumiNorm_ = factor;}
-    void set_BDT_cut(float cut){BDToutCut_ = cut;}
-    void set_Mpipi_cut(float cut){MpipiCut_ = cut;}
+    void set_BDT_cut(float cut){BDToutCut_ = cut; set_selection();}
+    void set_Mpipi_cut(float cut){MpipiCut_ = cut; set_selection();}
     void set_selection();
 
     // optimization tools
     double Nbkg_extraction();
     double Nsgn_extraction();
     double EFFsgn_extraction();
-    double PunziSign(double * PSerr);
+    double PunziSign(double * PSerr, double * Nbkg = NULL, double * Esgn = NULL);
+
+    // fitter
+    double TotalFit_Psi2S();
 
     int  makeSGNvsBKGplot();
     void Plot2D_BDToutMpipi();
@@ -94,7 +98,7 @@ public:
 
 private:
     // dataset
-    int year_;
+    TString year_;
     float LumiNorm_;
     TString channel_;
     bool is_blind_;
