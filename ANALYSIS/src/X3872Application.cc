@@ -23,9 +23,10 @@ int main(int argc, char* argv[]) {
 	char outputDir[1000];
 	char dataset[1000];
     int Nfiles = 1000;
+	int ifile = 1;
 	if ( argc < 2 ){
 		std::cout << " missing argument: insert the file and the dataset you want to use :-)" << std::endl; 
-		std::cout << " ./X3872Application inputFile [outpudir] [dataset-tag] [Nfiles]" << std::endl;
+		std::cout << " ./X3872Application inputFile [outpudir] [dataset-tag] [Nfiles] [ifile]" << std::endl;
 		return 1;
 	}
 	
@@ -53,7 +54,7 @@ int main(int argc, char* argv[]) {
             sscanf(Buffer,"%s",MyRootFile);
             std::cout << MyRootFile << std::endl;
             for(int i = 0; i < Nfiles; i++){
-                ChainPath = TString(MyRootFile); 
+                ChainPath = TString(MyRootFile);
                 if(ChainPath.EndsWith("_")){
                     if(i==0) continue;
                     ChainPath.Append(Form("%d.root", i));
@@ -61,7 +62,7 @@ int main(int argc, char* argv[]) {
                 
                 int status = theChain->Add(TString(ChainPath));
                 Nfile++;
-                //std::cout << " + chaining " << ChainPath << std::endl; 
+                std::cout << " + chaining " << ChainPath << std::endl; 
             }
         }
     }
