@@ -24,9 +24,10 @@ int main(int argc, char* argv[]) {
 	char outputDir[1000];
 	char dataset[1000];
     int Nfiles = 1000;
+	int ifile = 1;
 	if ( argc < 2 ){
 		std::cout << " missing argument: insert the file and the dataset you want to use :-)" << std::endl; 
-		std::cout << " ./X3872Application inputFile [outpudir] [dataset-tag] [Nfiles]" << std::endl;
+		std::cout << " ./X3872Application inputFile [outpudir] [dataset-tag] [Nfiles] [ifile]" << std::endl;
 		return 1;
 	}
 	

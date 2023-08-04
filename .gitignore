@@ -2,7 +2,7 @@
 *.d
 
 # TextFiles
-*.txt
+#*.txt
 *.csv
 
 # Job reports & outputs

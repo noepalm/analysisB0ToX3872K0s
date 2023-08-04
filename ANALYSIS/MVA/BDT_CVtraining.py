@@ -16,7 +16,7 @@ mpl_logger.setLevel(logging.WARNING)
 
 #####
 # --> CV training di un modello
-#     usage : python MVA/BDT_CVtraining.py --dataset UL_2017 --what mytag --CV 3
+#     usage : python MVA/BDT_CVtraining.py --dataset UL_2017 --what mytag --CV 3 --depth 3 --lrate 0.75 --ntrees 100
 #
 #             python BDT_CVtraining.py --dataset 2022 --era D --CV 3 --what D --lrate 0.075 --depth 3 --ntrees 350
 #
