@@ -42,15 +42,17 @@ void test_different_training(){
 
     //draw bdtout for signal vs background for each era
     for(int i = 0; i < 4; i++){
+
         c->cd(i+1);
         trees[i]->Draw(Form("BDTout >> bdtout_sgn_%d(100, -12, 6)", i), "is_signal == 1", "PLC PFC HIST");
 		TH1F* h_sgn = (TH1F*)gPad->GetPrimitive(Form("bdtout_sgn_%d", i));
 
         h_sgn->Scale(1./h_sgn->Integral());
         h_sgn->SetTitle(Form("BDT output for era %s", eras[i].c_str()));
+        h_sgn->SetMaximum(0.04);
         h_sgn->GetXaxis()->SetTitle("BDT output");
 
-        trees[i]->Draw(Form("BDTout >> bdtout_bkg_%d(100, -12, 6)", i), "is_signal == 0", "PLC PFC HIST SAME");
+        trees[i]->Draw(Form("BDTout >> bdtout_bkg_%d(100, -12, 6)", i), "is_signal == 0 && !(M_B0 > 5.20 && M_B0 < 5.34 && M_X3872 > 3.85 && M_X3872 < 3.89)", "PLC PFC HIST SAME"); //data is already blinded, but just in case
         TH1F* h_bkg = (TH1F*)gPad->GetPrimitive(Form("bdtout_bkg_%d", i));
         h_bkg->Scale(1./h_bkg->Integral());
 
@@ -61,15 +63,19 @@ void test_different_training(){
         leg->Draw();
 
 		c2->cd(i+1);
-		trees[i]->Draw(Form("BDTout:CosAlpha3DBSz_B0 >> 2dhist_%d", i), "", "colz");
+		trees[i]->Draw(Form("CosAlpha3DBSz_B0:BDTout >> 2dhist_%d(100, -12, 6, 100, -1.1, 1.1)", i), "is_signal == 0 && !(M_B0 > 5.18903 && M_B0 < 5.37143 && M_X3872 > 3.82562 && M_X3872 < 3.91839)", "colz"); //data is already blinded, but just in case
 		TH2F* hist2d = (TH2F*)gPad->GetPrimitive(Form("2dhist_%d", i));
         hist2d->SetTitle(Form("BDT output VS cosAlpha for era %s", eras[i].c_str()));
-
+        hist2d->GetXaxis()->SetTitle("BDTout");
+        hist2d->GetYaxis()->SetTitle("cosAlpha");
     }
 
     
-    c->SaveAs(outpath + "test_different_training.png");
-    c2->SaveAs(outpath + "test_different_training_cosAlpha.png");
+    c->SaveAs(outpath + "BDTout_per_era.png");
+    
+    // change n. of colors
+    TColor::CreateGradientColorTable(3, Stops, Red, Green, Blue, 255, 0.3);
+    c2->SaveAs(outpath + "BDTout_vs_cosAlpha_per_era.png");
 
 	
 

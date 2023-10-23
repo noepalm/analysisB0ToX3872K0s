@@ -34,8 +34,11 @@ input_files = {
    '2022E_data' : '/eos/home-n/npalmeri/B0toX3872K0s/data/Run3_2022E_blind.root',   
    '2022F_data' : '/eos/home-n/npalmeri/B0toX3872K0s/data/Run3_2022F_blind.root',
    '2022G_data' : '/eos/home-n/npalmeri/B0toX3872K0s/data/Run3_2022G_blind.root',
-   '2022_MC_X' : '../../PRELIMINARY/outRoot/RecoDecay_X3872_Run3.root',
-   '2022_MC_Psi' : '../../PRELIMINARY/outRoot/RecoDecay_Psi2S_Run3.root'
+   '2022_MC_matched_X' : '../../PRELIMINARY/outRoot/RecoDecay_X3872_Run3.root',
+   '2022_MC_matched_Psi' : '../../PRELIMINARY/outRoot/RecoDecay_Psi2S_Run3.root',
+   '2022_MC_X' : '../../ANALYSIS/outRoot/RecoDecay_X3872_noMCmatch_Run3.root',
+   '2022_MC_Psi' : '../../ANALYSIS/outRoot/RecoDecay_Psi2S_noMCmatch_Run3.root'
+
 }
 
 #import concurrent.futures
@@ -146,8 +149,10 @@ def pre_process_data(dataset, features, training = True, channel = 'X3872', era 
       bkg_data = bkg_data.query(selection_JpsiPiPi)
 
    ## get the SIGNAL data 
-   if (channel == "X3872"): sgn_dataset = dataset + '_MC_X'
-   if (channel == "Psi2S"): sgn_dataset = dataset + '_MC_Psi'
+   sgn_dataset = dataset + '_MC'
+   if(not keep_nonmatch): sgn_dataset += '_matched'    # keep MCmatched-only in training (keep_nonmatch = True in application)
+   if (channel == "X3872"): sgn_dataset += '_X'
+   if (channel == "Psi2S"): sgn_dataset += '_Psi'
    data_dict = get_data_sync(sgn_dataset, features)
    sgn_data = pd.DataFrame(data_dict)
    sgn_data['is_signal'] = np.ones(sgn_data.event.shape).astype(int)

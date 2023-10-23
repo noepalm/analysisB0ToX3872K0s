@@ -81,11 +81,11 @@ if args.dataset:
 
 # + Load and check era
 if args.era:
-    # era must be a single, uppercase letter
-    if len(args.era) == 1 and args.era.isupper():
+    # era must be a single, uppercase letter OR "all"
+    if (len(args.era) == 1 and args.era.isupper()) or args.era == "all":
         era = args.era
     else:
-        raise ValueError("ERROR: era must be a single, uppercase letter")
+        raise ValueError("ERROR: era must be a single, uppercase letter OR 'all'")
 else:
     print("ERROR: no era specified")
     exit()
@@ -96,7 +96,8 @@ if args.grid_search:
 else :
     mode = 'random'
 
-mods = '%s/BDT_optimisation_%s_%s%s' % (get_models_dir(), mode, dataset, era)
+# mods = '%s/BDT_optimisation_%s_%s%s' % (get_models_dir(), mode, dataset, era)
+mods = '%s/BDT_optimisation_%s_%s' % (get_models_dir(), mode, dataset)
 if not os.path.isdir(mods):
    os.makedirs(mods)
    print( " + created directory " + mods)
@@ -111,9 +112,14 @@ features   = ['pTM_B0', 'LxySignBSz_B0', 'SVprob_B0', 'CosAlpha3DBSz_B0', 'LxySi
 
 fields = additional + features
 
-data = pre_process_data(dataset, fields, era = era)
+data = pre_process_data(dataset, fields, era = era, keep_nonmatch = False) # optimize on MC-matched signal only
 orig = data.copy() 
 print(" orig.shape",orig.shape)
+
+# once data has been processed, change era to "" for output file names
+if era == "all": 
+      era = ""
+print(type(data))
 
 ## CONTROL PLOTS ##
 signal     = data.query("is_signal == 1")
@@ -169,7 +175,7 @@ else :
 print(" ### OPTIMIZATION ### ")
 print(hyperparameter_space)
 seed = 43
-Niter = 50
+Niter = 5 #50
 
 classifier = xgb.XGBClassifier(objective='binary:logitraw');
 if not (args.grid_search):
@@ -178,7 +184,8 @@ if not (args.grid_search):
                             scoring='roc_auc',
                             n_iter = Niter, 
                             cv = 3, 
-                            verbose = 3)
+                            verbose = 3,
+                            n_jobs = -1) #use all available cores
     print(" ... starting random search ")
 
 if (args.grid_search):
@@ -186,7 +193,8 @@ if (args.grid_search):
                     param_grid = hyperparameter_space,
                     scoring = 'roc_auc',
                     cv = 3,
-                    verbose = 3)
+                    verbose = 3,
+                    n_jobs = -1) #use all available cores
     print(" ... starting grid search ")
 
 optimizer.fit(train_test[features].values, train_test.is_signal.values.astype(int)) 

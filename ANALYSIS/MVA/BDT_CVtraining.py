@@ -129,11 +129,11 @@ if args.dataset:
    dataset = args.dataset
 
 if args.era:
-    # era must be a single, uppercase letter
+    # era must be a single, uppercase letter OR "all"
     if (len(args.era) == 1 and args.era.isupper()) or args.era == "all":
         era = args.era
     else:
-        raise ValueError("ERROR: era must be a single, uppercase letter")
+        raise ValueError("ERROR: era must be a single, uppercase letter or 'all'")
 else:
     print("ERROR: no era specified")
     exit()
@@ -168,7 +168,7 @@ print(fields)
 training_cuts = not args.load_model
 if training_cuts: print(" [TRAINING CUTS on data]")
 else: print(" [NO CUTS on data]")
-data = pre_process_data(dataset, fields, training_cuts, args.channel, era)
+data = pre_process_data(dataset, fields, training_cuts, args.channel, era, keep_nonmatch = args.load_model)
 
 # once data has been processed, change era to "" for output file names
 if era == "all": 

@@ -55,7 +55,7 @@ void HLTapply::Loop(){
 
     // ----- VARIABLES ----- //
     // toCount variables
-    int  N_FiredEvents = 0, N_PassedEvents = 0, n_PassedB0 = 0, N_PassedB0 = 0, N_B0matching = 0;
+    int  N_Candidates = 0, N_FiredEvents = 0, N_PassedEvents = 0, n_PassedB0 = 0, N_PassedB0 = 0, N_B0matching = 0;
     bool toCountJPsi = true, toCountPiPi= true, toCountK0s = true;
     int  prevMu1_idx, prevMu2_idx, prevPi1_idx, prevPi2_idx;
 
@@ -79,7 +79,10 @@ void HLTapply::Loop(){
         if(!HLT_DoubleMu4_3_LowMass && !is_trigger_check) continue; //skip HLT fired requirement if tag == "HLT_emulation_check"
         N_FiredEvents++;
 
+        N_Candidates += nB0;
+
         for (Int_t b = 0; b  < nB0; b++){
+
             
             // blind the B0 mass region if specified
             M_B0 = B0_finalFit_mass[b];
@@ -164,18 +167,23 @@ void HLTapply::Loop(){
     }// loop on events
 
     std::cout << " Total processed events "  << TotalEvents << std::endl;
+    std::cout << " Total processed candidates "  << N_Candidates << std::endl;
     std::cout << " Events which fired the HLT "  << N_FiredEvents << std::endl;
     std::cout << " Events which passed the HLT " << N_PassedEvents << std::endl;
     std::cout << " B0 cand. which passed the HLT " << N_PassedB0 << std::endl;
 
     // Save some check histograms
     gROOT->SetBatch(kTRUE);
+    fChain->Draw("B0_finalFit_mu1_pt >> hMu1Pt(100, 0, 20)");
+    fChain->Draw("B0_finalFit_mu2_pt >> hMu2Pt(100, 0, 14)");
     fChain->Draw("nB0 >> hnB0");
     fChain->Draw("nK0s >> hnK0s");
     fChain->Draw("nMuon >> hnMuon");
     fChain->Draw("npipi >> hnpipi");
     fChain->Draw("nJPsiToMuMu >> hnJPsiToMuMu");
     fChain->Draw("nSV >> hnSV");
+    TH1F* hMu1Pt = (TH1F*)gDirectory->Get("hMu1Pt");
+    TH1F* hMu2Pt = (TH1F*)gDirectory->Get("hMu2Pt");
     TH1I* hnB0 = (TH1I*)gDirectory->Get("hnB0");
     TH1I* hnK0s = (TH1I*)gDirectory->Get("hnK0s");
     TH1I* hnMuon = (TH1I*)gDirectory->Get("hnMuon");
@@ -202,7 +210,10 @@ void HLTapply::Loop(){
     h_K0s_M_postfit.Write();
     h_X3872_M_postfit.Write();
     h_B0_M_postfit.Write();
-    
+
+    hMu1Pt->Write();
+    hMu2Pt->Write();
+
     hnB0->Write();
     hnK0s->Write();
     hnMuon->Write();
@@ -257,7 +268,7 @@ void HLTapply::OutTree_setup(){
 // HLT emulation for muons
 int HLTapply::TriggerSelection_Muons(const int Bidx){
    // TRIGGER SETTINGS 
-    const float Min_Mu_pT_1 = 3., Min_Mu_pT_2 = 4., Max_Mu_eta = 2.5, Max_Mu_dr = 2.;
+    const float Min_Mu_pT_1 = 4., Min_Mu_pT_2 = 3., Max_Mu_eta = 2.5, Max_Mu_dr = 2.;
     const float Min_MuMu_pT = 4.9, Low_MuMu_M = 0.2,  High_MuMu_M = 8.5, Max_MuMu_DCA = 0.5;
     const float Min_MuMu_SVp = 0.005;
 
@@ -276,19 +287,41 @@ int HLTapply::TriggerSelection_Muons(const int Bidx){
     if ( (isFiredMu1 && isFiredMu2) && ( Muon_softId[mu1_idx] && Muon_softId[mu2_idx] )){ 
             // STEP 0
             isOK_mu1_step0 = true;
-            if((RecoP4_Mu1.Pt() < Min_Mu_pT_1) || (fabs(RecoP4_Mu1.Eta()) > Max_Mu_eta)  || ( B0_MuMu_mu1_dr[Bidx]) > Max_Mu_dr ) isOK_mu1_step0 = false;
+            if((RecoP4_Mu1.Pt() < Min_Mu_pT_1) || (fabs(RecoP4_Mu1.Eta()) > Max_Mu_eta)  || ( B0_MuMu_mu1_dr[Bidx]) > Max_Mu_dr ){
+                // std::cout << "FAILED MU1: " << std::endl;
+                // std::cout << "pT = " << RecoP4_Mu1.Pt() << std::endl;
+                // std::cout << "eta = " << RecoP4_Mu1.Eta() << std::endl;
+                // std::cout << "dr = " << B0_MuMu_mu1_dr[Bidx] << std::endl;
+                isOK_mu1_step0 = false;
+            }
             isOK_mu2_step0 = true;
-            if((RecoP4_Mu2.Pt() < Min_Mu_pT_2) || (fabs(RecoP4_Mu2.Eta()) > Max_Mu_eta)  || ( B0_MuMu_mu2_dr[Bidx]) > Max_Mu_dr ) isOK_mu2_step0 = false;
+            if((RecoP4_Mu2.Pt() < Min_Mu_pT_2) || (fabs(RecoP4_Mu2.Eta()) > Max_Mu_eta)  || ( B0_MuMu_mu2_dr[Bidx]) > Max_Mu_dr ){
+                // std::cout << "FAILED MU2: " << std::endl;
+                // std::cout << "pT = " << RecoP4_Mu2.Pt() << std::endl;
+                // std::cout << "eta = " << RecoP4_Mu2.Eta() << std::endl;
+                // std::cout << "dr = " << B0_MuMu_mu2_dr[Bidx] << std::endl;
+                isOK_mu2_step0 = false;
+            }
 
             if (isOK_mu1_step0 && isOK_mu2_step0){ 
 
                 // STEP 1 
                 isOK_mumu_step1 = true;
                 MassCut = ( (RecoP4_Mu1 + RecoP4_Mu2).M() > Low_MuMu_M ) && ( (RecoP4_Mu1 + RecoP4_Mu2).M() < High_MuMu_M  );
-                if ( !MassCut || ((RecoP4_Mu1 + RecoP4_Mu2).Pt() < Min_MuMu_pT ) || ( B0_MuMu_DCA[Bidx] > Max_MuMu_DCA )  )	isOK_mumu_step1 = false;
+                if ( !MassCut || ((RecoP4_Mu1 + RecoP4_Mu2).Pt() < Min_MuMu_pT ) || ( B0_MuMu_DCA[Bidx] > Max_MuMu_DCA )  )	{
+                    // std::cout << "FAILED: " << std::endl;
+                    // std::cout << "M = " << (RecoP4_Mu1 + RecoP4_Mu2).M() << std::endl;
+                    // std::cout << "pT = " << (RecoP4_Mu1 + RecoP4_Mu2).Pt() << std::endl;
+                    // std::cout << "DCA = " << B0_MuMu_DCA[Bidx] << std::endl;
+                    isOK_mumu_step1 = false;
+                } 
                 // STEP 2	
                 isOK_mumu_step2 = true;
-                if(B0_MuMu_sv_prob[Bidx] < Min_MuMu_SVp ) isOK_mumu_step2 = false;
+                if(B0_MuMu_sv_prob[Bidx] < Min_MuMu_SVp ){
+                    // std::cout << "FAILED: " << std::endl;
+                    // std::cout << "SVp = " << B0_MuMu_sv_prob[Bidx] << std::endl;
+                    isOK_mumu_step2 = false;
+                }
             }
     }
 

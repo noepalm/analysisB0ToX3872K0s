@@ -70,6 +70,14 @@ void RecoDecayX::Loop(){
     TH1F h_MuMu_M_MC        = TH1F("MuMu_M_MC", "", Nbins, xlow, xhigh); //MC-matched, post-fit
     TH1F h_MuMu_M_Fk        = TH1F("MuMu_M_Fk", "", Nbins, xlow, xhigh);
     TH1F h_MuMu_M_prefit    = TH1F("MuMu_M_prefit", "", Nbins, xlow, xhigh); //MC-matched, pre-fit
+    TH1F h_Mu1_pT_MC        = TH1F("Mu1_pT_MC", "", 50, 0., 20.);
+    TH1F h_Mu2_pT_MC        = TH1F("Mu2_pT_MC", "", 50, 0., 14.);
+    TH1F h_Mu1_eta_MC       = TH1F("Mu1_eta_MC", "", 30, -2.5, 2.5);
+    TH1F h_Mu2_eta_MC       = TH1F("Mu2_eta_MC", "", 30, -2.5, 2.5);
+    TH1F h_MuMu_pT_MC       = TH1F("MuMu_pT_MC", "", 100, 0, 50); //MC-matched, post-fit
+    TH1F h_MuMu_deltaR_MC   = TH1F("MuMu_deltaR_MC", "", 30, 0, 1.); //MC-matched, post-fit
+
+
 
     // Rho --> PiPi
     Nbins = 50 , xlow = 0., xhigh = 1.;
@@ -78,8 +86,11 @@ void RecoDecayX::Loop(){
     TH1F h_PiPi_M_prefit    = TH1F("PiPi_M_prefit", "", Nbins, xlow, xhigh); //MC-matched, pre-fit
 
     Nbins = 30, xlow = 0., xhigh = .30; 
-    TH1F h_Pi1_pT_MC        = TH1F("Pi1_pT_MC", "", Nbins, xlow, xhigh);
+    // TH1F h_Pi1_pT_MC        = TH1F("Pi1_pT_MC", "", Nbins, xlow, xhigh);
     TH1F h_Pi1_pT_Fk        = TH1F("Pi1_pT_Fk", "", Nbins, xlow, xhigh);
+    TH1F h_Pi1_pT_MC        = TH1F("Pi1_pT_MC", "", 50, 0, 6.);
+    TH1F h_Pi2_pT_MC        = TH1F("Pi2_pT_MC", "", 50, 0, 2.5);
+
     Nbins = 30, xlow = 0., xhigh = 0.60; 
     TH1F h_Pi1_DRwrtB_MC    = TH1F("Pi1_DRwrtB_MC", "", Nbins, xlow, xhigh);
     TH1F h_Pi1_DRwrtB_Fk    = TH1F("Pi1_DRwrtB_Fk", "", Nbins, xlow, xhigh);
@@ -104,7 +115,9 @@ void RecoDecayX::Loop(){
     Nbins = 50 , xlow = .300, xhigh = .600;
     TH1F h_K0s_M_MC        = TH1F("K0s_M_MC", "", Nbins, xlow, xhigh);       //MC-matched, pre-fit [!! others are different]
     TH1F h_K0s_M_Fk        = TH1F("K0s_M_Fk", "", Nbins, xlow, xhigh);
-    TH1F h_K0s_M_prefit   = TH1F("K0s_M_prefit", "", Nbins, xlow, xhigh);  //MC-matched, post-fit
+    TH1F h_K0s_M_prefit    = TH1F("K0s_M_prefit", "", Nbins, xlow, xhigh);  //MC-matched, post-fit
+
+    TH1F h_K0s_pT_MC       = TH1F("K0s_pT", "K0s_pT", 50, 0, 10.);
 
     xlow = 0., xhigh = 100;
     TH1F h_K0s_LxySign_wrtBvtx_MC = TH1F("K0s_LxySign_wrtBvtx_MC", "", Nbins, xlow, xhigh);
@@ -328,114 +341,128 @@ void RecoDecayX::Loop(){
             }
             else h_X3872_M_Fk.Fill(B0_finalFit_X_mass[b]);
 
-        // *** K0short ***
-        if (isMCmatched_K0s){
-            h_K0s_M_MC.Fill(B0_K0s_nmcFitted_mass[b]);
-            h_K0s_M_prefit.Fill(RecoP4_K0s_prefit.M());
-        } else {
-            h_K0s_M_Fk.Fill(B0_K0s_nmcFitted_mass[b]);
-        }
-        
-
-        Dist_GenV_PV = sqrt( (GenPart_vx[realB_idx] - B0_PVx[b])*(GenPart_vx[realB_idx] - B0_PVx[b]) + (GenPart_vy[realB_idx] - B0_PVy[b])*(GenPart_vy[realB_idx] - B0_PVy[b]));
-        Dist_GenV_BS = sqrt( (GenPart_vx[realB_idx] - B0_BSxRaw[b])*(GenPart_vx[realB_idx] - B0_BSxRaw[b]) + (GenPart_vy[realB_idx] - B0_BSyRaw[b])*(GenPart_vy[realB_idx] - B0_BSyRaw[b]));
-        Dist_GenV_BSwithZ = sqrt( (GenPart_vx[realB_idx] - B0_BSxWithZ[b])*(GenPart_vx[realB_idx] - B0_BSxWithZ[b]) + (GenPart_vy[realB_idx] - B0_BSyWithZ[b])*(GenPart_vy[realB_idx] - B0_BSyWithZ[b]));
-
-        // *** B0 --> X(3872) K0s ***
-        if (isMCmatched_B0){
-             
-            // ... masses ...
-            M_MuMu = B0_MuMu_fitted_mass[b];
-            M_PiPi = B0_finalFit_Rho_mass[b];
-            M_X3872= B0_finalFit_X_mass[b];
-            M_K0s  = B0_K0s_nmcFitted_mass[b];
-            h_B0_M_MC.Fill(B0_finalFit_mass[b]);
-            h_B0_M_prefit.Fill((RecoP4_Mu1 + RecoP4_Mu2 + RecoP4_Pi1 + RecoP4_Pi2 + RecoP4_K0s).M());
-            M_B0   = B0_finalFit_mass[b];
-            // ... pT ...
-            //pT_Mu1 = RecoP4_Mu1.Pt(); 
-            //pT_Mu2 = RecoP4_Mu2.Pt(); 
-            //pT_Pi1 = RecoP4_Pi1.Pt(); 
-            //pT_Pi2 = RecoP4_Pi2.Pt(); 
-            //pT_K0s = RecoP4_K0s.Pt(); 
-            // ... MVA variables ...
-            LxySignBSz_B0       = B0_lxySign_BSwithZ[b];
-            SVprob_B0           = B0_svprob[b];
-            CosAlpha3DBSz_B0    = B0_cosAlpha2D_BSwithZ[b];
-            pTM_B0              = RecoP4_B0.Pt()/M_B0;
-            LxySignSV_K0s       = B0_K0_lxySign_wrtBvtx[b];
-            SVprob_PiPi         = B0_PiPi_sv_prob[b];
-            pT_PiPi             = (RecoP4_Pi1 + RecoP4_Pi2).Pt()/RecoP4_B0.Pt();
-            pT_Pi1              = RecoP4_Pi1.Pt()/RecoP4_B0.Pt();
-            DR_B0Pi1            = ROOT::Math::VectorUtil::DeltaR(RecoP4_Pi1, RecoP4_B0);
-            D0_Pi1              = B0_PiPi_pi1_d0sig[b];
-            
-            outTree_->Fill();
-
-            // Rho
-            h_Pi1_pT_MC.Fill(RecoP4_Pi1.Pt());///RecoP4_B0.Pt());
-            h_Pi1_D0_MC.Fill( B0_PiPi_pi1_d0sig[b] );
-            h_Pi1_DRwrtB_MC.Fill(ROOT::Math::VectorUtil::DeltaR(RecoP4_Pi1, RecoP4_B0));
-            h_PiPi_svProb_MC.Fill(B0_PiPi_sv_prob[b]);
-            h_PiPi_pT_MC.Fill( (RecoP4_Pi1 + RecoP4_Pi2).Pt()/RecoP4_B0.Pt() );
-
-            //K0short
-            h_K0s_LxySign_wrtBvtx_MC.Fill(B0_K0_lxySign_wrtBvtx[b]);
-            //B0
-            h_B0_cosAlpha3DwrtPV_MC.Fill(fabs(B0_cosAlpha3D_PV[b]));
-            h_B0_cosAlpha2DwrtBS_MC.Fill(fabs(B0_cosAlpha2D_BS[b]));
-            h_B0_cosAlpha2DwrtBSwithZ_MC.Fill(fabs(B0_cosAlpha2D_BSwithZ[b]));
+            // *** K0short ***
+            if (isMCmatched_K0s){
+                h_K0s_M_MC.Fill(B0_K0s_nmcFitted_mass[b]);
+                h_K0s_M_prefit.Fill(RecoP4_K0s_prefit.M());
+            } else {
+                h_K0s_M_Fk.Fill(B0_K0s_nmcFitted_mass[b]);
+            }
             
 
-            h_B0_LxySign_wrtPV_MC.Fill(B0_lxySign_PV[b]);
-            h_B0_LxySign_wrtBS_MC.Fill(B0_lxySign_BS[b]);
-            h_B0_LxySign_wrtBSwithZ_MC.Fill(B0_lxySign_BSwithZ[b]);
+            Dist_GenV_PV = sqrt( (GenPart_vx[realB_idx] - B0_PVx[b])*(GenPart_vx[realB_idx] - B0_PVx[b]) + (GenPart_vy[realB_idx] - B0_PVy[b])*(GenPart_vy[realB_idx] - B0_PVy[b]));
+            Dist_GenV_BS = sqrt( (GenPart_vx[realB_idx] - B0_BSxRaw[b])*(GenPart_vx[realB_idx] - B0_BSxRaw[b]) + (GenPart_vy[realB_idx] - B0_BSyRaw[b])*(GenPart_vy[realB_idx] - B0_BSyRaw[b]));
+            Dist_GenV_BSwithZ = sqrt( (GenPart_vx[realB_idx] - B0_BSxWithZ[b])*(GenPart_vx[realB_idx] - B0_BSxWithZ[b]) + (GenPart_vy[realB_idx] - B0_BSyWithZ[b])*(GenPart_vy[realB_idx] - B0_BSyWithZ[b]));
 
-            h_B0_svProb_MC.Fill(B0_svprob[b]);
-            h_B0_pT_MC.Fill(RecoP4_B0.Pt()/B0_finalFit_mass[b]);
-           
-            h_B0_DistGenVtx_PV_MC.Fill(Dist_GenV_PV);
-            h_B0_DistGenVtx_BS_MC.Fill(Dist_GenV_BS);
-            h_B0_DistGenVtx_BSwithZ_MC.Fill(Dist_GenV_BSwithZ);
+            // *** B0 --> X(3872) K0s ***
+            if (isMCmatched_B0){
+                
+                // ... masses ...
+                M_MuMu = B0_MuMu_fitted_mass[b];
+                M_PiPi = B0_finalFit_Rho_mass[b];
+                M_X3872= B0_finalFit_X_mass[b];
+                M_K0s  = B0_K0s_nmcFitted_mass[b];
+                h_B0_M_MC.Fill(B0_finalFit_mass[b]);
+                h_B0_M_prefit.Fill((RecoP4_Mu1 + RecoP4_Mu2 + RecoP4_Pi1 + RecoP4_Pi2 + RecoP4_K0s).M());
+                M_B0   = B0_finalFit_mass[b];
+                // ... pT ...
+                //pT_Mu1 = RecoP4_Mu1.Pt(); 
+                //pT_Mu2 = RecoP4_Mu2.Pt(); 
+                //pT_Pi1 = RecoP4_Pi1.Pt(); 
+                //pT_Pi2 = RecoP4_Pi2.Pt(); 
+                //pT_K0s = RecoP4_K0s.Pt(); 
+                // ... MVA variables ...
+                LxySignBSz_B0       = B0_lxySign_BSwithZ[b];
+                SVprob_B0           = B0_svprob[b];
+                CosAlpha3DBSz_B0    = B0_cosAlpha2D_BSwithZ[b];
+                pTM_B0              = RecoP4_B0.Pt()/M_B0;
+                LxySignSV_K0s       = B0_K0_lxySign_wrtBvtx[b];
+                SVprob_PiPi         = B0_PiPi_sv_prob[b];
+                pT_PiPi             = (RecoP4_Pi1 + RecoP4_Pi2).Pt()/RecoP4_B0.Pt();
+                pT_Pi1              = RecoP4_Pi1.Pt()/RecoP4_B0.Pt();
+                DR_B0Pi1            = ROOT::Math::VectorUtil::DeltaR(RecoP4_Pi1, RecoP4_B0);
+                D0_Pi1              = B0_PiPi_pi1_d0sig[b];
+                
+                outTree_->Fill();
 
-            // TRIGGER CHECK - post emulation
-            h_trigger_fired_emulated.Fill(HLT_DoubleMu4_3_LowMass);
+                // Rho
+                h_Pi1_pT_MC.Fill(RecoP4_Pi1.Pt());///RecoP4_B0.Pt());
+                h_Pi1_D0_MC.Fill( B0_PiPi_pi1_d0sig[b] );
+                h_Pi1_DRwrtB_MC.Fill(ROOT::Math::VectorUtil::DeltaR(RecoP4_Pi1, RecoP4_B0));
+                h_PiPi_svProb_MC.Fill(B0_PiPi_sv_prob[b]);
+                h_PiPi_pT_MC.Fill( (RecoP4_Pi1 + RecoP4_Pi2).Pt()/RecoP4_B0.Pt() );
 
-        } else {
+                //K0short
+                h_K0s_LxySign_wrtBvtx_MC.Fill(B0_K0_lxySign_wrtBvtx[b]);
+                //B0
+                h_B0_cosAlpha3DwrtPV_MC.Fill(fabs(B0_cosAlpha3D_PV[b]));
+                h_B0_cosAlpha2DwrtBS_MC.Fill(fabs(B0_cosAlpha2D_BS[b]));
+                h_B0_cosAlpha2DwrtBSwithZ_MC.Fill(fabs(B0_cosAlpha2D_BSwithZ[b]));
+                
 
-            // ... masses ...
-            h_B0_M_Fk.Fill(B0_finalFit_mass[b]);
+                h_B0_LxySign_wrtPV_MC.Fill(B0_lxySign_PV[b]);
+                h_B0_LxySign_wrtBS_MC.Fill(B0_lxySign_BS[b]);
+                h_B0_LxySign_wrtBSwithZ_MC.Fill(B0_lxySign_BSwithZ[b]);
 
-            // Rho
-            h_Pi1_pT_Fk.Fill(RecoP4_Pi1.Pt()/RecoP4_B0.Pt());
-            h_Pi1_D0_Fk.Fill( B0_PiPi_pi1_d0sig[b] );
-            h_Pi1_DRwrtB_Fk.Fill(ROOT::Math::VectorUtil::DeltaR(RecoP4_Pi1, RecoP4_B0));
-            h_PiPi_svProb_Fk.Fill(B0_PiPi_sv_prob[b]);
-            h_PiPi_pT_Fk.Fill( (RecoP4_Pi1 + RecoP4_Pi2).Pt()/RecoP4_B0.Pt() );
-
-            //K0short
-            h_K0s_LxySign_wrtBvtx_Fk.Fill(B0_K0_lxySign_wrtBvtx[b]);
-
-            h_B0_cosAlpha3DwrtPV_Fk.Fill(fabs(B0_cosAlpha3D_PV[b]));
-            h_B0_cosAlpha2DwrtBS_Fk.Fill(fabs(B0_cosAlpha2D_BS[b]));
-            h_B0_cosAlpha2DwrtBSwithZ_Fk.Fill(fabs(B0_cosAlpha2D_BSwithZ[b]));
-
-            h_B0_svProb_Fk.Fill(B0_svprob[b]);
-            h_B0_pT_Fk.Fill(RecoP4_B0.Pt()/B0_finalFit_mass[b]);
+                h_B0_svProb_MC.Fill(B0_svprob[b]);
+                h_B0_pT_MC.Fill(RecoP4_B0.Pt()/B0_finalFit_mass[b]);
             
+                h_B0_DistGenVtx_PV_MC.Fill(Dist_GenV_PV);
+                h_B0_DistGenVtx_BS_MC.Fill(Dist_GenV_BS);
+                h_B0_DistGenVtx_BSwithZ_MC.Fill(Dist_GenV_BSwithZ);
+                
+                // --- FOR PRELIMINARY KINEMATICS PLOTS ---
+                // muon
+                h_Mu1_pT_MC.Fill(RecoP4_Mu1.Pt());
+                h_Mu2_pT_MC.Fill(RecoP4_Mu2.Pt());
+                h_Mu1_eta_MC.Fill(RecoP4_Mu1.Eta());
+                h_Mu2_eta_MC.Fill(RecoP4_Mu2.Eta());
+                // dimuon
+                h_MuMu_pT_MC.Fill((RecoP4_Mu1 + RecoP4_Mu2).Pt());
+                h_MuMu_deltaR_MC.Fill(ROOT::Math::VectorUtil::DeltaR(RecoP4_Mu1, RecoP4_Mu2));
+                // pion
+                h_Pi1_pT_MC.Fill(RecoP4_Pi1.Pt());
+                h_Pi2_pT_MC.Fill(RecoP4_Pi2.Pt());
+                // k0s
+                h_K0s_pT_MC.Fill(RecoP4_K0s.Pt());
 
-            h_B0_LxySign_wrtPV_Fk.Fill(B0_lxySign_PV[b]);
-            h_B0_LxySign_wrtBS_Fk.Fill(B0_lxySign_BS[b]);
-            h_B0_LxySign_wrtBSwithZ_Fk.Fill(B0_lxySign_BSwithZ[b]);
+                // TRIGGER CHECK - post emulation
+                h_trigger_fired_emulated.Fill(HLT_DoubleMu4_3_LowMass);
+
+            } else {
+
+                // ... masses ...
+                h_B0_M_Fk.Fill(B0_finalFit_mass[b]);
+
+                // Rho
+                h_Pi1_pT_Fk.Fill(RecoP4_Pi1.Pt()/RecoP4_B0.Pt());
+                h_Pi1_D0_Fk.Fill( B0_PiPi_pi1_d0sig[b] );
+                h_Pi1_DRwrtB_Fk.Fill(ROOT::Math::VectorUtil::DeltaR(RecoP4_Pi1, RecoP4_B0));
+                h_PiPi_svProb_Fk.Fill(B0_PiPi_sv_prob[b]);
+                h_PiPi_pT_Fk.Fill( (RecoP4_Pi1 + RecoP4_Pi2).Pt()/RecoP4_B0.Pt() );
+
+                //K0short
+                h_K0s_LxySign_wrtBvtx_Fk.Fill(B0_K0_lxySign_wrtBvtx[b]);
+
+                h_B0_cosAlpha3DwrtPV_Fk.Fill(fabs(B0_cosAlpha3D_PV[b]));
+                h_B0_cosAlpha2DwrtBS_Fk.Fill(fabs(B0_cosAlpha2D_BS[b]));
+                h_B0_cosAlpha2DwrtBSwithZ_Fk.Fill(fabs(B0_cosAlpha2D_BSwithZ[b]));
+
+                h_B0_svProb_Fk.Fill(B0_svprob[b]);
+                h_B0_pT_Fk.Fill(RecoP4_B0.Pt()/B0_finalFit_mass[b]);
+                
+
+                h_B0_LxySign_wrtPV_Fk.Fill(B0_lxySign_PV[b]);
+                h_B0_LxySign_wrtBS_Fk.Fill(B0_lxySign_BS[b]);
+                h_B0_LxySign_wrtBSwithZ_Fk.Fill(B0_lxySign_BSwithZ[b]);
+                
+                h_B0_DistGenVtx_PV_Fk.Fill(Dist_GenV_PV);
+                h_B0_DistGenVtx_BS_Fk.Fill(Dist_GenV_BS);
+                h_B0_DistGenVtx_BSwithZ_Fk.Fill(Dist_GenV_BSwithZ);
             
-            h_B0_DistGenVtx_PV_Fk.Fill(Dist_GenV_PV);
-            h_B0_DistGenVtx_BS_Fk.Fill(Dist_GenV_BS);
-            h_B0_DistGenVtx_BSwithZ_Fk.Fill(Dist_GenV_BSwithZ);
-        
-        }
+            }
 
-        if (isMCmatched_B0) N_B0matching++;
-
+            if (isMCmatched_B0) N_B0matching++;
         
         } // loop on B0 candidates
                
@@ -526,6 +553,21 @@ void RecoDecayX::Loop(){
     h_B0_M_MC.Write();
     h_B0_M_Fk.Write();
     h_B0_M_prefit.Write();
+
+    // --- for misc kinematics plots ---
+    h_Mu1_pT_MC.Write();
+    h_Mu2_pT_MC.Write();
+    h_Mu1_eta_MC.Write();
+    h_Mu2_eta_MC.Write();
+    // dimuon
+    h_MuMu_pT_MC.Write();
+    h_MuMu_deltaR_MC.Write();
+    // pion
+    h_Pi1_pT_MC.Write();
+    h_Pi2_pT_MC.Write();
+    // k0s
+    h_K0s_pT_MC.Write();
+
 
     h_TrigTrk_pT.Write(); 
     h_TrigTrk_eta.Write();
@@ -683,17 +725,17 @@ void RecoDecayX::MCtruthMatching(const bool verbose){
 
     // ... pions
 	if( (DRminPim > DRmin_threshold) || (DRminPim_DpT > DpT_threshold)) {
-        std::cout << "NO PI- MATCH" << std::endl;
-        std::cout << "  dR_min_pi- = " << DRminPim << std::endl;
-        std::cout << "  dpT_min_pi- = " << DRminPim_DpT << std::endl;
+        // std::cout << "NO PI- MATCH" << std::endl;
+        // std::cout << "  dR_min_pi- = " << DRminPim << std::endl;
+        // std::cout << "  dpT_min_pi- = " << DRminPim_DpT << std::endl;
         MCmatch_Pim_Idx = -1;
     }
 	MCmatch_Pim_DRmin = DRminPim; MCmatch_Pim_DpT = DRminPim_DpT;
 	if( (DRminPip > DRmin_threshold) || (DRminPip_DpT > DpT_threshold)) {
         MCmatch_Pip_Idx = -1;
-        std::cout << "NO PI+ MATCH" << std::endl;
-        std::cout << "  dR_min_pi+ = " << DRminPip << std::endl;
-        std::cout << "  dpT_min_pi+ = " << DRminPip_DpT << std::endl;
+        // std::cout << "NO PI+ MATCH" << std::endl;
+        // std::cout << "  dR_min_pi+ = " << DRminPip << std::endl;
+        // std::cout << "  dpT_min_pi+ = " << DRminPip_DpT << std::endl;
     }
 	MCmatch_Pip_DRmin = DRminPip; MCmatch_Pip_DpT = DRminPip_DpT; 
 
@@ -779,7 +821,7 @@ int RecoDecayX::TriggerSelection_Muons(const int Bidx){
             isOK_mu1_step0 = true;
             if((RecoP4_Mu1.Pt() < Min_Mu_pT_1) || (fabs(RecoP4_Mu1.Eta()) > Max_Mu_eta)  || ( B0_MuMu_mu1_dr[Bidx]) > Max_Mu_dr ) isOK_mu1_step0 = false;
             isOK_mu2_step0 = true;
-            if((RecoP4_Mu2.Pt() < Min_Mu_pT_1) || (fabs(RecoP4_Mu2.Eta()) > Max_Mu_eta)  || ( B0_MuMu_mu2_dr[Bidx]) > Max_Mu_dr ) isOK_mu2_step0 = false;
+            if((RecoP4_Mu2.Pt() < Min_Mu_pT_2) || (fabs(RecoP4_Mu2.Eta()) > Max_Mu_eta)  || ( B0_MuMu_mu2_dr[Bidx]) > Max_Mu_dr ) isOK_mu2_step0 = false;
 
             if (isOK_mu1_step0 && isOK_mu2_step0){ 
 

@@ -32,7 +32,7 @@ $(OUTLIB)B0toX3872K0s_base.o: $(INCLUDEDIR)src/B0toX3872K0s_base.C
 		$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)B0toX3872K0s_base.o $<
 $(OUTLIB)HLTapply.o: $(INCLUDEDIR)src/HLTapply.C 
 		$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)HLTapply.o $<
-$(OUTLIB)MVAoptimizer.o: $(INCLUDEDIR)src/MVAoptimizer.C
+$(OUTLIB)MVAoptimizer.o: $(INCLUDEDIR)src/MVAoptimizer.C $(INCLUDEDIR)include/LumiConstants.h
 		$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)MVAoptimizer.o $<
 $(OUTLIB)RootPlots.o: $(INCLUDEDIR)tools/RootPlots.C
 		$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)RootPlots.o $<

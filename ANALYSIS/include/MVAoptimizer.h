@@ -43,6 +43,7 @@ using namespace RooFit;
  
 #include "TFile.h"
 #include "TTree.h"
+#include "TChain.h"
 #include "TText.h"
 #include "TLine.h"
 #include "TString.h"
@@ -89,12 +90,16 @@ public:
     double PunziSign(double * PSerr, double * Nbkg = NULL, double * Esgn = NULL);
 
     // fitter
-    double TotalFit_Psi2S();
+    RooRealVar TotalFit_Psi2S(); //returns #signal events in SR region, with error
+    RooRealVar TotalFit_X3872();
 
     int  makeSGNvsBKGplot();
     void Plot2D_BDToutMpipi();
 
-    void CMSxxx(TCanvas*);
+    // utilities
+    void load_files();
+    void create_pseudodataset();
+    void CMSxxx(TCanvas*, TString data_or_sim = "data/simulation");
 
 private:
     // dataset
@@ -106,7 +111,7 @@ private:
     // input data
     TString inPath_;
     TFile*  inFile_;
-    TTree*  inTree_;
+    TChain* inTree_;
 
     // output path
     TString outPath_;

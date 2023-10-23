@@ -38,6 +38,7 @@ void merge_trees(TString era){
         while ((file=(TSystemFile*)next())) {
             fname = file->GetName();
             // check if fname starts with Run3_2022 + era + any number: if so, add to chain
+            // if merging all eras, era is a regexp matching any era letter
             if (fname.Contains(TRegexp("Run3_2022" + era + "[0-9]+_blind.root"))) {
                 cout << "   + " << fname << endl;
                 chain->Add(folder + fname);

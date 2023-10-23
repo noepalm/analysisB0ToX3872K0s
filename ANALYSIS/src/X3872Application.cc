@@ -15,7 +15,14 @@
 
 using namespace std;
 
-// For Run 3 analysis: run on CMSSW 12.6.0
+// [!!!] For Run 3 analysis: run on CMSSW 12.6.0 [!!!]
+//
+//	MC: 
+//		./X3872Application data/MC_X_2022.txt ./outRoot/RecoDecay_X3872_noMCmatch_Run3 MC_X3872 1
+// 		./X3872Application data/MC_Psi2S_2022.txt ./outRoot/RecoDecay_Psi2S_noMCmatch_Run3 MC_Psi2S 1
+// 
+//	Data:
+//		use Condor (scripts/submit_batch.py)
 
 int main(int argc, char* argv[]) {
 

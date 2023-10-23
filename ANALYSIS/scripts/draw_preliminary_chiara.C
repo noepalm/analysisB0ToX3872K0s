@@ -28,6 +28,7 @@ void draw_preliminary_chiara(){
         t_eras[i] = (TTree*)f_eras[i]->Get("HLTemulation");
     }
 
+    // [!!!] data vs MC-MATCHED MC [!!!] ---> excludes combinatorics
     TFile* f_mc_x = TFile::Open("~/analysisB0ToX3872K0s/PRELIMINARY/outRoot/RecoDecay_X3872_Run3.root");
     TFile* f_mc_psi2s = TFile::Open("~/analysisB0ToX3872K0s/PRELIMINARY/outRoot/RecoDecay_Psi2S_Run3.root");
 
@@ -230,7 +231,10 @@ void draw_preliminary_chiara(){
     c5->Divide(5,2);
 
     TLegend* legs[10];
-    for(int i = 0; i < 10; i++) legs[i] = new TLegend();
+    for(int i = 0; i < 10; i++){
+        legs[i] = new TLegend();
+        legs[i]->SetBorderSize(0);
+    }
 
     // TTree* t = (TTree*)f->Get("HLTemulation");
     std::vector<std::string> features = {"pTM_B0", "LxySignBSz_B0", "SVprob_B0", "CosAlpha3DBSz_B0", "LxySignSV_K0s", "SVprob_PiPi", "pT_PiPi", "pT_Pi1", "DR_B0Pi1", "D0_Pi1"};
